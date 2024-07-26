@@ -1,13 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Ardalis.Result" Version="9.1.0" />
+    <PackageReference Include="Bogus" Version="35.6.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -18,5 +13,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
 </Project>
