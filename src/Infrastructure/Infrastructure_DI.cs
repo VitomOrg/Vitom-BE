@@ -5,15 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Infrastructure;
 public static class Infrastructure_DI
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         // services.add;
-        services.AddDbContext<VitomDBContext>(option =>
-            {
-                option.UseNpgsql(configuration.GetConnectionString("Default"));
-                option.EnableSensitiveDataLogging();
-                option.EnableDetailedErrors();
-            });
         return services;
     }
 }

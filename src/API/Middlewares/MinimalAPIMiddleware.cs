@@ -6,8 +6,8 @@ public static class MinimalAPIMiddleware
 {
     public static WebApplication MapMinimalAPI(this WebApplication host)
     {
-        host.MapGroup("Users").MapUserEndpoint();
-        
+        host.MapGroup("Users").MapUserEndpoint().WithTags("Users");
+
         return host;
     }
 }

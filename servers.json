@@ -1,0 +1,14 @@
+{
+    "Servers": {
+      "1": {
+        "Name": "VitomDB",
+        "Group": "docker_postgres_group",
+        "Host": "postgres_db",
+        "Port": 5432,
+        "MaintenanceDB": "VitomDB",
+        "Username": "postgres",
+        "PassFile": "postgres",
+        "SSLMode": "prefer"
+      }
+    }
+  }
