@@ -1,19 +1,35 @@
 services:
-  web:
+  vitom-be:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: vitom_api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:8080
     ports:
-      - "80:80"
+      - 8080:8080
     depends_on:
       app-seq:
         condition: service_started
         restart: true
       postgres_db:
+        condition: service_started
+        restart: true
+        
+  vitom-fe:
+    build:
+      context: ../Vitom-FE
+      dockerfile: Dockerfile
+    volumes:
+      - ../../packages/dashboard:/app
+    ports:
+      - 80:80
+    depends_on:
+      postgres_db:
+        condition: service_started
+        restart: true
+      app-seq:
         condition: service_started
         restart: true
 
@@ -29,6 +45,21 @@ services:
     ports:
       - 5432:5432
     restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: thinhdpham2510@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: Ph@mDucThinh25102003post
+    ports:
+      - 8090:80
+    depends_on:
+      postgres_db:
+        condition: service_started
+        restart: true
+    volumes:
+      - ./servers.json:/pgadmin4/servers.json
+
   app-seq:
     image: datalust/seq:latest
     container_name: app-seq

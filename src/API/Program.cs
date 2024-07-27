@@ -20,6 +20,13 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 builder.Services.AddPersistence(configuration);
+builder.Services.AddCors(option =>
+{
+    option.AddDefaultPolicy(option =>
+    {
+        option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
 // using Custom Interfaces
 builder.Services.AddScoped<IVitomDbContext, VitomDBContext>();
 // using SERILOG
@@ -38,6 +45,7 @@ else
 {
     app.MigrateDatabase<VitomDBContext>(async (dbContext, _) => await Task.CompletedTask);
 }
+app.UseCors();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.MapMinimalAPI();
