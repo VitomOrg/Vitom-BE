@@ -10,13 +10,13 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      app-seq:
+      seq:
         condition: service_started
         restart: true
       postgres_db:
         condition: service_started
         restart: true
-        
+
   vitom-fe:
     build:
       context: ../Vitom-FE
@@ -29,7 +29,7 @@ services:
       postgres_db:
         condition: service_started
         restart: true
-      app-seq:
+      seq:
         condition: service_started
         restart: true
 
@@ -50,7 +50,7 @@ services:
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: thinhdpham2510@gmail.com
-      PGADMIN_DEFAULT_PASSWORD: Ph@mDucThinh25102003post
+      PGADMIN_DEFAULT_PASSWORD: Ph@mDucThinh25102003
     ports:
       - 8090:80
     depends_on:
@@ -60,7 +60,7 @@ services:
     volumes:
       - ./servers.json:/pgadmin4/servers.json
 
-  app-seq:
+  seq:
     image: datalust/seq:latest
     container_name: app-seq
     environment:
@@ -69,5 +69,10 @@ services:
       - 5341:5341
       - 8089:80
 
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
 volumes:
   data:

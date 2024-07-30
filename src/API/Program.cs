@@ -18,7 +18,7 @@ builder.Services.AddSwaggerGen(option =>
 });
 // using PROJECTS
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(configuration);
 builder.Services.AddPersistence(configuration);
 builder.Services.AddCors(option =>
 {
