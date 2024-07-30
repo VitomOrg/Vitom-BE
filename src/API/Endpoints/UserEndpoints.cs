@@ -9,6 +9,8 @@ public static class UserEndpoints
     {
         group.MapGet("", GetAllUsersEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get all users"));
+        group.MapDelete("",RemoveUserEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Remove users"));;
         return group;
     }
 }
