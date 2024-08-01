@@ -1,5 +1,6 @@
 using Application.Contracts;
 using Ardalis.Result;
+using Domain.DomainEvent;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +11,12 @@ public class GetAllUsers
 {
     public record GetAllUsersQuery(int PageNumber, int PageSize) : IRequest<Result<IEnumerable<User>>>;
 
-    public sealed class GetAllUsersHandler(IVitomDbContext context, ICacheServices cacheServices) : IRequestHandler<GetAllUsersQuery, Result<IEnumerable<User>>>
+    public sealed class GetAllUsersHandler(IVitomDbContext context, ICacheServices cacheServices, IPublisher publisher) : IRequestHandler<GetAllUsersQuery, Result<IEnumerable<User>>>
     {
         public async Task<Result<IEnumerable<User>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
         {
             string key = "users-all";
+            await publisher.Publish(new UserGetsDomainEvent(DateTimeOffset.UtcNow), cancellationToken);
             IEnumerable<User>? usersResponse = await cacheServices.GetAsync<IEnumerable<User>>(key, cancellationToken);
             if (usersResponse is not null)
             {
