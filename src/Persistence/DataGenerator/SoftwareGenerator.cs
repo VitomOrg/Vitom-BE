@@ -1,13 +1,12 @@
 using Bogus;
 using Domain.Entities;
-using Domain.Enums;
 
 namespace Persistence.DataGenerator;
 
-public class UserGenerator
+public class SoftwareGenerator
 {
-    public static User[] Generate()
-        => [.. new Faker<User>()
+    public static Software[] Generate()
+        => [.. new Faker<Software>()
             .UseSeed(1)
             .UseDateTimeReference(DateTime.UtcNow)
             // base entity
@@ -15,12 +14,12 @@ public class UserGenerator
             .RuleFor(e=>e.CreatedAt,f=>f.Date.Past())
             .RuleFor(e=>e.UpdatedAt,f=>f.Random.Bool() ? f.Date.Past():null!)
             .RuleFor(e=>e.DeletedAt,(f,e) => f.Random.Bool() ? f.Date.Past():null!)
-            .RuleFor(e=>e.Role,f=>f.PickRandom<RolesEnum>())
-            .RuleFor(e=>e.Username,f=>f.Person.FirstName)
-            .RuleFor(e=>e.Email,f=>f.Person.Email)
-            .RuleFor(e=>e.PhoneNumber,f=>f.Person.Phone)
+            .RuleFor(e=>e.Name,f=>f.Person.FirstName)
+            .RuleFor(e=>e.Description,f=>f.Lorem.Word())
+            .RuleFor(e=>e.TotalPurchases,f=>f.PickRandom(1,int.MaxValue))
             .Generate(100)
-            .DistinctBy(e=>e.Email)
             .ToArray()
-            ];
+            .DistinctBy(e=>e.Name)
+            .ToArray()
+        ];
 }

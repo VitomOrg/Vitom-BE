@@ -4,10 +4,10 @@ using Domain.Enums;
 
 namespace Persistence.DataGenerator;
 
-public class UserGenerator
+public class TransactionGenerator
 {
-    public static User[] Generate()
-        => [.. new Faker<User>()
+    public static Transaction[] Generate(User[] users)
+        => [.. new Faker<Transaction>()
             .UseSeed(1)
             .UseDateTimeReference(DateTime.UtcNow)
             // base entity
@@ -15,12 +15,11 @@ public class UserGenerator
             .RuleFor(e=>e.CreatedAt,f=>f.Date.Past())
             .RuleFor(e=>e.UpdatedAt,f=>f.Random.Bool() ? f.Date.Past():null!)
             .RuleFor(e=>e.DeletedAt,(f,e) => f.Random.Bool() ? f.Date.Past():null!)
-            .RuleFor(e=>e.Role,f=>f.PickRandom<RolesEnum>())
-            .RuleFor(e=>e.Username,f=>f.Person.FirstName)
-            .RuleFor(e=>e.Email,f=>f.Person.Email)
-            .RuleFor(e=>e.PhoneNumber,f=>f.Person.Phone)
+            .RuleFor(e=>e.UserId,f=>f.PickRandom(users).Id)
+            .RuleFor(e=>e.TotalAmount,f=>f.PickRandom<decimal>(1,9999999999))
+            .RuleFor(e=>e.PaymentMethod,f=>f.PickRandom<PaymentMethodEnum>())
+            .RuleFor(e=>e.TransactionStatus,f=>f.PickRandom<TransactionStatusEnum>())
             .Generate(100)
-            .DistinctBy(e=>e.Email)
             .ToArray()
-            ];
+        ];
 }

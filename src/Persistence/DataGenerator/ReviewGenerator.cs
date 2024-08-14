@@ -1,13 +1,13 @@
 using Bogus;
 using Domain.Entities;
-using Domain.Enums;
+using System.Reflection.Metadata;
 
 namespace Persistence.DataGenerator;
 
-public class UserGenerator
+public class ReviewGenerator
 {
-    public static User[] Generate()
-        => [.. new Faker<User>()
+    public static Review[] Generate(Product[] products, User[] users)
+        => [.. new Faker<Review>()
             .UseSeed(1)
             .UseDateTimeReference(DateTime.UtcNow)
             // base entity
@@ -15,12 +15,11 @@ public class UserGenerator
             .RuleFor(e=>e.CreatedAt,f=>f.Date.Past())
             .RuleFor(e=>e.UpdatedAt,f=>f.Random.Bool() ? f.Date.Past():null!)
             .RuleFor(e=>e.DeletedAt,(f,e) => f.Random.Bool() ? f.Date.Past():null!)
-            .RuleFor(e=>e.Role,f=>f.PickRandom<RolesEnum>())
-            .RuleFor(e=>e.Username,f=>f.Person.FirstName)
-            .RuleFor(e=>e.Email,f=>f.Person.Email)
-            .RuleFor(e=>e.PhoneNumber,f=>f.Person.Phone)
+            .RuleFor(e=>e.ProductId,f=>f.PickRandom(products).Id)
+            .RuleFor(e=>e.UserId,f=>f.PickRandom(users).Id)
+            .RuleFor(e=>e.Rating,f=>f.PickRandom(1,5))
+            .RuleFor(e=>e.Content,f=>f.Lorem.Text())
             .Generate(100)
-            .DistinctBy(e=>e.Email)
             .ToArray()
             ];
 }
