@@ -6,11 +6,11 @@ namespace Domain.Entities;
 public class User : Entity
 {
     public required RolesEnum Role { get; set; }
-    [MaxLength(15)]
+    [MaxLength(25)]
     public required string Username { get; set; }
     [MaxLength(50)]
     public required string Email { get; set; }
-    [MaxLength(15)]
+    [MaxLength(25)]
     public required string PhoneNumber { get; set; }
     public Cart Cart { get; set; } = null!;
     public ICollection<LikeProduct> LikeProduct { get; set; } = null!;
