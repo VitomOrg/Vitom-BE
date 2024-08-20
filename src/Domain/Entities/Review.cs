@@ -7,7 +7,7 @@ namespace Domain.Entities;
 public class Review : Entity
 {
     public required Guid ProductId { get; set; }
-    public required Guid UserId { get; set; }
+    public required string UserId { get; set; }
     [Range(1,5)]
     public required int Rating { get; set; }
     public required string Content { get; set; }

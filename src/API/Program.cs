@@ -6,6 +6,8 @@ using Application;
 using Persistence;
 using Serilog;
 using Application.Contracts;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 // builder config
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -27,6 +29,19 @@ builder.Services.AddCors(option =>
         option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
 });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://exotic-squid-32.clerk.accounts.dev";
+        // options.Audience = audience;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = false
+        };
+    });
 // using Custom Interfaces
 builder.Services.AddScoped<IVitomDbContext, VitomDBContext>();
 // using SERILOG
