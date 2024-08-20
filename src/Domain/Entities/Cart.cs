@@ -5,7 +5,7 @@ namespace Domain.Entities;
 
 public class Cart : Entity
 {
-    public Guid UserId { get; set; }
+    public required string UserId { get; set; }
     [ForeignKey(nameof(UserId))]
     public User User { get; set; } = null!;
     public ICollection<CartItem> CartItems { get; set; } = [];

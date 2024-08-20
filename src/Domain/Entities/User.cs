@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Domain.Entities;
 public class User : Entity
 {
+    public new string Id { get; set; } = string.Empty;
     public required RolesEnum Role { get; set; }
     [MaxLength(25)]
     public required string Username { get; set; }

@@ -7,7 +7,7 @@ namespace Domain.Entities;
 
 public class Transaction : Entity
 {
-    public required Guid UserId { get; set; }
+    public required string UserId { get; set; }
     [Range(0, 9999999999)]
     [RegularExpression(@"^\d+(\.\d{1,2})?$")]
     public decimal TotalAmount { get; set; } = 0;

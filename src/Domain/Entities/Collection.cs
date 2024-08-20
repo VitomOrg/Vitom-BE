@@ -6,7 +6,7 @@ namespace Domain.Entities;
 
 public class Collection : Entity
 {
-    public Guid UserId { get; set; }
+    public required string UserId { get; set; }
     [MaxLength(30)]
     public required string Name { get; set; }
     [MaxLength(100)]
