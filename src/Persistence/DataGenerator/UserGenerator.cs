@@ -11,7 +11,7 @@ public class UserGenerator
             .UseSeed(1)
             .UseDateTimeReference(DateTime.UtcNow)
             // base entity
-            .RuleFor(e=>e.Id,f=>f.Random.Word())
+            .RuleFor(e=>e.Id,f=>f.Random.Uuid().ToString())
             .RuleFor(e=>e.CreatedAt,f=>f.Date.Past())
             .RuleFor(e=>e.UpdatedAt,f=>f.Random.Bool() ? f.Date.Past():null!)
             .RuleFor(e=>e.DeletedAt,(f,e) => f.Random.Bool() ? f.Date.Past():null!)
