@@ -19,6 +19,7 @@ builder.Services.AddSwaggerGen(option =>
     option.EnableAnnotations();
 });
 // using PROJECTS
+builder.Services.AddScoped<AuthMiddleware>();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(configuration);
 builder.Services.AddPersistence(configuration);
@@ -63,6 +64,7 @@ else
 app.UseCors();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
+app.UseMiddleware<AuthMiddleware>();
 app.MapMinimalAPI();
 
 app.Run();

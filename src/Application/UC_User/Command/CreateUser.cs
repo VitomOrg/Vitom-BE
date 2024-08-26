@@ -13,14 +13,14 @@ public class CreateUser
         string Username,
         string PhoneNumber,
         string Email
-    ) : IRequest<Result>;
+    ) : IRequest<Result<User>>;
 
-    public class CreateUserHandler(IVitomDbContext context) : IRequestHandler<CreateUserCommand, Result>
+    public class CreateUserHandler(IVitomDbContext context) : IRequestHandler<CreateUserCommand, Result<User>>
     {
-        public async Task<Result> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result<User>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             User? checkingUser = await context.Users.SingleOrDefaultAsync(u => u.Id.Equals(request.Id), cancellationToken);
-            if (checkingUser is not null) return Result.Error("User is already exist !");
+            if (checkingUser is not null) return Result.Success(checkingUser);
             checkingUser = new()
             {
                 Id = request.Id,
@@ -31,7 +31,7 @@ public class CreateUser
             };
             await context.Users.AddAsync(checkingUser, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
-            return Result.SuccessWithMessage("User is created successfully !");
+            return Result.Success(checkingUser);
         }
     }
 
