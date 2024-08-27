@@ -7,6 +7,8 @@ public static class SoftwareEndpoints
 {
     public static RouteGroupBuilder MapSoftwareEndpoint(this RouteGroupBuilder group)
     {
+        group.MapGet("", ViewListOfSoftwaresEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get softwares"));
         group.MapPost("", CreateSoftwareEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Admin create new software"))
             .RequireAuthorization();
