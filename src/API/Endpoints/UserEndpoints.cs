@@ -15,7 +15,7 @@ public static class UserEndpoints
                 return $"{resultingUser.Id} - {resultingUser.Username}";
             }
             return "Hello World";
-        });
+        }).RequireAuthorization();
         return group;
     }
 }

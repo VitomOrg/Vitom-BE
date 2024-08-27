@@ -38,11 +38,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         // options.Audience = audience;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = true,
+            ValidateAudience = false,
+            ValidateIssuer = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = false
         };
     });
+builder.Services.AddAuthorization();
 // using Custom Interfaces
 builder.Services.AddScoped<IVitomDbContext, VitomDBContext>();
 // using SERILOG
@@ -66,5 +68,7 @@ app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseMiddleware<AuthMiddleware>();
 app.MapMinimalAPI();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
