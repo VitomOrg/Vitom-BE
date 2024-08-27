@@ -20,9 +20,9 @@ public class UpdateSoftware
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
             // check if current user is admin
-            if (!IsCurrentUserAdmin(currentUser.User!)) return Result.Forbidden();
+            if (!currentUser.User!.IsAdmin()) return Result.Forbidden();
             // get updating software
-            Software? updatingSoftware = await context.Softwares.SingleOrDefaultAsync(s => s.Id.Equals(request.Id), cancellationToken);
+            Software? updatingSoftware = await context.Softwares.SingleOrDefaultAsync(s => s.Id.Equals(request.Id) && s.DeletedAt == null, cancellationToken);
             if (updatingSoftware is null) return Result.NotFound();
             // update the software
             updatingSoftware.Update(
@@ -34,7 +34,5 @@ public class UpdateSoftware
             // return final result
             return Result.NoContent();
         }
-        private static bool IsCurrentUserAdmin(User currentUser)
-            => currentUser.Role.Equals(RolesEnum.Admin);
     }
 }
