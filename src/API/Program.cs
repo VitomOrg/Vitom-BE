@@ -8,6 +8,7 @@ using Serilog;
 using Application.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 // builder config
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -17,6 +18,30 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
     option.EnableAnnotations();
+    option.AddSecurityDefinition(name: "Bearer", securityScheme: new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Enter the Bearer Authorization string as following: `Bearer Generated-JWT-Token`",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+      {
+        new OpenApiSecurityScheme
+        {
+          Reference = new OpenApiReference
+          {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
+          },
+        },
+        Array.Empty<string>()
+      }
+    });
 });
 // using PROJECTS
 builder.Services.AddScoped<AuthMiddleware>();
@@ -66,9 +91,9 @@ else
 app.UseCors();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
-app.UseMiddleware<AuthMiddleware>();
-app.MapMinimalAPI();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<AuthMiddleware>();
+app.MapMinimalAPI();
 
 app.Run();
