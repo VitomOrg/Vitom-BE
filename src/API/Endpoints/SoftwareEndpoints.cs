@@ -13,6 +13,9 @@ public static class SoftwareEndpoints
         group.MapPut("/{Id}", UpdateSoftwareEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Admin update existing software"))
             .RequireAuthorization();
+        group.MapDelete("/{Id}", DeleteSoftwareEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Admin delete existing software"))
+            .RequireAuthorization();
         return group;
     }
 }

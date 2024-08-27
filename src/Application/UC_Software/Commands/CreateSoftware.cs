@@ -20,7 +20,7 @@ public class CreateSoftware
         public async Task<Result<CreateSoftwareResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
             // check if user is admin
-            if (!IsCurrentUserAdmin(currentUser.User!)) return Result.Forbidden();
+            if (!currentUser.User!.IsAdmin()) return Result.Forbidden();
             // init new software object
             Software newSoftware = new()
             {
@@ -34,7 +34,5 @@ public class CreateSoftware
             // return result with mapped object
             return Result.Success(newSoftware.MapToCreateSoftwareResponse(), $"Create new {request.Name} software successfully");
         }
-        private static bool IsCurrentUserAdmin(User checkingUser)
-            => checkingUser.Role.Equals(RolesEnum.Admin);
     }
 }
