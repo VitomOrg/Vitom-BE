@@ -15,10 +15,10 @@ public class ViewListOfSoftware
         string Keyword,
         int PageSize,
         int PageIndex
-    ) : IRequest<PaginatedResponse<SoftwareDetailsResponse>>;
-    public class Handler(IVitomDbContext context, ICacheServices cacheServices) : IRequestHandler<Query, PaginatedResponse<SoftwareDetailsResponse>>
+    ) : IRequest<Result<PaginatedResponse<SoftwareDetailsResponse>>>;
+    public class Handler(IVitomDbContext context, ICacheServices cacheServices) : IRequestHandler<Query, Result<PaginatedResponse<SoftwareDetailsResponse>>>
     {
-        public async Task<PaginatedResponse<SoftwareDetailsResponse>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<PaginatedResponse<SoftwareDetailsResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
             // set key
             string key = $"software-keyword{request.Keyword}-pagesize{request.PageSize}-pageindex-{request.PageIndex}";
@@ -43,6 +43,7 @@ public class ViewListOfSoftware
             cacheResult = new(
                 Data: result,
                 PageIndex: request.PageIndex,
+                PageSize: request.PageSize,
                 TotalPages: totalPages
             );
             // set to cache
