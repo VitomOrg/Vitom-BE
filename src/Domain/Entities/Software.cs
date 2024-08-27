@@ -12,4 +12,11 @@ public class Software : Entity
     [Range(0, int.MaxValue)]
     public int TotalPurchases { get; set; } = 0;
     public ICollection<ProductSoftware> ProductSoftwares { get; set; } = [];
+
+    public void Update(string name, string description)
+    {
+        Name = name;
+        Description = description;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }

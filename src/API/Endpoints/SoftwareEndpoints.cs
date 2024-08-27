@@ -10,6 +10,9 @@ public static class SoftwareEndpoints
         group.MapPost("", CreateSoftwareEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Admin create new software"))
             .RequireAuthorization();
+        group.MapPut("/{Id}", UpdateSoftwareEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Admin update existing software"))
+            .RequireAuthorization();
         return group;
     }
 }

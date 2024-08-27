@@ -47,7 +47,7 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
         //     PhoneNumber: phoneNumber,
         //     Email: email
         // ));
-        User? checkingUser = await vitomDbContext.Users.SingleOrDefaultAsync(u => u.Id.Equals(id));
+        User? checkingUser = await vitomDbContext.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id.Equals(id));
         if (checkingUser is null)
         {
             checkingUser = new()

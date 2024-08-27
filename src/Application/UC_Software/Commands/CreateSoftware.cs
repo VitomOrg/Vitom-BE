@@ -7,17 +7,17 @@ using Domain.Enums;
 using Domain.Primitives;
 using MediatR;
 
-namespace Application.UC_Software;
+namespace Application.UC_Software.Commands;
 
 public class CreateSoftware
 {
-    public record CreateSoftwareCommand(
+    public record Command(
         string Name,
         string Description
     ) : IRequest<Result<CreateSoftwareResponse>>;
-    public class CreateSoftwareHandler(IVitomDbContext context, CurrentUser currentUser) : IRequestHandler<CreateSoftwareCommand, Result<CreateSoftwareResponse>>
+    public class Handler(IVitomDbContext context, CurrentUser currentUser) : IRequestHandler<Command, Result<CreateSoftwareResponse>>
     {
-        public async Task<Result<CreateSoftwareResponse>> Handle(CreateSoftwareCommand request, CancellationToken cancellationToken)
+        public async Task<Result<CreateSoftwareResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
             // check if user is admin
             if (!IsCurrentUserAdmin(currentUser.User!)) return Result.Forbidden();
