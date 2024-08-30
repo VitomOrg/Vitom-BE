@@ -24,7 +24,7 @@ RUN dotnet build
 
 FROM build AS publish
 WORKDIR /app/src/API
-RUN dotnet publish -c Release --no-restore -o /app/publish
+RUN dotnet publish API.csproj -c Release --no-restore -o /app/publish
 
 # Create a new image from the ASP.NET Core runtime image
 FROM base AS final
