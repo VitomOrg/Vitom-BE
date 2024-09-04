@@ -36,8 +36,7 @@ public class ViewListOfType
             IQueryable<Type> query = context
                 .Types.AsNoTracking()
                 .Where(t =>
-                    string.Equals(t.Name, request.Keyword, StringComparison.OrdinalIgnoreCase)
-                    && t.DeletedAt != null
+                    t.Name.ToLower().Contains(request.Keyword.ToLower()) && t.DeletedAt != null
                 );
 
             int totalPages = (int)Math.Ceiling((decimal)query.Count() / request.PageSize);
