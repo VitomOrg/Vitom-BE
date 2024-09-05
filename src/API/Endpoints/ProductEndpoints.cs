@@ -13,6 +13,9 @@ public static class ProductEndpoints
             .WithMetadata(new SwaggerOperationAttribute("Get reviews of product"));
         group.MapGet("/list", FetchListOfProductsEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get list of products"));
+        group.MapPost("", CreateProductEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Organization create new product"))
+            .RequireAuthorization();
         return group;
     }
 }
