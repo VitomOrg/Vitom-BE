@@ -3,6 +3,8 @@ using Application.Responses.ProductResponses;
 using Application.UC_Product.Commands;
 using Ardalis.Result;
 using Domain.Enums;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 

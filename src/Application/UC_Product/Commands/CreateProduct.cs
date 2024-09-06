@@ -5,6 +5,7 @@ using Ardalis.Result;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Primitives;
+using FluentValidation;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
 
@@ -14,21 +15,10 @@ public class CreateProduct
 {
     public record Command
     (
-        [Required]
-        [EnumDataType(typeof(LicenseEnum), ErrorMessage = "Invalid License value.")]
         LicenseEnum License,
-
-        [Required, MinLength(1, ErrorMessage = "Name is required.")]
         string Name,
-
         string Description,
-
-        [Required]
-        [Range(0, double.MaxValue, ErrorMessage = "Price must be greater than or equal to zero.")]
-        [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Price must be a valid number with up to 2 decimal places.")]
         decimal Price,
-
-        [Required, Url(ErrorMessage = "Invalid URL format.")]
         string DownloadUrl
     ) : IRequest<Result<CreateProductResponse>>;
 
@@ -36,20 +26,8 @@ public class CreateProduct
     {
         public async Task<Result<CreateProductResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
-            // Validate the request
-            var validationResults = new List<ValidationResult>();
-            var validationContext = new ValidationContext(request);
-            bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, true);
-
-            if (!isValid)
-            {
-                // Get the first validation error message
-                var firstErrorMessage = validationResults.First().ErrorMessage;
-                return Result.Error(firstErrorMessage);
-            }
-
             // check if user is Organization
-            //if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
+            // if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
             // init new product object
             Product newProduct = new()
             {
@@ -66,6 +44,24 @@ public class CreateProduct
             await context.SaveChangesAsync(cancellationToken);
             // return result with mapped object
             return Result.Success(newProduct.MapToCreateProductResponse(), $"Create new {request.Name} product successfully");
+        }
+    }
+
+    public class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.License).IsInEnum().WithMessage("License must be 0, 1, Free, or Pro");
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
+            RuleFor(x => x.Price).GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative number")
+                .Must(HaveValidDecimalPlaces).WithMessage("Price must have up to two decimal places"); ;
+            RuleFor(x => x.DownloadUrl).Must(url => Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute)).WithMessage("DownloadUrl must be a valid URL");
+        }
+
+        private bool HaveValidDecimalPlaces(decimal price)
+        {
+            // Ensure that price has at most two decimal places
+            return decimal.Round(price, 2) == price;
         }
     }
 
