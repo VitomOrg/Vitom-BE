@@ -23,4 +23,7 @@ public class User : Entity
 
     public bool IsAdmin()
         => Role.Equals(RolesEnum.Admin);
+
+    public bool IsOrganization()
+        => Role.Equals(RolesEnum.Organization);
 }
