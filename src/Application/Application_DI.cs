@@ -1,6 +1,8 @@
+using Application.Behaviors;
 using Domain.Primitives;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using System.Reflection;
 
 namespace Application;
 public static class Application_DI
@@ -11,7 +13,9 @@ public static class Application_DI
         services.AddMediatR(option =>
         {
             option.RegisterServicesFromAssembly(typeof(Application_DI).Assembly);
+            option.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         return services;
     }
 }
