@@ -1,8 +1,6 @@
 services:
   vitom-be:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: persiedacoder/vitom-be:latest
     container_name: vitom_api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
