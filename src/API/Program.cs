@@ -43,6 +43,9 @@ builder.Services.AddSwaggerGen(option =>
       }
     });
 });
+builder.Services.AddExceptionHandler<ValidationExceptionHandlerMiddleware>();
+builder.Services.AddExceptionHandler<ExceptionHandlerMiddleware>();
+builder.Services.AddProblemDetails();
 // using PROJECTS
 builder.Services.AddScoped<AuthMiddleware>();
 builder.Services.AddApplication();
@@ -72,6 +75,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 // using Custom Interfaces
 builder.Services.AddScoped<IVitomDbContext, VitomDBContext>();
+//register validators
+// builder.Services.AddScoped<IValidator<CreateProductEndpointHandler.CreateProductRequest>, CreateProductRequestValidator>();
 // using SERILOG
 builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 // app config
@@ -93,6 +98,7 @@ app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseExceptionHandler();
 app.UseMiddleware<AuthMiddleware>();
 app.MapMinimalAPI();
 

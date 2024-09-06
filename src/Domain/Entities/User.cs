@@ -23,10 +23,13 @@ public class User : Entity
 
     public bool IsAdmin()
         => Role.Equals(RolesEnum.Admin);
-
+        
     public void AssignToArtist()
     {
         Role = RolesEnum.Organization;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
+    
+    public bool IsOrganization()
+        => Role.Equals(RolesEnum.Organization);
 }
