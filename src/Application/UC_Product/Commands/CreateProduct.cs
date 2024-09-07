@@ -27,7 +27,7 @@ public class CreateProduct
         public async Task<Result<CreateProductResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
             // check if user is Organization
-            // if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
+            if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
             // init new product object
             Product newProduct = new()
             {
@@ -55,7 +55,7 @@ public class CreateProduct
             RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
             RuleFor(x => x.Price).GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative number")
                 .Must(HaveValidDecimalPlaces).WithMessage("Price must have up to two decimal places"); ;
-            RuleFor(x => x.DownloadUrl).Must(url => Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute)).WithMessage("DownloadUrl must be a valid URL");
+            RuleFor(x => x.DownloadUrl).Must(url => Uri.IsWellFormedUriString(url, UriKind.Absolute)).WithMessage("DownloadUrl must be a valid URL");
         }
 
         private bool HaveValidDecimalPlaces(decimal price)
