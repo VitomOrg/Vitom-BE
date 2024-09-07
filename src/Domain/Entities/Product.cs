@@ -29,4 +29,13 @@ public class Product : Entity
     public ICollection<ProductImage> ProductImages { get; set; } = [];
     public ICollection<CustomColor> CustomColors { get; set; } = [];
     public ICollection<TransactionDetail> TransactionDetails { get; set; } = [];
+
+    public void Update(string name, string description, decimal price, string downloadUrl)
+    {
+        Name = name;
+        Description = description;
+        Price = price;
+        DownloadUrl = downloadUrl;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }
