@@ -16,6 +16,9 @@ public static class ProductEndpoints
         group.MapPost("", CreateProductEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Organization create new product"))
             .RequireAuthorization();
+        group.MapPut("/{Id}", UpdateProductEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Organization update existing product"))
+            .RequireAuthorization();
         return group;
     }
 }
