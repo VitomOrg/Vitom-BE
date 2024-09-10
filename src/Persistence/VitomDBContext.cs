@@ -1,6 +1,7 @@
 
 using Application.Contracts;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence;
@@ -24,4 +25,9 @@ public class VitomDBContext(DbContextOptions<VitomDBContext> options) : DbContex
     public DbSet<Domain.Entities.Type> Types { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserLibrary> UserLibrarys { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Product>().Property(e => e.License).HasConversion(v => v.ToString(), v => (LicenseEnum)Enum.Parse(typeof(LicenseEnum), v));
+    }
 }
