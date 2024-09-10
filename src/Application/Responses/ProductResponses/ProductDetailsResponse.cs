@@ -10,6 +10,7 @@ public record ProductDetailsResponse
     string License,
     string Name,
     string Description,
+    IEnumerable<string> Types,
     decimal Price,
     string DownloadUrl,
     int TotalPurchases,

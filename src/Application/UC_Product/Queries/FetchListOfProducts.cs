@@ -7,19 +7,20 @@ using Domain.Entities;
 using Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 
 namespace Application.UC_Product.Queries
 {
     public class FetchListOfProducts
     {
         public record Query(
-            string? Type,
-            LicenseEnum? License,
-            decimal? PriceFrom,
-            decimal? PriceTo,
+            decimal PriceFrom,
+            decimal PriceTo,
             bool AscByCreatedAt,
             int PageSize,
-            int PageIndex
+            int PageIndex,
+            string Type,
+            string License
         ) : IRequest<Result<PaginatedResponse<ProductDetailsResponse>>>;
 
         public class Handler(IVitomDbContext context, ICacheServices cacheServices) : IRequestHandler<Query, Result<PaginatedResponse<ProductDetailsResponse>>>
@@ -34,20 +35,17 @@ namespace Application.UC_Product.Queries
                 //query
                 IQueryable<Product> query = context.Products
                 .AsNoTracking()
-                .Include(p => p.UserLibraries)
                 .Include(p => p.LikeProducts)
-                .Include(p => p.CollectionProducts)
-                .Include(p => p.ProductTypes)
-                .ThenInclude(p => p.Type)
+                .Include(p => p.ProductTypes).ThenInclude(p => p.Type)
                 .Include(p => p.ProductSoftwares)
                 .Include(p => p.ProductImages)
                 .Include(p => p.CustomColors)
                 .Where(p => p.DeletedAt == null)
-                .Where(p => p.ProductTypes.Any(pt => pt.Type.Name == request.Type) || request.Type == null)
-                .Where(p => p.License == request.License || request.License == null)
-                .Where(p => p.Price >= request.PriceFrom && request.PriceTo == null ||
-                p.Price <= request.PriceTo && request.PriceFrom == null ||
-                request.PriceFrom == null && request.PriceTo == null);
+                // .Where(p => p.ProductTypes.Any(pt => EF.Functions.Like(pt.Type.Name, $"%{request.Type}%")))
+                .Where(p => p.ProductTypes.Any(pt => pt.Type.Name.ToLower().Contains(request.Type.ToLower())))
+                .Where(p => EF.Functions.Like((string)(object)p.License, $"%{request.License}%"))
+                // .Where(p => ((string)(object)p.License).ToString().Contains(request.License))
+                .Where(p => p.Price >= request.PriceFrom && p.Price < request.PriceTo);
                 //sort
                 if (request.AscByCreatedAt)
                 {
