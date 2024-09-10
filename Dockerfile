@@ -4,7 +4,7 @@ WORKDIR /app
 EXPOSE 8080
 
 # Use the official Microsoft .NET SDK as a build image
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy-arm64v8 AS build
 WORKDIR /app/src
 
 # Copy the solution file and restore dependencies
