@@ -12,6 +12,7 @@ public class CreateUser
         string Id,
         string Username,
         string PhoneNumber,
+        string ImageUrl,
         string Email
     ) : IRequest<Result<User>>;
 
@@ -26,6 +27,7 @@ public class CreateUser
                 Id = request.Id,
                 Username = request.Username,
                 PhoneNumber = request.PhoneNumber,
+                ImageUrl = request.ImageUrl,
                 Email = request.Email,
                 Role = Domain.Enums.RolesEnum.Customer
             };
