@@ -14,6 +14,7 @@ public static class ProductDetailsResponseMapper
             License: Enum.TryParse(product.License.ToString(), out LicenseEnum license) ? ((LicenseEnum)product.License).ToString() : "unknown license",
             Name: product.Name,
             Description: product.Description,
+            Types: product.ProductTypes.Select(p => p.Type.Name),
             Price: product.Price,
             DownloadUrl: product.DownloadUrl,
             TotalPurchases: product.TotalPurchases,

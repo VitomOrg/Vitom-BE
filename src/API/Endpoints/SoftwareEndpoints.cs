@@ -1,3 +1,4 @@
+using API.EndpointHandlers.ProductEndpointHandlers;
 using API.EndpointHandlers.SoftwareEndpointHandlers;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -9,6 +10,8 @@ public static class SoftwareEndpoints
     {
         group.MapGet("", ViewListOfSoftwaresEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get softwares"));
+        group.MapGet("/products", FetchProductsForEachSoftwareEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get products for each software"));
         group.MapPost("", CreateSoftwareEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Admin create new software"))
             .RequireAuthorization();
