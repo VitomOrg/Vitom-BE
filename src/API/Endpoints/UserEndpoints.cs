@@ -23,6 +23,10 @@ public static class UserEndpoints
         group.MapPut("/artist/{Id}", AssignUserToArtistEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Assign user to artist"))
             .RequireAuthorization();
+
+        group.MapGet("{Id}/products", FetchLikedProductByUserIdEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get product user liked"))
+            .RequireAuthorization();
         return group;
     }
 }
