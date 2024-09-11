@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using Application.Contracts;
 using Application.UC_User.Command;
 using Ardalis.Result;
@@ -6,7 +7,6 @@ using Domain.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Middlewares;
 
@@ -16,8 +16,7 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
     {
         string issuer = "https://exotic-squid-32.clerk.accounts.dev";
         var authHeader = context.Request.Headers.Authorization.ToString();
-        if (authHeader.IsNullOrEmpty()
-            || !authHeader.Contains("Bearer "))
+        if (authHeader.IsNullOrEmpty() || !authHeader.Contains("Bearer "))
         {
             await next.Invoke(context);
             return;
@@ -36,18 +35,47 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
         // {
         //     Console.WriteLine(claim.Type + "-" + claim.Value);
         // }
-        string? id = claims.FirstOrDefault(c => c.Type.Equals("id", StringComparison.InvariantCultureIgnoreCase))?.Value ?? string.Empty;
+        string? id =
+            claims
+                .FirstOrDefault(c =>
+                    c.Type.Equals("id", StringComparison.InvariantCultureIgnoreCase)
+                )
+                ?.Value ?? string.Empty;
         // Console.WriteLine($"id : {id}");
-        string? username = claims.FirstOrDefault(c => c.Type.Equals("username", StringComparison.InvariantCultureIgnoreCase))?.Value ?? string.Empty;
-        string? email = claims.FirstOrDefault(c => c.Type.Equals("email", StringComparison.InvariantCultureIgnoreCase))?.Value ?? string.Empty;
-        string? phoneNumber = claims.FirstOrDefault(c => c.Type.Equals("phonenumber", StringComparison.InvariantCultureIgnoreCase))?.Value ?? string.Empty;
+        string? username =
+            claims
+                .FirstOrDefault(c =>
+                    c.Type.Equals("username", StringComparison.InvariantCultureIgnoreCase)
+                )
+                ?.Value ?? string.Empty;
+        string? email =
+            claims
+                .FirstOrDefault(c =>
+                    c.Type.Equals("email", StringComparison.InvariantCultureIgnoreCase)
+                )
+                ?.Value ?? string.Empty;
+        string? phoneNumber =
+            claims
+                .FirstOrDefault(c =>
+                    c.Type.Equals("phonenumber", StringComparison.InvariantCultureIgnoreCase)
+                )
+                ?.Value ?? string.Empty;
+        string? imageUrl =
+            claims
+                .FirstOrDefault(c =>
+                    c.Type.Equals("imageurl", StringComparison.InvariantCultureIgnoreCase)
+                )
+                ?.Value ?? string.Empty;
+
         // Result<User> result = await sender.Send(new CreateUser.CreateUserCommand(
         //     Id: null!,
         //     Username: username,
         //     PhoneNumber: phoneNumber,
         //     Email: email
         // ));
-        User? checkingUser = await vitomDbContext.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id.Equals(id));
+        User? checkingUser = await vitomDbContext
+            .Users.AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Id.Equals(id));
         if (checkingUser is null)
         {
             checkingUser = new()
@@ -55,6 +83,7 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
                 Id = id,
                 Username = username,
                 PhoneNumber = phoneNumber,
+                ImageUrl = imageUrl,
                 Email = email,
                 Role = Domain.Enums.RolesEnum.Customer
             };
