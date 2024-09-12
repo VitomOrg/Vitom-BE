@@ -14,13 +14,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
       # Log in to Docker Hub
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
+      
       # Build the Docker image
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/vitom-be:latest .
+        run: docker buildx build --platform linux/arm64 -t ${{ secrets.DOCKERHUB_USERNAME }}/vitom-be:latest --push .
 
       # Push the Docker image to Docker Hub
       - name: Push Docker image
