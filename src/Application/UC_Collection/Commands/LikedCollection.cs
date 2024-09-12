@@ -28,31 +28,57 @@ public class LikedCollection
                 .Where(c => c.UserId == request.UserId)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            // Check if user already liked collection
-            if (likeCollection is not null && likeCollection.DeletedAt is null)
-                return Result.Success(
-                    new LikeCollectionResponse(likeCollection.Id, likeCollection.CreatedAt)
-                    {
-                        Id = likeCollection.Id,
-                        CreatedAt = likeCollection.CreatedAt
-                    },
-                    $"User {request.UserId} already liked collection {request.CollectionId}"
-                );
+            if (likeCollection is null)
+            {
+                return await CreateNewLikeCollection(request, cancellationToken);
+            }
 
-            // Create new like collection
-            likeCollection = new() { CollectionId = request.CollectionId, UserId = request.UserId };
+            if (likeCollection.DeletedAt is null)
+            {
+                return Result.NoContent();
+            }
 
-            // Add like collection to database
-            context.LikeCollections.Add(likeCollection);
+            return await RestoreLikeCollection(likeCollection, cancellationToken);
+        }
+
+        private async Task<Result<LikeCollectionResponse>> CreateNewLikeCollection(
+            Command request,
+            CancellationToken cancellationToken
+        )
+        {
+            var newLikeCollection = new LikeCollection
+            {
+                CollectionId = request.CollectionId,
+                UserId = request.UserId
+            };
+
+            context.LikeCollections.Add(newLikeCollection);
             await context.SaveChangesAsync(cancellationToken);
 
+            return CreateSuccessResult(newLikeCollection);
+        }
+
+        private async Task<Result<LikeCollectionResponse>> RestoreLikeCollection(
+            LikeCollection likeCollection,
+            CancellationToken cancellationToken
+        )
+        {
+            likeCollection.DeletedAt = null;
+            context.LikeCollections.Update(likeCollection);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return CreateSuccessResult(likeCollection);
+        }
+
+        private static Result<LikeCollectionResponse> CreateSuccessResult(
+            LikeCollection likeCollection
+        )
+        {
+            var response = new LikeCollectionResponse(likeCollection.Id, likeCollection.CreatedAt);
+
             return Result.Success(
-                new LikeCollectionResponse(likeCollection.Id, likeCollection.CreatedAt)
-                {
-                    Id = likeCollection.Id,
-                    CreatedAt = likeCollection.CreatedAt
-                },
-                $"User {request.UserId} already liked collection {request.CollectionId}"
+                response,
+                $"User {likeCollection.UserId} already liked collection {likeCollection.CollectionId}"
             );
         }
     }
