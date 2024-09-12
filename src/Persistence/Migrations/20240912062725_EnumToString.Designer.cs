@@ -12,8 +12,8 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(VitomDBContext))]
-    [Migration("20240826152636_ChangeUserIdToString")]
-    partial class ChangeUserIdToString
+    [Migration("20240912062725_EnumToString")]
+    partial class EnumToString
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -277,8 +277,9 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("License")
-                        .HasColumnType("integer");
+                    b.Property<string>("License")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -585,6 +586,10 @@ namespace Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -809,7 +814,7 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Review", b =>
                 {
                     b.HasOne("Domain.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("Reviews")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -901,6 +906,8 @@ namespace Persistence.Migrations
                     b.Navigation("ProductSoftwares");
 
                     b.Navigation("ProductTypes");
+
+                    b.Navigation("Reviews");
 
                     b.Navigation("TransactionDetails");
 

@@ -583,6 +583,10 @@ namespace Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -807,7 +811,7 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Review", b =>
                 {
                     b.HasOne("Domain.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("Reviews")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -899,6 +903,8 @@ namespace Persistence.Migrations
                     b.Navigation("ProductSoftwares");
 
                     b.Navigation("ProductTypes");
+
+                    b.Navigation("Reviews");
 
                     b.Navigation("TransactionDetails");
 

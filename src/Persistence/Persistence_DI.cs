@@ -11,7 +11,7 @@ public static class Persistence_DI
         // services.add;
         services.AddDbContext<VitomDBContext>(option =>
             {
-                option.UseNpgsql(configuration.GetConnectionString("Local-DB"), builder =>
+                option.UseNpgsql(configuration.GetConnectionString("DB"), builder =>
                 {
                     builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 });

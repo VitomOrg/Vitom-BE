@@ -1,4 +1,4 @@
-// USING
+// USINGasd
 using API.Extensions;
 using API.Middlewares;
 using Infrastructure;
@@ -12,6 +12,12 @@ using Microsoft.OpenApi.Models;
 // builder config
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+// Add configuration sources
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables(); // This allows environment variables to override
 // using API Endpoints
 builder.Services.AddEndpointsApiExplorer();
 // using SWAGGER
