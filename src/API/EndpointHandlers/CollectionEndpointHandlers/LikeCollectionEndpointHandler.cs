@@ -9,8 +9,7 @@ namespace API.EndpointHandlers.CollectionEndpointHandlers;
 
 public class LikeCollectionEndpointHandler
 {
-    public record LikeCollectionRequest(Guid CollectionId, string UserId)
-        : IRequest<LikeCollectionResponse>;
+    public record LikeCollectionRequest(Guid CollectionId, string UserId);
 
     public static async Task<IResult> Handle(
         ISender sender,

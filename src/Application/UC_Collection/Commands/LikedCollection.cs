@@ -10,24 +10,43 @@ namespace Application.UC_Collection.Commands;
 
 public class LikedCollection
 {
-    public record Command(Guid CollectionId, string UserId) : IRequest<LikeCollectionResponse>;
+    public record Command(Guid CollectionId, string UserId)
+        : IRequest<Result<LikeCollectionResponse>>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser)
-        : IRequestHandler<Command, LikeCollectionResponse>
+        : IRequestHandler<Command, Result<LikeCollectionResponse>>
     {
-        public async Task<LikeCollectionResponse> Handle(
+        public async Task<Result<LikeCollectionResponse>> Handle(
             Command request,
             CancellationToken cancellationToken
         )
         {
-            IQueryable<LikeCollection> query = context
+            // Get existing like collection
+            LikeCollection? likeCollection = await context
                 .LikeCollections.AsNoTracking()
                 .Where(c => c.CollectionId == request.CollectionId)
-                .Where(c => c.UserId == request.UserId);
+                .Where(c => c.UserId == request.UserId)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            LikeCollection? likeCollection = await query.FirstOrDefaultAsync(cancellationToken);
+            // Check if user already liked collection
+            if (likeCollection is not null && likeCollection.DeletedAt is null)
+                return Result.Success(
+                    new LikeCollectionResponse(likeCollection.Id, likeCollection.CreatedAt)
+                    {
+                        Id = likeCollection.Id,
+                        CreatedAt = likeCollection.CreatedAt
+                    },
+                    $"User {request.UserId} already liked collection {request.CollectionId}"
+                );
 
-            var returnResult = Result.Success(
+            // Create new like collection
+            likeCollection = new() { CollectionId = request.CollectionId, UserId = request.UserId };
+
+            // Add like collection to database
+            context.LikeCollections.Add(likeCollection);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success(
                 new LikeCollectionResponse(likeCollection.Id, likeCollection.CreatedAt)
                 {
                     Id = likeCollection.Id,
@@ -35,18 +54,6 @@ public class LikedCollection
                 },
                 $"User {request.UserId} already liked collection {request.CollectionId}"
             );
-
-            // Check if user already liked collection
-            if (likeCollection is not null && likeCollection.DeletedAt is null)
-                return returnResult;
-
-            likeCollection = new() { CollectionId = request.CollectionId, UserId = request.UserId };
-
-            context.LikeCollections.Add(likeCollection);
-
-            await context.SaveChangesAsync(cancellationToken);
-
-            return returnResult;
         }
     }
 }
