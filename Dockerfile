@@ -4,15 +4,15 @@ WORKDIR /app
 EXPOSE 8080
 
 # Use the official Microsoft .NET SDK as a build image
-FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy-arm64v8 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0.401-1-alpine3.20-amd64 AS build
 WORKDIR /app/src
 
 # Copy the solution file and restore dependencies
 COPY ["src/API/API.csproj", "API/"]
-COPY ["src/Application/Application.csproj", "Application/"]
-COPY ["src/Domain/Domain.csproj", "Domain/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "Infrastructure/"]
 COPY ["src/Persistence/Persistence.csproj", "Persistence/"]
+COPY ["src/Application/Application.csproj", "Application/"]
+COPY ["src/Domain/Domain.csproj", "Domain/"]
 
 RUN dotnet restore "API/API.csproj"
 
