@@ -32,3 +32,4 @@ jobs:
           context: .
           push: true
           tags: persiedacoder/vitom-be
+          platforms: linux/arm64
