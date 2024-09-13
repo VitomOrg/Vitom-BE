@@ -11,13 +11,13 @@ namespace API.EndpointHandlers.ProductEndpointHandlers;
 public class FetchListOfProductsEndpointHandler
 {
     public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender,
+        LicenseEnum license = default,
         string type = "",
         decimal priceFrom = 0,
         decimal priceTo = int.MaxValue,
         bool ascByCreatedAt = false,
         int pageSize = 10,
         int pageIndex = 1,
-        string license = "",
         CancellationToken cancellationToken = default)
     {
         Result<PaginatedResponse<ProductDetailsResponse>> result = await sender.Send(new FetchListOfProducts.Query(
