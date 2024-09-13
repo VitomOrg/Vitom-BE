@@ -6,7 +6,7 @@ using Ardalis.Result;
 using MediatR;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 
-namespace API.EndpointHandlers.UserEndpointHandlers;
+namespace API.EndpointHandlers.ProductEndpointHandlers;
 
 public class FetchLikedProductByUserIdEndpointHandler
 {
