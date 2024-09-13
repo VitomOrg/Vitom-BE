@@ -35,5 +35,11 @@ public class User : Entity
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
+    public void AssignToAdmin()
+    {
+        Role = RolesEnum.Admin;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
     public bool IsOrganization() => Role.Equals(RolesEnum.Organization);
 }
