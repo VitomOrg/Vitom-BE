@@ -12,7 +12,7 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(VitomDBContext))]
-    [Migration("20240913010756_FixLicenseEnum")]
+    [Migration("20240913151130_FixLicenseEnum")]
     partial class FixLicenseEnum
     {
         /// <inheritdoc />
