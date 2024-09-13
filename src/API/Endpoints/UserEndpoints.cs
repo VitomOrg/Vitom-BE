@@ -24,8 +24,12 @@ public static class UserEndpoints
             .WithMetadata(new SwaggerOperationAttribute("Assign user to artist"))
             .RequireAuthorization();
 
-        group.MapGet("{Id}/products", FetchLikedProductByUserIdEndpointHandler.Handle)
+        group.MapGet("products", FetchLikedProductByUserIdEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get product user liked"))
+            .RequireAuthorization();
+
+        group.MapPut("/admin/{Id}", AssignUserToAdminEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Assign user to admin"))
             .RequireAuthorization();
         return group;
     }
