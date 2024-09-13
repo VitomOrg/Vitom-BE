@@ -22,8 +22,10 @@ public class FetchLikedProductByUserId
     {
         public async Task<Result<PaginatedResponse<ProductDetailsResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
+            //check if user is null
+            if (currentUser.User is null) return Result.Forbidden();
             //set key
-            string key = $"user-likedproduct-pageindex{request.PageIndex}-pagesize{request.PageSize}-userid{currentUser.User!.Id}";
+            string key = $"user-likedproduct-pageindex{request.PageIndex}-pagesize{request.PageSize}-orderascbycreatat{request.AscByCreatedAt}-userid{currentUser.User!.Id}";
             //get cache response
             PaginatedResponse<ProductDetailsResponse>? cacheResponse = await cacheServices.GetAsync<PaginatedResponse<ProductDetailsResponse>>(key, cancellationToken);
             if (cacheResponse is not null) return Result.Success(cacheResponse, "Get liked products successfully!");

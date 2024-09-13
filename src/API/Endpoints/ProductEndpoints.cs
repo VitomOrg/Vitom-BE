@@ -1,4 +1,5 @@
 using API.EndpointHandlers.ProductEndpointHandlers;
+using API.EndpointHandlers.UserEndpointHandlers;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace API.Endpoints;
@@ -12,12 +13,12 @@ public static class ProductEndpoints
             .WithMetadata(new SwaggerOperationAttribute("Get detail of product"));
 
         group
-            .MapGet("/{productId}/reviews", FetchReviewsByProductEndpointHandler.Handle)
-            .WithMetadata(new SwaggerOperationAttribute("Get reviews of product"));
-
-        group
             .MapGet("/list", FetchListOfProductsEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get list of products"));
+
+        group.MapGet("/user", FetchLikedProductByUserIdEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get product user liked"))
+            .RequireAuthorization();
 
         group
             .MapPost("", CreateProductEndpointHandler.Handle)

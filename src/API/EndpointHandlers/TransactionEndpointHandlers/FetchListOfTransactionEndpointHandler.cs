@@ -1,14 +1,14 @@
 using API.Utils;
-using Application.Responses.ProductResponses;
 using Application.Responses.Shared;
-using Application.UC_User.Queries;
+using Application.Responses.TransactionResponses;
+using Application.UC_Transaction;
 using Ardalis.Result;
 using MediatR;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 
-namespace API.EndpointHandlers.UserEndpointHandlers;
+namespace API.EndpointHandlers.TransactionEndpointHandlers;
 
-public class FetchLikedProductByUserIdEndpointHandler
+public class FetchListOfTransactionEndpointHandler
 {
     public static async Task<IResult> Handle(ISender sender,
         bool AscByCreatedAt = false,
@@ -16,7 +16,7 @@ public class FetchLikedProductByUserIdEndpointHandler
         int PageSize = 10,
         CancellationToken cancellationToken = default)
     {
-        Result<PaginatedResponse<ProductDetailsResponse>> result = await sender.Send(new FetchLikedProductByUserId.Query(
+        Result<PaginatedResponse<TransactionDetailsResponse>> result = await sender.Send(new FetchListOfTransaction.Query(
             AscByCreatedAt: AscByCreatedAt,
             PageIndex: PageIndex,
             PageSize: PageSize

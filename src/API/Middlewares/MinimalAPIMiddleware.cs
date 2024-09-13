@@ -13,6 +13,7 @@ public static class MinimalAPIMiddleware
         host.MapGroup("types").MapTypeEndpoint().WithTags("Types");
         host.MapGroup("reviews").MapReviewEndpoint().WithTags("Reviews");
         host.MapGroup("products").MapProductEndpoint().WithTags("Products");
+        host.MapGroup("transactions").MapTransactionEndpoint().WithTags("Transactions");
         return host;
     }
 }
