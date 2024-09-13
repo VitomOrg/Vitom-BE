@@ -8,7 +8,7 @@ namespace API.EndpointHandlers.CollectionEndpointHandlers;
 
 public class DislikeCollectionEndpointHandler
 {
-    public record DislikeCollectionRequest(Guid CollectionId, string UserId);
+    public record DislikeCollectionRequest(Guid CollectionId);
 
     public static async Task<IResult> Handle(
         ISender sender,
@@ -17,10 +17,7 @@ public class DislikeCollectionEndpointHandler
     )
     {
         Result result = await sender.Send(
-            new DislikedCollection.Command(
-                CollectionId: request.CollectionId,
-                UserId: request.UserId
-            ),
+            new DislikedCollection.Command(CollectionId: request.CollectionId),
             cancellationToken
         );
 
