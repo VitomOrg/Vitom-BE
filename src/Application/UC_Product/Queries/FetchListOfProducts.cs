@@ -45,7 +45,7 @@ namespace Application.UC_Product.Queries
                 .Where(p => p.ProductTypes.Any(pt => pt.Type.Name.ToLower().Contains(request.Type.ToLower())))
                 // .Where(p => EF.Functions.Like((string)(object)p.License, $"%{request.License}%"))
                 // .Where(p => ((string)(object)p.License).Contains(request.License))
-                .Where(p => p.License == request.License )
+                .Where(p => p.License == request.License)
                 .Where(p => p.Price >= request.PriceFrom && p.Price < request.PriceTo);
                 //sort
                 if (request.AscByCreatedAt)

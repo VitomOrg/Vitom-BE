@@ -274,9 +274,8 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("License")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("License")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()

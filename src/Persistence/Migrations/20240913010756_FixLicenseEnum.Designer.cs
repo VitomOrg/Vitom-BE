@@ -12,8 +12,8 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(VitomDBContext))]
-    [Migration("20240912062725_EnumToString")]
-    partial class EnumToString
+    [Migration("20240913010756_FixLicenseEnum")]
+    partial class FixLicenseEnum
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -277,9 +277,8 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("License")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("License")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
