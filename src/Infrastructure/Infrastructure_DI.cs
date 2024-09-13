@@ -12,7 +12,7 @@ public static class Infrastructure_DI
         // services.add;
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration.GetConnectionString("Local-Cache");
+            options.Configuration = configuration.GetConnectionString("Cache");
         });
         services.AddSingleton<ICacheServices, CacheServices>();
         services.AddDistributedMemoryCache();

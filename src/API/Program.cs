@@ -1,4 +1,4 @@
-// USING
+// USINGasd
 using API.Extensions;
 using API.Middlewares;
 using Infrastructure;
@@ -91,7 +91,9 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.MigrateDatabase<VitomDBContext>(async (dbContext, _) => await Task.CompletedTask);
+    app.UseSwagger();
+    app.UseSwaggerUI(option => option.DisplayRequestDuration());
+    app.MigrateDatabase<VitomDBContext>(async (dbContext, _) => await dbContext.Seed());
 }
 app.UseCors();
 app.UseSerilogRequestLogging();
