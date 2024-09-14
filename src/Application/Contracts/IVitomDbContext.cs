@@ -1,8 +1,10 @@
 using Domain.Entities;
+using Domain.Entities.Report;
 using Microsoft.EntityFrameworkCore;
 using Type = Domain.Entities.Type;
 
 namespace Application.Contracts;
+
 public interface IVitomDbContext
 {
     DbSet<Cart> Carts { get; set; }
@@ -23,5 +25,7 @@ public interface IVitomDbContext
     DbSet<Type> Types { get; set; }
     DbSet<User> Users { get; set; }
     DbSet<UserLibrary> UserLibrarys { get; set; }
+    DbSet<MonthlyIncome> MonthlyIncomes { get; set; }
+    DbSet<SystemTotal> SystemTotals { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
