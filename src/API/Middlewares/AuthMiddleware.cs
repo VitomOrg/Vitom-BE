@@ -1,10 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using Application.Contracts;
-using Application.UC_User.Command;
-using Ardalis.Result;
 using Domain.Entities;
 using Domain.Primitives;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
