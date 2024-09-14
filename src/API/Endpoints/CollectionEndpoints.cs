@@ -17,6 +17,10 @@ public static class CollectionEndpoints
             .WithMetadata(new SwaggerOperationAttribute("Dislike a collection"))
             .RequireAuthorization();
 
+        group
+            .MapGet("", ViewAllPublicCollectionEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("View all public collections"));
+
         return group;
     }
 }
