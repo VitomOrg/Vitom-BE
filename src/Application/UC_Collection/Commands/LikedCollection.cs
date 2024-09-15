@@ -23,7 +23,7 @@ public class LikedCollection
             // Check if collection exists
             Collection? collection = await context
                 .Collections.AsNoTracking()
-                .Where(c => c.Id == request.CollectionId)
+                .Where(c => c.Id == request.CollectionId && c.DeletedAt == null)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (collection is null)
@@ -36,77 +36,87 @@ public class LikedCollection
                 .Where(c => c.UserId == currentUser.User.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (likeCollection is null)
-                return await CreateNewLikeCollection(request, cancellationToken);
-
-            // If collection is already liked, dislike it
-            if (likeCollection.DeletedAt is null)
-                return await DislikeCollection(likeCollection, cancellationToken);
-
-            // If collection is already disliked, restore it
-            if (likeCollection.DeletedAt is not null)
-                return await RestoreLikeCollection(likeCollection, cancellationToken);
-
-            return Result.NoContent();
+            return likeCollection switch
+            {
+                null
+                    => await CreateNewLikeCollection(
+                        request.CollectionId,
+                        collection,
+                        cancellationToken
+                    ),
+                { DeletedAt: null }
+                    => await DislikeCollection(likeCollection, collection, cancellationToken),
+                _ => await RestoreLikeCollection(likeCollection, collection, cancellationToken)
+            };
         }
 
         private async Task<Result<LikeCollectionResponse>> CreateNewLikeCollection(
-            Command request,
+            Guid collectionId,
+            Collection collection,
             CancellationToken cancellationToken
         )
         {
             var newLikeCollection = new LikeCollection
             {
-                CollectionId = request.CollectionId,
+                CollectionId = collectionId,
                 UserId = currentUser.User.Id
             };
 
+            collection.TotalLiked++;
+            context.Collections.Update(collection);
             context.LikeCollections.Add(newLikeCollection);
+
             await context.SaveChangesAsync(cancellationToken);
 
-            string message = "liked";
-
-            return CreateSuccessResult(newLikeCollection, message);
+            return CreateSuccessResult(newLikeCollection, "liked");
         }
 
         private async Task<Result<LikeCollectionResponse>> DislikeCollection(
             LikeCollection likeCollection,
+            Collection collection,
             CancellationToken cancellationToken
         )
         {
             likeCollection.Delete();
+            collection.TotalLiked--;
             context.LikeCollections.Update(likeCollection);
+            context.Collections.Update(collection);
+
             await context.SaveChangesAsync(cancellationToken);
 
-            string message = "disliked";
-
-            return CreateSuccessResult(likeCollection, message);
+            return CreateSuccessResult(likeCollection, "disliked");
         }
 
         private async Task<Result<LikeCollectionResponse>> RestoreLikeCollection(
             LikeCollection likeCollection,
+            Collection collection,
             CancellationToken cancellationToken
         )
         {
+            collection.TotalLiked++;
             likeCollection.DeletedAt = null;
+            context.Collections.Update(collection);
             context.LikeCollections.Update(likeCollection);
+
             await context.SaveChangesAsync(cancellationToken);
 
-            string message = "liked";
-
-            return CreateSuccessResult(likeCollection, message);
+            return CreateSuccessResult(likeCollection, "liked");
         }
 
         private static Result<LikeCollectionResponse> CreateSuccessResult(
             LikeCollection likeCollection,
-            string message
+            string action
         )
         {
-            var response = new LikeCollectionResponse(likeCollection.Id, likeCollection.CreatedAt);
+            var response = new LikeCollectionResponse(
+                likeCollection.Id,
+                likeCollection.CreatedAt,
+                likeCollection.DeletedAt
+            );
 
             return Result.Success(
                 response,
-                $"User {likeCollection.UserId} already {message} collection {likeCollection.CollectionId}"
+                $"User {likeCollection.UserId} {action} collection {likeCollection.CollectionId}"
             );
         }
     }
