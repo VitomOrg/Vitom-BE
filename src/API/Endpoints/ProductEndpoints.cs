@@ -23,7 +23,8 @@ public static class ProductEndpoints
         group
             .MapPost("", CreateProductEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Organization create new product"))
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .DisableAntiforgery();
 
         group
             .MapPut("/{Id}", UpdateProductEndpointHandler.Handle)
