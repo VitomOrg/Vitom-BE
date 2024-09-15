@@ -9,7 +9,7 @@ namespace API.EndpointHandlers.CollectionEndpointHandlers;
 
 public class LikeCollectionEndpointHandler
 {
-    public record LikeCollectionRequest(Guid CollectionId, string UserId);
+    public record LikeCollectionRequest(Guid CollectionId);
 
     public static async Task<IResult> Handle(
         ISender sender,
@@ -18,7 +18,7 @@ public class LikeCollectionEndpointHandler
     )
     {
         Result<LikeCollectionResponse> result = await sender.Send(
-            new LikedCollection.Command(CollectionId: request.CollectionId, UserId: request.UserId),
+            new LikedCollection.Command(CollectionId: request.CollectionId),
             cancellationToken
         );
 
