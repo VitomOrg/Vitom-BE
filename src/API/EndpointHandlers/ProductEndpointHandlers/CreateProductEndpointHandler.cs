@@ -19,7 +19,11 @@ public class CreateProductEndpointHandler
             Name: request.Name,
             Description: request.Description,
             Price: request.Price,
-            DownloadUrl: request.DownloadUrl
+            DownloadUrl: request.DownloadUrl,
+            TypeIds: request.TypeIds,
+            SoftwareIds: request.SoftwareIds,
+            ImageUrls: request.ImageUrls,
+            CustomColors: request.CustomColors.Select(x => new CreateProduct.CreateCustomColorCommand(x.Name, x.Code))
         ), cancellationToken);
         return result.Check();
     }
@@ -29,6 +33,12 @@ public class CreateProductEndpointHandler
         string Name,
         string Description,
         decimal Price,
-        string DownloadUrl
+        string DownloadUrl,
+        IEnumerable<Guid> TypeIds,
+        IEnumerable<Guid> SoftwareIds,
+        IEnumerable<string> ImageUrls,
+        IEnumerable<CreateCustomColorRequest> CustomColors
     );
+
+    public record CreateCustomColorRequest(string Name, string Code);
 }

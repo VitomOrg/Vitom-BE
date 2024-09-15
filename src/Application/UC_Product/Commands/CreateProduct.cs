@@ -13,13 +13,19 @@ namespace Application.UC_Product.Commands;
 
 public class CreateProduct
 {
+    public record CreateCustomColorCommand(string Name, string Code);
+
     public record Command
     (
         LicenseEnum License,
         string Name,
         string Description,
         decimal Price,
-        string DownloadUrl
+        string DownloadUrl,
+        IEnumerable<Guid> TypeIds,
+        IEnumerable<Guid> SoftwareIds,
+        IEnumerable<string> ImageUrls,
+        IEnumerable<CreateCustomColorCommand> CustomColors
     ) : IRequest<Result<CreateProductResponse>>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser) : IRequestHandler<Command, Result<CreateProductResponse>>
@@ -27,7 +33,7 @@ public class CreateProduct
         public async Task<Result<CreateProductResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
             // check if user is Organization
-            if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
+            //if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
             // init new product object
             Product newProduct = new()
             {
@@ -38,8 +44,27 @@ public class CreateProduct
                 Price = request.Price,
                 DownloadUrl = request.DownloadUrl
             };
-            // add to db
             context.Products.Add(newProduct);
+            // add product types
+            foreach (var typeId in request.TypeIds)
+            {
+                newProduct.ProductTypes.Add(new ProductType { ProductId = newProduct.Id, TypeId = typeId });
+            }
+            // add product softwares
+            foreach (var softwareId in request.SoftwareIds)
+            {
+                newProduct.ProductSoftwares.Add(new ProductSoftware { ProductId = newProduct.Id, SoftwareId = softwareId });
+            }
+            // add product images
+            foreach (var imageUrl in request.ImageUrls)
+            {
+                newProduct.ProductImages.Add(new ProductImage { ProductId = newProduct.Id, Url = imageUrl });
+            }
+            // add custom colors
+            foreach (var customColor in request.CustomColors)
+            {
+                newProduct.CustomColors.Add(new CustomColor { ProductId = newProduct.Id, Name = customColor.Name, Code = customColor.Code });
+            }
             // save changes
             await context.SaveChangesAsync(cancellationToken);
             // return result with mapped object
