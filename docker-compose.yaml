@@ -1,36 +1,4 @@
 services:
-  vitom-be:
-    image: persiedacoder/vitom-be:latest
-    container_name: vitom_api
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:8080
-    ports:
-      - 8080:8080
-    depends_on:
-      seq:
-        condition: service_started
-        restart: true
-      postgres_db:
-        condition: service_started
-        restart: true
-
-  vitom-fe:
-    build:
-      context: ../Vitom-FE
-      dockerfile: Dockerfile
-    volumes:
-      - ../../packages/dashboard:/app
-    ports:
-      - 80:80
-    depends_on:
-      postgres_db:
-        condition: service_started
-        restart: true
-      seq:
-        condition: service_started
-        restart: true
-
   postgres_db:
     container_name: postgres_container
     image: postgres:16

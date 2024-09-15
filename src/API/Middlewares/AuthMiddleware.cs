@@ -1,10 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using Application.Contracts;
-using Application.UC_User.Command;
-using Ardalis.Result;
 using Domain.Entities;
 using Domain.Primitives;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -67,14 +64,8 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
                 )
                 ?.Value ?? string.Empty;
 
-        // Result<User> result = await sender.Send(new CreateUser.CreateUserCommand(
-        //     Id: null!,
-        //     Username: username,
-        //     PhoneNumber: phoneNumber,
-        //     Email: email
-        // ));
         User? checkingUser = await vitomDbContext
-            .Users.AsNoTracking()
+            .Users
             .SingleOrDefaultAsync(u => u.Id.Equals(id));
         if (checkingUser is null)
         {
@@ -89,6 +80,18 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
             };
             vitomDbContext.Users.Add(checkingUser);
             await vitomDbContext.SaveChangesAsync(cancellationToken: default);
+        }
+        // then checking user is not null
+        else
+        {
+            if (checkingUser.Username != username || checkingUser.Email != email || checkingUser.PhoneNumber != phoneNumber || checkingUser.ImageUrl != imageUrl)
+            {
+                checkingUser.Username = username;
+                checkingUser.Email = email;
+                checkingUser.PhoneNumber = phoneNumber;
+                checkingUser.ImageUrl = imageUrl;
+                await vitomDbContext.SaveChangesAsync(cancellationToken: default);
+            }
         }
         CurrentUser currentUser = context.RequestServices.GetRequiredService<CurrentUser>();
         currentUser.User = checkingUser;
