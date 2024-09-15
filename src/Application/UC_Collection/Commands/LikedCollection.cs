@@ -39,10 +39,15 @@ public class LikedCollection
             if (likeCollection is null)
                 return await CreateNewLikeCollection(request, cancellationToken);
 
+            // If collection is already liked, dislike it
             if (likeCollection.DeletedAt is null)
-                return Result.NoContent();
+                return await DislikeCollection(likeCollection, cancellationToken);
 
-            return await RestoreLikeCollection(likeCollection, cancellationToken);
+            // If collection is already disliked, restore it
+            if (likeCollection.DeletedAt is not null)
+                return await RestoreLikeCollection(likeCollection, cancellationToken);
+
+            return Result.NoContent();
         }
 
         private async Task<Result<LikeCollectionResponse>> CreateNewLikeCollection(
@@ -59,7 +64,23 @@ public class LikedCollection
             context.LikeCollections.Add(newLikeCollection);
             await context.SaveChangesAsync(cancellationToken);
 
-            return CreateSuccessResult(newLikeCollection);
+            string message = "liked";
+
+            return CreateSuccessResult(newLikeCollection, message);
+        }
+
+        private async Task<Result<LikeCollectionResponse>> DislikeCollection(
+            LikeCollection likeCollection,
+            CancellationToken cancellationToken
+        )
+        {
+            likeCollection.Delete();
+            context.LikeCollections.Update(likeCollection);
+            await context.SaveChangesAsync(cancellationToken);
+
+            string message = "disliked";
+
+            return CreateSuccessResult(likeCollection, message);
         }
 
         private async Task<Result<LikeCollectionResponse>> RestoreLikeCollection(
@@ -71,18 +92,21 @@ public class LikedCollection
             context.LikeCollections.Update(likeCollection);
             await context.SaveChangesAsync(cancellationToken);
 
-            return CreateSuccessResult(likeCollection);
+            string message = "liked";
+
+            return CreateSuccessResult(likeCollection, message);
         }
 
         private static Result<LikeCollectionResponse> CreateSuccessResult(
-            LikeCollection likeCollection
+            LikeCollection likeCollection,
+            string message
         )
         {
             var response = new LikeCollectionResponse(likeCollection.Id, likeCollection.CreatedAt);
 
             return Result.Success(
                 response,
-                $"User {likeCollection.UserId} already liked collection {likeCollection.CollectionId}"
+                $"User {likeCollection.UserId} already {message} collection {likeCollection.CollectionId}"
             );
         }
     }
