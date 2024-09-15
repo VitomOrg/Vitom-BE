@@ -15,7 +15,12 @@ public static class CollectionEndpoints
         group
             .MapGet("", ViewAllPublicCollectionEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("View all public collections"));
-      
+
+        group
+            .MapGet("liked", ViewLikedCollectionEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("View liked collections"))
+            .RequireAuthorization();
+
         return group;
     }
 }
