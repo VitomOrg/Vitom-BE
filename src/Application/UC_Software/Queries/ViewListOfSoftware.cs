@@ -35,7 +35,7 @@ public class ViewListOfSoftware
             IQueryable<Software> query = context
                 .Softwares.AsNoTracking()
                 .Where(s => s.Name.ToLower().Contains(request.Keyword.ToLower()))
-                .Where(s => s.IsNotDeleted());
+                .Where(s => s.DeletedAt == null);
             // calculating total pages
             int totalPages = (int)Math.Ceiling((decimal)query.Count() / request.PageSize);
             // get result
