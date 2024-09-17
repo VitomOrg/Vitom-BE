@@ -1,10 +1,13 @@
-
 using Application.Contracts;
 using Domain.Entities;
+using Domain.Entities.Report;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence;
-public class VitomDBContext(DbContextOptions<VitomDBContext> options) : DbContext(options), IVitomDbContext
+
+public class VitomDBContext(DbContextOptions<VitomDBContext> options)
+    : DbContext(options),
+        IVitomDbContext
 {
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
@@ -24,4 +27,14 @@ public class VitomDBContext(DbContextOptions<VitomDBContext> options) : DbContex
     public DbSet<Domain.Entities.Type> Types { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserLibrary> UserLibrarys { get; set; }
+    public DbSet<MonthlyIncome> MonthlyIncomes { get; set; }
+    public DbSet<SystemTotal> SystemTotals { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Defining composite key
+        modelBuilder.Entity<MonthlyIncome>().HasKey(mi => new { mi.Year, mi.Month });
+
+        base.OnModelCreating(modelBuilder);
+    }
 }
