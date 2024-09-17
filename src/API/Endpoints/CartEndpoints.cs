@@ -12,6 +12,11 @@ public static class CartEndpoints
             .WithMetadata(new SwaggerOperationAttribute("Add product to cart"))
             .RequireAuthorization();
 
+        group
+            .MapDelete("{ProductId}", DeleteProductFromCartEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Delete product from cart"))
+            .RequireAuthorization();
+
         return group;
     }
 }
