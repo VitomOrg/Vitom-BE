@@ -33,7 +33,6 @@ public class AddProductToCart
             // Check if the product is already in the cart
             CartItem? cartItem = context
                 .CartItems.Include(ci => ci.Cart)
-                .Where(ci => ci.DeletedAt == null)
                 .FirstOrDefault(ci =>
                     ci.ProductId == product.Id && ci.Cart.UserId == currentUser.User!.Id
                 );
