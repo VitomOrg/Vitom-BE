@@ -64,9 +64,7 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
                 )
                 ?.Value ?? string.Empty;
 
-        User? checkingUser = await vitomDbContext
-            .Users
-            .SingleOrDefaultAsync(u => u.Id.Equals(id));
+        User? checkingUser = await vitomDbContext.Users.SingleOrDefaultAsync(u => u.Id.Equals(id));
         if (checkingUser is null)
         {
             checkingUser = new()
@@ -76,7 +74,8 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
                 PhoneNumber = phoneNumber,
                 ImageUrl = imageUrl,
                 Email = email,
-                Role = Domain.Enums.RolesEnum.Customer
+                Role = Domain.Enums.RolesEnum.Customer,
+                Cart = new() { UserId = id }
             };
             vitomDbContext.Users.Add(checkingUser);
             await vitomDbContext.SaveChangesAsync(cancellationToken: default);
@@ -84,7 +83,12 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
         // then checking user is not null
         else
         {
-            if (checkingUser.Username != username || checkingUser.Email != email || checkingUser.PhoneNumber != phoneNumber || checkingUser.ImageUrl != imageUrl)
+            if (
+                checkingUser.Username != username
+                || checkingUser.Email != email
+                || checkingUser.PhoneNumber != phoneNumber
+                || checkingUser.ImageUrl != imageUrl
+            )
             {
                 checkingUser.Username = username;
                 checkingUser.Email = email;
