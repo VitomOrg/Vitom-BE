@@ -10,8 +10,7 @@ namespace Application.UC_Collection.Commands;
 
 public class LikedCollection
 {
-    public record Command(Guid CollectionId, string UserId)
-        : IRequest<Result<LikeCollectionResponse>>;
+    public record Command(Guid CollectionId) : IRequest<Result<LikeCollectionResponse>>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser)
         : IRequestHandler<Command, Result<LikeCollectionResponse>>
@@ -21,64 +20,103 @@ public class LikedCollection
             CancellationToken cancellationToken
         )
         {
+            // Check if collection exists
+            Collection? collection = await context
+                .Collections.AsNoTracking()
+                .Where(c => c.Id == request.CollectionId && c.DeletedAt == null)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (collection is null)
+                return Result.NotFound("Collection not found");
+
             // Get existing like collection
             LikeCollection? likeCollection = await context
                 .LikeCollections.AsNoTracking()
                 .Where(c => c.CollectionId == request.CollectionId)
-                .Where(c => c.UserId == request.UserId)
+                .Where(c => c.UserId == currentUser.User.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (likeCollection is null)
+            return likeCollection switch
             {
-                return await CreateNewLikeCollection(request, cancellationToken);
-            }
-
-            if (likeCollection.DeletedAt is null)
-            {
-                return Result.NoContent();
-            }
-
-            return await RestoreLikeCollection(likeCollection, cancellationToken);
+                null
+                    => await CreateNewLikeCollection(
+                        request.CollectionId,
+                        collection,
+                        cancellationToken
+                    ),
+                { DeletedAt: null }
+                    => await DislikeCollection(likeCollection, collection, cancellationToken),
+                _ => await RestoreLikeCollection(likeCollection, collection, cancellationToken)
+            };
         }
 
         private async Task<Result<LikeCollectionResponse>> CreateNewLikeCollection(
-            Command request,
+            Guid collectionId,
+            Collection collection,
             CancellationToken cancellationToken
         )
         {
             var newLikeCollection = new LikeCollection
             {
-                CollectionId = request.CollectionId,
-                UserId = request.UserId
+                CollectionId = collectionId,
+                UserId = currentUser.User.Id
             };
 
+            collection.TotalLiked++;
+            context.Collections.Update(collection);
             context.LikeCollections.Add(newLikeCollection);
+
             await context.SaveChangesAsync(cancellationToken);
 
-            return CreateSuccessResult(newLikeCollection);
+            return CreateSuccessResult(newLikeCollection, "liked");
+        }
+
+        private async Task<Result<LikeCollectionResponse>> DislikeCollection(
+            LikeCollection likeCollection,
+            Collection collection,
+            CancellationToken cancellationToken
+        )
+        {
+            likeCollection.Delete();
+            collection.TotalLiked--;
+            context.LikeCollections.Update(likeCollection);
+            context.Collections.Update(collection);
+
+            await context.SaveChangesAsync(cancellationToken);
+
+            return CreateSuccessResult(likeCollection, "disliked");
         }
 
         private async Task<Result<LikeCollectionResponse>> RestoreLikeCollection(
             LikeCollection likeCollection,
+            Collection collection,
             CancellationToken cancellationToken
         )
         {
+            collection.TotalLiked++;
             likeCollection.DeletedAt = null;
+            context.Collections.Update(collection);
             context.LikeCollections.Update(likeCollection);
+
             await context.SaveChangesAsync(cancellationToken);
 
-            return CreateSuccessResult(likeCollection);
+            return CreateSuccessResult(likeCollection, "liked");
         }
 
         private static Result<LikeCollectionResponse> CreateSuccessResult(
-            LikeCollection likeCollection
+            LikeCollection likeCollection,
+            string action
         )
         {
-            var response = new LikeCollectionResponse(likeCollection.Id, likeCollection.CreatedAt);
+            var response = new LikeCollectionResponse(
+                likeCollection.Id,
+                likeCollection.CreatedAt,
+                likeCollection.DeletedAt
+            );
 
             return Result.Success(
                 response,
-                $"User {likeCollection.UserId} already liked collection {likeCollection.CollectionId}"
+                $"User {likeCollection.UserId} {action} collection {likeCollection.CollectionId}"
             );
         }
     }

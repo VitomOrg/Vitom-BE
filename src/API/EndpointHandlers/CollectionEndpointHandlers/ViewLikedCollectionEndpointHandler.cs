@@ -1,24 +1,24 @@
 using API.Utils;
 using Application.Responses.CollectionResponses;
-using Application.UC_Collection.Commands;
+using Application.Responses.Shared;
+using Application.UC_Collection.Queries;
 using Ardalis.Result;
 using MediatR;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 
 namespace API.EndpointHandlers.CollectionEndpointHandlers;
 
-public class LikeCollectionEndpointHandler
+public class ViewLikedCollectionEndpointHandler
 {
-    public record LikeCollectionRequest(Guid CollectionId);
-
     public static async Task<IResult> Handle(
         ISender sender,
-        LikeCollectionRequest request,
+        int PageSize = 10,
+        int PageIndex = 1,
         CancellationToken cancellationToken = default
     )
     {
-        Result<LikeCollectionResponse> result = await sender.Send(
-            new LikedCollection.Command(CollectionId: request.CollectionId),
+        Result<PaginatedResponse<AllCollectionDetailsResponse>> result = await sender.Send(
+            new ViewLikedCollections.Query(PageSize, PageIndex),
             cancellationToken
         );
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistence;
@@ -11,9 +12,11 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(VitomDBContext))]
-    partial class VitomDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240917062027_RemoveQuantityFromCartItems")]
+    partial class RemoveQuantityFromCartItems
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -389,59 +392,6 @@ namespace Persistence.Migrations
                     b.HasIndex("TypeId");
 
                     b.ToTable("ProductTypes");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Report.MonthlyIncome", b =>
-                {
-                    b.Property<int>("Year")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Month")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("TotalIncome")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("TotalTransaction")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Year", "Month");
-
-                    b.ToTable("MonthlyIncomes");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Report.SystemTotal", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("TotalIncome")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("TotalProducts")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TotalTransactions")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TotalUsers")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SystemTotals");
                 });
 
             modelBuilder.Entity("Domain.Entities.Review", b =>
