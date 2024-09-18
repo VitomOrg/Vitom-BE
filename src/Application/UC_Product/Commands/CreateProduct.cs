@@ -32,7 +32,7 @@ public class CreateProduct
         public async Task<Result<CreateProductResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
             // check if user is Organization
-            //if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
+            if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
             // init new product object
             Product newProduct = new()
             {
