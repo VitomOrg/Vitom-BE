@@ -38,7 +38,9 @@ public class UpdateProduct
             .Include(product => product.ProductImages)
             .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
             if (updatingProduct is null) return Result.NotFound();
-
+            // check if user is owner
+            if (updatingProduct.UserId != currentUser.User.Id) return Result.Forbidden();
+            
             //remove all current relationships
             context.ProductTypes.RemoveRange(updatingProduct.ProductTypes);
             context.ProductSoftwares.RemoveRange(updatingProduct.ProductSoftwares);
@@ -51,7 +53,6 @@ public class UpdateProduct
             {
                 context.ProductTypes.Add(new ProductType { ProductId = updatingProduct.Id, TypeId = type.Id });
             }
-
             //check product softwares are existed
             IEnumerable<Software> checkingSoftwares = context.Softwares.Where(s => request.SoftwareIds.Contains(s.Id) && s.DeletedAt == null);
             if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound($"Softwares with id {request.SoftwareIds} are not existed");
@@ -79,7 +80,6 @@ public class UpdateProduct
             {
                 context.ProductImages.Add(new ProductImage { ProductId = updatingProduct.Id, Url = imageUrl });
             }
-
             //update product
             updatingProduct.Update(
                 license: request.License,
@@ -88,7 +88,6 @@ public class UpdateProduct
                 price: request.Price,
                 downloadUrl: request.DownloadUrl
             );
-
             //save to db
             await context.SaveChangesAsync(cancellationToken);
             //return final result

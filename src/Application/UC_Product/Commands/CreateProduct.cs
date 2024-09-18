@@ -44,7 +44,6 @@ public class CreateProduct
                 DownloadUrl = request.DownloadUrl
             };
             context.Products.Add(newProduct);
-
             //check product types are existed
             IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
             if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound($"Types with id {request.TypeIds} are not existed");
@@ -70,7 +69,6 @@ public class CreateProduct
             {
                 newProduct.ProductImages.Add(new ProductImage { ProductId = newProduct.Id, Url = imageUrl });
             }
-
             // save changes
             await context.SaveChangesAsync(cancellationToken);
             // return result with mapped object
