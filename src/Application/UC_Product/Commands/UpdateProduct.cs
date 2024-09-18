@@ -30,7 +30,7 @@ public class UpdateProduct
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
             //check if user is not organization
-            if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
+            if (!currentUser.User!.IsOrganization() && currentUser.User.Role != RolesEnum.Admin) return Result.Forbidden();
             //get updating product
             Product? updatingProduct = await context.Products
             .Include(product => product.ProductSoftwares)
@@ -39,8 +39,8 @@ public class UpdateProduct
             .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
             if (updatingProduct is null) return Result.NotFound();
             // check if user is owner
-            if (updatingProduct.UserId != currentUser.User.Id) return Result.Forbidden();
-            
+            if (updatingProduct.UserId != currentUser.User.Id && currentUser.User.Role != RolesEnum.Admin) return Result.Forbidden();
+
             //remove all current relationships
             context.ProductTypes.RemoveRange(updatingProduct.ProductTypes);
             context.ProductSoftwares.RemoveRange(updatingProduct.ProductSoftwares);
