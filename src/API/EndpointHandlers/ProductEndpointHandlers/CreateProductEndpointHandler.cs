@@ -37,6 +37,4 @@ public class CreateProductEndpointHandler
         ), cancellationToken);
         return result.Check();
     }
-
-    public record CreateCustomColorRequest(string Name, string Code);
 }
