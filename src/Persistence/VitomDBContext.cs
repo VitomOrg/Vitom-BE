@@ -13,7 +13,6 @@ public class VitomDBContext(DbContextOptions<VitomDBContext> options)
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<Collection> Collections { get; set; }
     public DbSet<CollectionProduct> CollectionProducts { get; set; }
-    public DbSet<CustomColor> CustomColors { get; set; }
     public DbSet<LikeCollection> LikeCollections { get; set; }
     public DbSet<LikeProduct> LikeProducts { get; set; }
     public DbSet<Product> Products { get; set; }
