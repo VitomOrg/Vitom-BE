@@ -39,7 +39,6 @@ public static class VitomDBContextSeed
         LikeCollection[] likeCollections = LikeCollectionGenerator.Generate(collections, users);
         CollectionProduct[] collectionProducts = CollectionProductGenerator.Generate(collections, products);
         CartItem[] cartItems = CartItemGenerator.Generate(carts, products);
-        CustomColor[] customColors = CustomColorGenerator.Generate(products);
         ProductImage[] productImages = ProductImageGenerator.Generate(products);
         ProductSoftware[] productSoftwares = ProductSoftwareGenerator.Generate(products, softwares);
         ProductType[] productTypes = ProductTypeGenerator.Generate(products, types);
@@ -57,7 +56,6 @@ public static class VitomDBContextSeed
         tasks.Add(context.AddRangeAsync(likeCollections));
         tasks.Add(context.AddRangeAsync(collectionProducts));
         tasks.Add(context.AddRangeAsync(cartItems));
-        tasks.Add(context.AddRangeAsync(customColors));
         tasks.Add(context.AddRangeAsync(productImages));
         tasks.Add(context.AddRangeAsync(productSoftwares));
         tasks.Add(context.AddRangeAsync(productTypes));

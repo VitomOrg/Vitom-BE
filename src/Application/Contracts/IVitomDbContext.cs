@@ -11,7 +11,6 @@ public interface IVitomDbContext
     DbSet<CartItem> CartItems { get; set; }
     DbSet<Collection> Collections { get; set; }
     DbSet<CollectionProduct> CollectionProducts { get; set; }
-    DbSet<CustomColor> CustomColors { get; set; }
     DbSet<LikeCollection> LikeCollections { get; set; }
     DbSet<LikeProduct> LikeProducts { get; set; }
     DbSet<Product> Products { get; set; }

@@ -39,7 +39,6 @@ namespace Application.UC_Product.Queries
                 .Include(p => p.ProductTypes).ThenInclude(p => p.Type)
                 .Include(p => p.ProductSoftwares)
                 .Include(p => p.ProductImages)
-                .Include(p => p.CustomColors)
                 .Where(p => p.DeletedAt == null)
                 // .Where(p => p.ProductTypes.Any(pt => EF.Functions.Like(pt.Type.Name, $"%{request.Type}%")))
                 .Where(p => p.ProductTypes.Any(pt => pt.Type.Name.ToLower().Contains(request.Type.ToLower())))

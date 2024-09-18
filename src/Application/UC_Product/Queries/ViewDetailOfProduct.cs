@@ -36,7 +36,6 @@ public class ViewDetailOfProduct
                 .ThenInclude(p => p.Type)
                 .Include(p => p.ProductSoftwares)
                 .Include(p => p.ProductImages)
-                .Include(p => p.CustomColors)
                 .Include(p => p.Reviews)
                 .ThenInclude(p => p.User)
                 .Where(p => p.DeletedAt == null)
