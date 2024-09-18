@@ -34,7 +34,6 @@ public class FetchProductsForEachSoftware
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.LikeProducts)
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ProductTypes).ThenInclude(p => p.Type)
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ProductImages)
-                    .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.CustomColors)
                     .Where(s => s.DeletedAt == null)
                     .Where(s => s.ProductSoftwares.Any(ps => ps.Product.ProductTypes.Any(p => p.Type.Name.ToLower().Contains(request.Type.ToLower()))))
                     .Where(s => s.ProductSoftwares.Any(ps => ps.Product.DeletedAt == null));
