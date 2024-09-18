@@ -9,6 +9,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using System.Text.RegularExpressions;
+using Type = Domain.Entities.Type;
 
 namespace Application.UC_Product.Commands;
 
@@ -45,38 +46,29 @@ public class CreateProduct
             context.Products.Add(newProduct);
 
             //check product types are existed
-            foreach (var typeIntput in request.TypeIds)
-            {
-                if (!context.Types.Any(t => t.Id == typeIntput && t.DeletedAt == null))
-                {
-                    return Result.NotFound($"Type with id {typeIntput} is not existed");
-                }
-            }
+            IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
+            if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound($"Type with id {request.TypeIds} is not existed");
             // add product types
-            foreach (var typeId in request.TypeIds)
-            {
-                newProduct.ProductTypes.Add(new ProductType { ProductId = newProduct.Id, TypeId = typeId });
-            }
-
+            newProduct.ProductTypes = checkingTypes.Select(t => new ProductType { ProductId = newProduct.Id, TypeId = t.Id }).ToList();
             //check product softwares are existed
-            foreach (var softwareId in request.SoftwareIds)
-            {
-                if (!context.Softwares.Any(s => s.Id == softwareId && s.DeletedAt == null))
-                {
-                    return Result.NotFound($"Software with id {softwareId} is not existed");
-                }
-            }
+            IEnumerable<Software> checkingSoftwares = context.Softwares.Where(s => request.SoftwareIds.Contains(s.Id) && s.DeletedAt == null);
+            if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound($"Software with id {request.SoftwareIds} is not existed");
             // add product softwares
-            foreach (var softwareId in request.SoftwareIds)
-            {
-                newProduct.ProductSoftwares.Add(new ProductSoftware { ProductId = newProduct.Id, SoftwareId = softwareId });
-            }
+            newProduct.ProductSoftwares = checkingSoftwares.Select(s => new ProductSoftware { ProductId = newProduct.Id, SoftwareId = s.Id }).ToList();
             // add product images
+            List<Task<string>> tasks = [];
+            // upload images
             foreach (var image in request.Images)
             {
-                string imageUrl = await firebaseService.UploadFile(image.Name, image, "products");
+                tasks.Add(firebaseService.UploadFile(image.Name, image, "products"));
+            }
+            // await all tasks are finished
+            string[] imageUrls = await Task.WhenAll(tasks);
+            foreach (var imageUrl in imageUrls)
+            {
                 newProduct.ProductImages.Add(new ProductImage { ProductId = newProduct.Id, Url = imageUrl });
             }
+
             // save changes
             await context.SaveChangesAsync(cancellationToken);
             // return result with mapped object
