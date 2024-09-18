@@ -29,12 +29,14 @@ public static class ProductEndpoints
         group
             .MapPut("/{Id}", UpdateProductEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Organization update existing product"))
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .DisableAntiforgery(); ;
 
         group
             .MapDelete("/{Id}", DeleteProductEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Organization delete existing product"))
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .DisableAntiforgery();
 
         return group;
     }

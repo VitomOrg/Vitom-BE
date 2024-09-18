@@ -34,8 +34,9 @@ public class Product : Entity
     public ICollection<TransactionDetail> TransactionDetails { get; set; } = [];
     public ICollection<Review> Reviews { get; set; } = [];
 
-    public void Update(string name, string description, decimal price, string downloadUrl)
+    public void Update(LicenseEnum license, string name, string description, decimal price, string downloadUrl)
     {
+        License = license;
         Name = name;
         Description = description;
         Price = price;
