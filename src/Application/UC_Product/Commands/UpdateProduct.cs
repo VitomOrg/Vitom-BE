@@ -30,7 +30,7 @@ public class UpdateProduct
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
             //check if user is not organization
-            if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
+            if (!currentUser.User!.IsOrganization() && !currentUser.User.IsAdmin()) return Result.Forbidden();
             //get updating product
             Product? updatingProduct = await context.Products
             .Include(product => product.ProductSoftwares)
@@ -38,6 +38,8 @@ public class UpdateProduct
             .Include(product => product.ProductImages)
             .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
             if (updatingProduct is null) return Result.NotFound();
+            // check if user is owner
+            if (!updatingProduct.UserId.Equals(currentUser.User.Id) && !currentUser.User.IsAdmin()) return Result.Forbidden();
 
             //remove all current relationships
             context.ProductTypes.RemoveRange(updatingProduct.ProductTypes);
@@ -51,7 +53,6 @@ public class UpdateProduct
             {
                 context.ProductTypes.Add(new ProductType { ProductId = updatingProduct.Id, TypeId = type.Id });
             }
-
             //check product softwares are existed
             IEnumerable<Software> checkingSoftwares = context.Softwares.Where(s => request.SoftwareIds.Contains(s.Id) && s.DeletedAt == null);
             if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound($"Softwares with id {request.SoftwareIds} are not existed");
@@ -79,7 +80,6 @@ public class UpdateProduct
             {
                 context.ProductImages.Add(new ProductImage { ProductId = updatingProduct.Id, Url = imageUrl });
             }
-
             //update product
             updatingProduct.Update(
                 license: request.License,
@@ -88,7 +88,6 @@ public class UpdateProduct
                 price: request.Price,
                 downloadUrl: request.DownloadUrl
             );
-
             //save to db
             await context.SaveChangesAsync(cancellationToken);
             //return final result
