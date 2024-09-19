@@ -46,13 +46,13 @@ public class CreateProduct
             context.Products.Add(newProduct);
             //check product types are existed
             IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
-            if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound($"Types with id {request.TypeIds} are not existed");
+            if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound($"Types with id {string.Join(", ", request.TypeIds)}  are not existed");
             // add product types
             newProduct.ProductTypes = checkingTypes.Select(t => new ProductType { ProductId = newProduct.Id, TypeId = t.Id }).ToList();
 
             //check product softwares are existed
             IEnumerable<Software> checkingSoftwares = context.Softwares.Where(s => request.SoftwareIds.Contains(s.Id) && s.DeletedAt == null);
-            if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound($"Softwares with id {request.SoftwareIds} are not existed");
+            if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound($"Softwares with id {string.Join(", ", request.SoftwareIds)} are not existed");
             // add product softwares
             newProduct.ProductSoftwares = checkingSoftwares.Select(s => new ProductSoftware { ProductId = newProduct.Id, SoftwareId = s.Id }).ToList();
 
