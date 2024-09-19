@@ -12,7 +12,7 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(VitomDBContext))]
-    [Migration("20240919042804_AddBlogTable")]
+    [Migration("20240919061606_AddBlogTable")]
     partial class AddBlogTable
     {
         /// <inheritdoc />
@@ -54,6 +54,8 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Blogs");
                 });
 
@@ -80,6 +82,8 @@ namespace Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BlogId");
 
                     b.ToTable("BlogImages");
                 });
@@ -715,6 +719,28 @@ namespace Persistence.Migrations
                     b.ToTable("UserLibrarys");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Blog", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("Blogs")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.BlogImage", b =>
+                {
+                    b.HasOne("Domain.Entities.Blog", "Blogs")
+                        .WithMany("Images")
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Blogs");
+                });
+
             modelBuilder.Entity("Domain.Entities.Cart", b =>
                 {
                     b.HasOne("Domain.Entities.User", "User")
@@ -941,6 +967,11 @@ namespace Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Blog", b =>
+                {
+                    b.Navigation("Images");
+                });
+
             modelBuilder.Entity("Domain.Entities.Cart", b =>
                 {
                     b.Navigation("CartItems");
@@ -991,6 +1022,8 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
+                    b.Navigation("Blogs");
+
                     b.Navigation("Cart")
                         .IsRequired();
 
