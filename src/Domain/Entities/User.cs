@@ -26,6 +26,7 @@ public class User : Entity
     public ICollection<Transaction> Transactions { get; set; } = [];
     public ICollection<Collection> Collections { get; set; } = [];
     public ICollection<Review> Reviews { get; set; } = [];
+    public ICollection<Blog> Blogs { get; set; } = [];
 
     public bool IsAdmin() => Role.Equals(RolesEnum.Admin);
 
