@@ -1,16 +1,66 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class FixLicenseEnum : Migration
+    public partial class AddBlogTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "BlogImages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    BlogId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Url = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BlogImages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Blogs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Blogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MonthlyIncomes",
+                columns: table => new
+                {
+                    Year = table.Column<int>(type: "integer", nullable: false),
+                    Month = table.Column<int>(type: "integer", nullable: false),
+                    TotalIncome = table.Column<decimal>(type: "numeric", nullable: false),
+                    TotalTransaction = table.Column<decimal>(type: "numeric", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MonthlyIncomes", x => new { x.Year, x.Month });
+                });
+
             migrationBuilder.CreateTable(
                 name: "Softwares",
                 columns: table => new
@@ -26,6 +76,23 @@ namespace Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Softwares", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SystemTotals",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TotalIncome = table.Column<decimal>(type: "numeric", nullable: false),
+                    TotalTransactions = table.Column<int>(type: "integer", nullable: false),
+                    TotalProducts = table.Column<int>(type: "integer", nullable: false),
+                    TotalUsers = table.Column<int>(type: "integer", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SystemTotals", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -197,7 +264,6 @@ namespace Persistence.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     CartId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false),
                     PriceAtPurchase = table.Column<decimal>(type: "numeric", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
@@ -242,29 +308,6 @@ namespace Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_CollectionProducts_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CustomColors",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
-                    Code = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomColors", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CustomColors_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -496,11 +539,6 @@ namespace Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomColors_ProductId",
-                table: "CustomColors",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_LikeCollections_CollectionId",
                 table: "LikeCollections",
                 column: "CollectionId");
@@ -590,19 +628,25 @@ namespace Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "BlogImages");
+
+            migrationBuilder.DropTable(
+                name: "Blogs");
+
+            migrationBuilder.DropTable(
                 name: "CartItems");
 
             migrationBuilder.DropTable(
                 name: "CollectionProducts");
 
             migrationBuilder.DropTable(
-                name: "CustomColors");
-
-            migrationBuilder.DropTable(
                 name: "LikeCollections");
 
             migrationBuilder.DropTable(
                 name: "LikeProducts");
+
+            migrationBuilder.DropTable(
+                name: "MonthlyIncomes");
 
             migrationBuilder.DropTable(
                 name: "ProductImages");
@@ -615,6 +659,9 @@ namespace Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reviews");
+
+            migrationBuilder.DropTable(
+                name: "SystemTotals");
 
             migrationBuilder.DropTable(
                 name: "TransactionDetails");

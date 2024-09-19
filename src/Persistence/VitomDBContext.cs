@@ -28,6 +28,8 @@ public class VitomDBContext(DbContextOptions<VitomDBContext> options)
     public DbSet<UserLibrary> UserLibrarys { get; set; }
     public DbSet<MonthlyIncome> MonthlyIncomes { get; set; }
     public DbSet<SystemTotal> SystemTotals { get; set; }
+    public DbSet<Blog> Blogs { get; set; }
+    public DbSet<BlogImage> BlogImages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
