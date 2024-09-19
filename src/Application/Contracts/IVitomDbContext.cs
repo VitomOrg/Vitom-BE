@@ -26,5 +26,7 @@ public interface IVitomDbContext
     DbSet<UserLibrary> UserLibrarys { get; set; }
     DbSet<MonthlyIncome> MonthlyIncomes { get; set; }
     DbSet<SystemTotal> SystemTotals { get; set; }
+    DbSet<Blog> Blogs { get; set; }
+    DbSet<BlogImage> BlogImages { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
