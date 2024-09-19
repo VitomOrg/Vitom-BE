@@ -23,12 +23,14 @@ services:
       postgres_db:
         condition: service_started
         restart: true
+    restart: unless-stopped
     volumes:
       - ./servers.json:/pgadmin4/servers.json
 
   seq:
     image: datalust/seq:latest
     container_name: app-seq
+    restart: unless-stopped
     environment:
       - ACCEPT_EULA=Y
     ports:
@@ -37,7 +39,7 @@ services:
 
   redis:
     image: redis:latest
-    restart: always
+    restart: unless-stopped
     ports:
       - 6379:6379
 volumes:

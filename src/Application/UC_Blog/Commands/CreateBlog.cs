@@ -7,7 +7,7 @@ using Domain.Primitives;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
-namespace Application.UC_Blog;
+namespace Application.UC_Blog.Commands;
 
 public class CreateBlog
 {

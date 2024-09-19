@@ -1,6 +1,6 @@
 using API.Utils;
 using Application.Responses.BlogResponses;
-using Application.UC_Blog;
+using Application.UC_Blog.Commands;
 using Ardalis.Result;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
