@@ -9,16 +9,14 @@ namespace Application.UC_User.Command;
 
 public class AssignUserToArtist
 {
-    public record Command(string Id) : IRequest<Result>;
+    public record Command() : IRequest<Result>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser) : IRequestHandler<Command, Result>
     {
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
-            // check if current user is admin
-            if (!currentUser.User!.IsAdmin()) return Result.Forbidden();
             // get updating user
-            User? checkingUser = await context.Users.SingleOrDefaultAsync(u => u.Id.Equals(request.Id) && u.DeletedAt == null, cancellationToken);
+            User? checkingUser = await context.Users.SingleOrDefaultAsync(u => u.Id.Equals(currentUser.User!.Id) && u.DeletedAt == null, cancellationToken);
             if (checkingUser is null) return Result.NotFound("User is not found !");
             // updating user
             checkingUser.AssignToArtist();
