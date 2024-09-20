@@ -21,6 +21,10 @@ public static class CollectionEndpoints
             .WithMetadata(new SwaggerOperationAttribute("View liked collections"))
             .RequireAuthorization();
 
+        group.MapPut("", UpdateCollectionEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Update a collection"))
+            .RequireAuthorization();
+
         return group;
     }
 }
