@@ -7,9 +7,9 @@ namespace API.EndpointHandlers.UserEndpointHandlers;
 
 public class AssignUserToArtistEndpointHandler
 {
-    public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender, string Id, CancellationToken cancellationToken = default)
+    public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender, CancellationToken cancellationToken = default)
     {
-        Result result = await sender.Send(new AssignUserToArtist.Command(Id), cancellationToken);
+        Result result = await sender.Send(new AssignUserToArtist.Command(), cancellationToken);
         return result.Check();
     }
 }
