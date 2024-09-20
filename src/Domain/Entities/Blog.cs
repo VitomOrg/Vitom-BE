@@ -11,4 +11,11 @@ public class Blog : Entity
     public ICollection<BlogImage> Images { get; set; } = [];
     [ForeignKey(nameof(UserId))]
     public User User { get; set; } = null!;
+
+    public void Update(string title, string content)
+    {
+        Title = title;
+        Content = content;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }
