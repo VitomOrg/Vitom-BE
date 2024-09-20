@@ -11,7 +11,7 @@ namespace API.EndpointHandlers.ProductEndpointHandlers;
 public class FetchListOfProductsEndpointHandler
 {
     public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender,
-        LicenseEnum license = default,
+        LicenseEnum? license,
         string type = "",
         decimal priceFrom = 0,
         decimal priceTo = int.MaxValue,
