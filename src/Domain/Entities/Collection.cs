@@ -17,4 +17,12 @@ public class Collection : Entity
     public User User { get; set; } = null!;
     public ICollection<CollectionProduct> CollectionProducts { get; set; } = [];
     public ICollection<LikeCollection> LikeCollections { get; set; } = [];
+
+    public void Update(string name, string description, bool isPublic)
+    {
+        Name = name;
+        Description = description;
+        IsPublic = isPublic;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }

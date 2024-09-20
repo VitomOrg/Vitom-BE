@@ -17,6 +17,10 @@ public static class CollectionEndpoints
             .WithMetadata(new SwaggerOperationAttribute("Dislike a collection"))
             .RequireAuthorization();
 
+        group.MapPut("", UpdateCollectionEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Update a collection"))
+            .RequireAuthorization();
+
         return group;
     }
 }
