@@ -14,6 +14,10 @@ public static class BlogEndpoints
         group.MapPost("", CreateBlogEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Create new blog"))
             .RequireAuthorization().DisableAntiforgery();
+        // PUT
+        group.MapPut("{Id}", UpdateBlogEndpointHandler.Handle)
+        .WithMetadata(new SwaggerOperationAttribute("Update existing blog"))
+        .RequireAuthorization().DisableAntiforgery();
 
         return group;
     }
