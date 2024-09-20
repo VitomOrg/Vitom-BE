@@ -15,6 +15,7 @@ public static class ProductDetailsResponseMapper
             Name: product.Name,
             Description: product.Description,
             Types: product.ProductTypes.Select(p => p.Type.Name),
+            ImageUrls: product.ProductImages.Select(p => p.Url),
             Price: product.Price,
             DownloadUrl: product.DownloadUrl,
             TotalPurchases: product.TotalPurchases,

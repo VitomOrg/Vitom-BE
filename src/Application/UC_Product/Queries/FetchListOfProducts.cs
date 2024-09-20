@@ -20,7 +20,7 @@ namespace Application.UC_Product.Queries
             int PageSize,
             int PageIndex,
             string Type,
-            LicenseEnum License
+            LicenseEnum? License
         ) : IRequest<Result<PaginatedResponse<ProductDetailsResponse>>>;
 
         public class Handler(IVitomDbContext context, ICacheServices cacheServices) : IRequestHandler<Query, Result<PaginatedResponse<ProductDetailsResponse>>>
@@ -35,7 +35,6 @@ namespace Application.UC_Product.Queries
                 //query
                 IQueryable<Product> query = context.Products
                 .AsNoTracking()
-                .Include(p => p.LikeProducts)
                 .Include(p => p.ProductTypes).ThenInclude(p => p.Type)
                 .Include(p => p.ProductSoftwares)
                 .Include(p => p.ProductImages)
@@ -44,7 +43,7 @@ namespace Application.UC_Product.Queries
                 .Where(p => p.ProductTypes.Any(pt => pt.Type.Name.ToLower().Contains(request.Type.ToLower())))
                 // .Where(p => EF.Functions.Like((string)(object)p.License, $"%{request.License}%"))
                 // .Where(p => ((string)(object)p.License).Contains(request.License))
-                .Where(p => p.License == request.License)
+                .Where(p => p.License == request.License || request.License == null)
                 .Where(p => p.Price >= request.PriceFrom && p.Price < request.PriceTo);
                 //sort
                 if (request.AscByCreatedAt)
