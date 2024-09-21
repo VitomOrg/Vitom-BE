@@ -7,6 +7,10 @@ public static class CartEndpoints
 {
     public static RouteGroupBuilder MapCartEndpoint(this RouteGroupBuilder group)
     {
+        group.MapGet("", FetchCartOfUserEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Fetch cart of user"))
+            .RequireAuthorization();
+
         group
             .MapPost("", AddProductToCartEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Add product to cart"))
