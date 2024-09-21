@@ -44,6 +44,14 @@ public class UpdateProduct
             //remove all current relationships
             context.ProductTypes.RemoveRange(updatingProduct.ProductTypes);
             context.ProductSoftwares.RemoveRange(updatingProduct.ProductSoftwares);
+            context.ProductImages.RemoveRange(updatingProduct.ProductImages);
+            List<Task<bool>> tasksDelete = [];
+            foreach (var productImage in updatingProduct.ProductImages)
+            {
+                tasksDelete.Add(firebaseService.DeleteFile(productImage.Url));
+            }
+            await Task.WhenAll(tasksDelete);
+            if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete images failed");
 
             //check product types are existed
             IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
@@ -60,12 +68,6 @@ public class UpdateProduct
             foreach (Software software in checkingSoftwares)
             {
                 context.ProductSoftwares.Add(new ProductSoftware { ProductId = updatingProduct.Id, SoftwareId = software.Id });
-            }
-
-            //set status delete for product images
-            foreach (ProductImage image in updatingProduct.ProductImages)
-            {
-                image.Delete();
             }
             // add product images
             List<Task<string>> tasks = [];
