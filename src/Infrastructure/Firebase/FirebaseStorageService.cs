@@ -20,13 +20,28 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         await file.CopyToAsync(stream);
 
         // Uploading image to FireBase
-        var image = await _storageClient.UploadObjectAsync(BucketName,
-            $"images/ticket/{name}-{randomGuid}", file.ContentType, stream);
+        var objectName = $"images/{name}-{randomGuid}";
+        var image = await _storageClient.UploadObjectAsync(BucketName, objectName, file.ContentType, stream);
 
-        //Get the image URI to get on the client the img
-        var photoUri = image.MediaLink;
+        // Make the object publicly accessible
+        await _storageClient.UpdateObjectAsync(new Google.Apis.Storage.v1.Data.Object
+        {
+            Bucket = BucketName,
+            Name = objectName,
+            Acl =
+            [
+                new Google.Apis.Storage.v1.Data.ObjectAccessControl
+                {
+                    Entity = "allUsers",
+                    Role = "READER"
+                }
+            ]
+        });
 
-        return photoUri;
+        // Construct and return the public URL for the uploaded image
+        var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
+
+        return publicUrl;
     }
 
     public async Task<string> UploadFile(string name, IFormFile file, string folderSave)
@@ -38,37 +53,45 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         await file.CopyToAsync(stream);
 
         // Uploading image to FireBase
-        var image = await _storageClient.UploadObjectAsync(BucketName,
-            $"images/{folderSave}/{name}-{randomGuid}", file.ContentType, stream);
+        var objectName = $"images/{folderSave}/{name}-{randomGuid}";
+        var image = await _storageClient.UploadObjectAsync(BucketName, objectName, file.ContentType, stream);
 
-        //Get the image URI to get on the client the img
-        var photoUri = image.MediaLink;
+        // Make the object publicly accessible
+        await _storageClient.UpdateObjectAsync(new Google.Apis.Storage.v1.Data.Object
+        {
+            Bucket = BucketName,
+            Name = objectName,
+            Acl =
+            [
+                new Google.Apis.Storage.v1.Data.ObjectAccessControl
+                {
+                    Entity = "allUsers",
+                    Role = "READER"
+                }
+            ]
+        });
 
-        return photoUri;
+        // Construct and return the public URL for the uploaded image
+        var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
+
+        return publicUrl;
     }
 
     public async Task<bool> DeleteFile(string imageUrl)
     {
         try
         {
-            // Extract the file path from the full image URL
-            var uri = new Uri(imageUrl);
+            // Extract the file path from the URL (after the bucket name)
+            var storageBaseUrl = $"https://storage.googleapis.com/{BucketName}/";
 
-            var objectName = uri.AbsolutePath;
+            // Ensure the URL is valid and belongs to the expected bucket
+            if (!imageUrl.StartsWith(storageBaseUrl))
+                return false;
 
-            // Kiểm tra xem URL có chứa "/o/" không, nếu có, thì tách nó ra
-            if (objectName.Contains("/o/"))
-            {
-                objectName = objectName.Split(separator, StringSplitOptions.None)[1];
-            }
+            // Extract the object name from the URL
+            var objectName = imageUrl.Substring(storageBaseUrl.Length);
 
-            // Giải mã các ký tự đã mã hóa
-            objectName = Uri.UnescapeDataString(objectName); // Chuyển đổi %2F thành /
-
-            // Xóa dấu '/' đầu tiên
-            objectName = objectName.TrimStart('/');
-
-            // Deleting the object from Firebase Storage
+            // Delete the object from Firebase Storage
             await _storageClient.DeleteObjectAsync(BucketName, objectName);
             return true;
         }
