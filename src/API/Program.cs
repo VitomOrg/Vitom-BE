@@ -51,6 +51,7 @@ builder.Services.AddScoped<AuthMiddleware>();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(configuration);
 builder.Services.AddPersistence(configuration);
+builder.Services.AddPayOSService(configuration);
 builder.Services.AddCors(option =>
 {
     option.AddDefaultPolicy(option =>
