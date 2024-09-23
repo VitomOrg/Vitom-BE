@@ -30,7 +30,8 @@ public class UpdateProduct
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
             //check if user is not organization
-            if (!currentUser.User!.IsOrganization() && !currentUser.User.IsAdmin()) return Result.Forbidden();
+            if ((!currentUser.User!.IsOrganization() && !currentUser.User.IsAdmin())
+                || currentUser.User.DeletedAt != null) return Result.Forbidden();
             //get updating product
             Product? updatingProduct = await context.Products
             .Include(product => product.ProductSoftwares)

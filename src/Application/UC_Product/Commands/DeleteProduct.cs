@@ -18,13 +18,13 @@ public class DeleteProduct
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
             //check if current user is organization
-            if (!currentUser.User!.IsOrganization()) return Result.Forbidden();
+            if (!currentUser.User!.IsOrganization() || currentUser.User.DeletedAt != null) return Result.Forbidden();
             //get deleting product
             Product? deletingProduct = await context.Products
             .Include(product => product.ProductSoftwares)
             .Include(product => product.ProductTypes)
             .Include(product => product.ProductImages)
-            .SingleOrDefaultAsync(p => p.Id.Equals(request.Id), cancellationToken);
+            .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
             if (deletingProduct is null) return Result.NotFound();
             //if deleted at is not null means already deleted
             if (deletingProduct.DeletedAt is not null) return Result.Error($"Product with id {request.Id} has already been deleted");
