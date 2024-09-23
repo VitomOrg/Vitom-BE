@@ -12,7 +12,7 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(VitomDBContext))]
-    [Migration("20240919061606_AddBlogTable")]
+    [Migration("20240923073058_AddBlogTable")]
     partial class AddBlogTable
     {
         /// <inheritdoc />
