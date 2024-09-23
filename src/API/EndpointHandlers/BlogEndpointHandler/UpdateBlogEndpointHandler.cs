@@ -12,7 +12,7 @@ public class UpdateBlogEndpointHandler
 {
     public static async Task<IResult> Handle(
         ISender sender,
-        [FromForm] Guid Id,
+        [FromRoute] Guid Id,
         [FromForm] string Title,
         [FromForm] string Content,
         IFormFileCollection Images,

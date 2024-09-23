@@ -15,7 +15,7 @@ public static class HostingExtension
 
         try
         {
-            context?.Database.EnsureDeleted();
+            // context?.Database.EnsureDeleted();
             context?.Database.Migrate();
             // logger.LogInformation("Migrated successfully");
             seeder(context!, services).Wait();

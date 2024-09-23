@@ -10,15 +10,20 @@ public static class BlogEndpoints
         // GET
         group.MapGet("", GetBlogsEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get blogs"));
+        group.MapGet("{Id}", GetBlogByIdEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get blog by id"));
         // POST
         group.MapPost("", CreateBlogEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Create new blog"))
             .RequireAuthorization().DisableAntiforgery();
         // PUT
         group.MapPut("{Id}", UpdateBlogEndpointHandler.Handle)
-        .WithMetadata(new SwaggerOperationAttribute("Update existing blog"))
-        .RequireAuthorization().DisableAntiforgery();
+            .WithMetadata(new SwaggerOperationAttribute("Update existing blog"))
+            .RequireAuthorization().DisableAntiforgery();
 
+        group.MapDelete("{Id}", DeleteBlogEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Delete existing blog"))
+            .RequireAuthorization();
         return group;
     }
 }
