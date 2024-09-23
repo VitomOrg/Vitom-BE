@@ -35,7 +35,25 @@ public class VitomDBContext(DbContextOptions<VitomDBContext> options)
     {
         // Defining composite key
         modelBuilder.Entity<MonthlyIncome>().HasKey(mi => new { mi.Year, mi.Month });
-
+        modelBuilder.Entity<Blog>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<BlogImage>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<Cart>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<CartItem>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<Collection>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<CollectionProduct>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<LikeCollection>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<LikeProduct>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<Product>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<ProductImage>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<ProductSoftware>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<ProductType>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<Review>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<Software>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<Transaction>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<TransactionDetail>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<Domain.Entities.Type>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<User>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<UserLibrary>().HasQueryFilter(t => t.DeletedAt == null);
         base.OnModelCreating(modelBuilder);
     }
 }
