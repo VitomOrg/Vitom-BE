@@ -14,10 +14,13 @@ namespace Application.UC_Cart.Commands;
 
 public class Checkout
 {
-    public record Command(Guid CartId) : IRequest<Result<CheckoutResponse>>;
+    public record Command(string BaseUrl) : IRequest<Result<CheckoutResponse>>;
 
-    public class Handler(IVitomDbContext context, IOptionsMonitor<PayOSSettings> _payOSSettings)
-        : IRequestHandler<Command, Result<CheckoutResponse>>
+    public class Handler(
+        IVitomDbContext context,
+        CurrentUser currentUser,
+        IOptionsMonitor<PayOSSettings> _payOSSettings
+    ) : IRequestHandler<Command, Result<CheckoutResponse>>
     {
         private readonly PayOSSettings payOSSettings = _payOSSettings.CurrentValue;
 
@@ -35,7 +38,7 @@ public class Checkout
             Cart? cart = await context
                 .Carts.Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
-                .Where(c => c.Id == request.CartId)
+                .Where(c => c.UserId == currentUser.User!.Id)
                 .Where(c => c.DeletedAt == null)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -55,20 +58,48 @@ public class Checkout
                 productList.Add(new ItemData(productName, quantity, price));
             }
 
-            string domain = $"order/success/";
+            string returnUrl = $"{request.BaseUrl}/payment/return";
+            string cancelUrl = $"{request.BaseUrl}/payment/cancel";
+
+            // Generate a random order code based on the GUID
+            int orderCode;
+            do
+            {
+                orderCode = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
+            } while (orderCode <= 0);
 
             var paymentLinkRequest = new PaymentData(
-                orderCode: int.Parse(DateTimeOffset.Now.ToString("ffffff")),
+                orderCode: orderCode,
                 amount: totalAmount,
-                description: "Thanh toan don hang",
+                description: $"Don hang {GenerateDescriptionCode()}",
                 items: productList,
-                returnUrl: domain,
-                cancelUrl: domain
+                returnUrl: returnUrl,
+                cancelUrl: cancelUrl,
+                expiredAt: (int?)DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds()
             );
 
             var response = await payOS.createPaymentLink(paymentLinkRequest);
 
+            cart.OrderCode = orderCode;
+
+            await context.SaveChangesAsync(cancellationToken);
+
             return Result<CheckoutResponse>.Success(new(response.checkoutUrl));
+        }
+
+        // Generate a random string for the description code
+        private static readonly Random random = new();
+        private static int sequence = 0;
+
+        public static string GenerateDescriptionCode()
+        {
+            const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            string randomPart =
+                new(Enumerable.Repeat(chars, 4).Select(s => s[random.Next(s.Length)]).ToArray());
+
+            int sequentialPart = Interlocked.Increment(ref sequence) % 10000;
+
+            return $"{randomPart}{sequentialPart:D4}";
         }
     }
 }

@@ -9,16 +9,16 @@ namespace API.EndpointHandlers.CartEndpointHandler;
 
 public class CheckoutEndpointHandler
 {
-    public record CheckoutEndpointHandlerRequest(Guid CartId);
-
     public static async Task<IResult> Handle(
+        HttpContext httpContext,
         ISender sender,
-        CheckoutEndpointHandlerRequest request,
         CancellationToken cancellationToken = default
     )
     {
+        string baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
+
         Result<CheckoutResponse> result = await sender.Send(
-            new Checkout.Command(CartId: request.CartId),
+            new Checkout.Command(baseUrl),
             cancellationToken
         );
 
