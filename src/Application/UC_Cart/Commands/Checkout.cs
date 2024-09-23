@@ -19,7 +19,7 @@ public class Checkout
     public class Handler(
         IVitomDbContext context,
         CurrentUser currentUser,
-        IOptionsMonitor<PayOSSettings> _payOSSettings,
+        IOptionsMonitor<PayOSSettings> _payOSSettings
     ) : IRequestHandler<Command, Result<CheckoutResponse>>
     {
         private readonly PayOSSettings payOSSettings = _payOSSettings.CurrentValue;
