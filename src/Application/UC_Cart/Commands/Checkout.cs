@@ -20,11 +20,9 @@ public class Checkout
         IVitomDbContext context,
         CurrentUser currentUser,
         IOptionsMonitor<PayOSSettings> _payOSSettings,
-        IOptionsMonitor<PaymentSettings> _paymentSettings
     ) : IRequestHandler<Command, Result<CheckoutResponse>>
     {
         private readonly PayOSSettings payOSSettings = _payOSSettings.CurrentValue;
-        private readonly PaymentSettings paymentSettings = _paymentSettings.CurrentValue;
 
         public async Task<Result<CheckoutResponse>> Handle(
             Command request,
