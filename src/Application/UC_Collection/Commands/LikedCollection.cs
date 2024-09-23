@@ -33,7 +33,7 @@ public class LikedCollection
             LikeCollection? likeCollection = await context
                 .LikeCollections.AsNoTracking()
                 .Where(c => c.CollectionId == request.CollectionId)
-                .Where(c => c.UserId == currentUser.User.Id)
+                .Where(c => c.UserId == currentUser.User!.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 
             return likeCollection switch
@@ -59,7 +59,7 @@ public class LikedCollection
             var newLikeCollection = new LikeCollection
             {
                 CollectionId = collectionId,
-                UserId = currentUser.User.Id
+                UserId = currentUser.User!.Id
             };
 
             collection.TotalLiked++;
