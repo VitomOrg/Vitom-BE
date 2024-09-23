@@ -23,7 +23,7 @@ public class FetchCartOfUser
         public async Task<Result<PaginatedResponse<CartItemResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
             //check if user is null
-            if (currentUser.User is null) return Result.Forbidden();
+            if (currentUser.User is null || currentUser.User.DeletedAt != null) return Result.Forbidden();
             //set key
             string key = $"cart:{currentUser.User!.Id}-sortascbycreateat{request.AscByCreatedAt}";
             //get data from cache
@@ -32,9 +32,13 @@ public class FetchCartOfUser
             //get data from db
             IQueryable<CartItem> items = context.CartItems
                 .AsNoTracking()
-                .Include(ci => ci.Product)
+                .Include(ci => ci.Product).ThenInclude(ci => ci.ProductImages)
+                .Include(ci => ci.Product).ThenInclude(ci => ci.ProductTypes).ThenInclude(ci => ci.Type)
                 .Include(ci => ci.Cart)
-                .Where(ci => ci.Cart.UserId == currentUser.User!.Id);
+                .Where(ci => ci.Cart.UserId == currentUser.User!.Id)
+                .Where(ci => ci.Cart.DeletedAt == null)
+                .Where(ci => ci.DeletedAt == null)
+                .Where(ci => ci.Product.DeletedAt == null);
             //sort
             if (request.AscByCreatedAt)
             {

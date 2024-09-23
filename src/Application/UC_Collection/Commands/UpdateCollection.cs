@@ -23,10 +23,10 @@ public class UpdateCollection
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
             //check if user is not found
-            if (currentUser is null) return Result.Forbidden();
+            if (currentUser.User is null || currentUser.User.DeletedAt != null) return Result.Forbidden();
             // Get existing collection
             Collection? collection = await context.Collections
-                .SingleOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
+                .SingleOrDefaultAsync(c => c.Id == request.Id && c.DeletedAt == null, cancellationToken);
             //check if collection is not found
             if (collection is null) return Result.NotFound();
             //check if user is not the owner of the collection

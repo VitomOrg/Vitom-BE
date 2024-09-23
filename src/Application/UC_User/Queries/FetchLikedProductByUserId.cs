@@ -23,7 +23,7 @@ public class FetchLikedProductByUserId
         public async Task<Result<PaginatedResponse<ProductDetailsResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
             //check if user is null
-            if (currentUser.User is null) return Result.Forbidden();
+            if (currentUser.User is null || currentUser.User.DeletedAt != null) return Result.Forbidden();
             //set key
             string key = $"user-likedproduct-pageindex{request.PageIndex}-pagesize{request.PageSize}-orderascbycreatat{request.AscByCreatedAt}-userid{currentUser.User!.Id}";
             //get cache response
@@ -36,7 +36,7 @@ public class FetchLikedProductByUserId
                 .Include(p => p.ProductTypes).ThenInclude(p => p.Type)
                 .Include(p => p.ProductSoftwares)
                 .Include(p => p.ProductImages)
-                .Where(p => p.LikeProducts.Any(lp => lp.UserId == currentUser.User!.Id))
+                .Where(p => p.LikeProducts.Any(lp => lp.UserId == currentUser.User!.Id && lp.DeletedAt == null))
                 .Where(p => p.DeletedAt == null);
 
             //sort

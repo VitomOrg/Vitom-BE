@@ -23,7 +23,7 @@ public class FetchListOfTransaction
         public async Task<Result<PaginatedResponse<TransactionDetailsResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
             //check if user is not authenticated
-            if (currentUser.User is null) return Result.Forbidden();
+            if (currentUser.User is null || currentUser.User.DeletedAt != null) return Result.Forbidden();
             //set key
             string key = $"user-transaction-pageindex{request.PageIndex}-pagesize{request.PageSize}-orderascbycreatat{request.AscByCreatedAt}-userid{currentUser.User!.Id}";
             //get cache response
