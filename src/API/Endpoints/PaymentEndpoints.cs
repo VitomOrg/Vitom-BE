@@ -23,6 +23,14 @@ public static class PaymentEndpoints
                 )
             );
 
+        group
+            .MapPost("webhook", PaymentWebhookEndpointHandler.Handle)
+            .WithMetadata(
+                new SwaggerOperationAttribute(
+                    "Handle payment webhook, called by PayOS to notify payment status"
+                )
+            );
+
         return group;
     }
 }
