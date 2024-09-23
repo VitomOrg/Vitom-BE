@@ -14,7 +14,7 @@ namespace Application.UC_Cart.Commands;
 
 public class Checkout
 {
-    public record Command() : IRequest<Result<CheckoutResponse>>;
+    public record Command(string BaseUrl) : IRequest<Result<CheckoutResponse>>;
 
     public class Handler(
         IVitomDbContext context,
@@ -58,18 +58,31 @@ public class Checkout
                 productList.Add(new ItemData(productName, quantity, price));
             }
 
-            string domain = $"order/success/";
+            string returnUrl = $"{request.BaseUrl}/payment/return";
+            string cancelUrl = $"{request.BaseUrl}/payment/cancel";
+
+            // Generate a random order code based on the GUID
+            int orderCode;
+            do
+            {
+                orderCode = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
+            } while (orderCode <= 0);
 
             var paymentLinkRequest = new PaymentData(
-                orderCode: int.Parse(DateTimeOffset.Now.ToString("ffffff")),
+                orderCode: orderCode,
                 amount: totalAmount,
-                description: $"Đon hang {GenerateDescriptionCode()}",
+                description: $"Don hang {GenerateDescriptionCode()}",
                 items: productList,
-                returnUrl: domain,
-                cancelUrl: domain
+                returnUrl: returnUrl,
+                cancelUrl: cancelUrl,
+                expiredAt: (int?)DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds()
             );
 
             var response = await payOS.createPaymentLink(paymentLinkRequest);
+
+            cart.OrderCode = orderCode;
+
+            await context.SaveChangesAsync(cancellationToken);
 
             return Result<CheckoutResponse>.Success(new(response.checkoutUrl));
         }

@@ -7,4 +7,5 @@ public enum PaymentMethodEnum
     Napas = 2,
     Momo = 3,
     ZaloPay = 4,
+    PayOS = 5
 }
