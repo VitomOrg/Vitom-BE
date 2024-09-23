@@ -33,9 +33,9 @@ public class FetchReviewsOfProduct
                     .Include(s => s.Product)
                     .Include(s => s.User)
                     .Where(s => s.ProductId.Equals(request.ProductId))
-                    .Where(s=>s.User.DeletedAt == null)
-                    .Where(s=>s.Product.DeletedAt == null)
-                    .Where(s => s.DeletedAt != null);
+                    .Where(s => s.User.DeletedAt == null)
+                    .Where(s => s.Product.DeletedAt == null)
+                    .Where(s => s.DeletedAt == null);
             // calculating total pages
             int totalPages = (int)Math.Ceiling((decimal)query.Count() / request.PageSize);
             // get result

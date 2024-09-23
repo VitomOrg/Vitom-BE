@@ -5,7 +5,7 @@ using Application.UC_Review.Queries;
 using Ardalis.Result;
 using MediatR;
 
-namespace API.EndpointHandlers.ProductEndpointHandlers;
+namespace API.EndpointHandlers.ReviewEndpointHandler;
 
 public class FetchReviewsByProductEndpointHandler
 {
