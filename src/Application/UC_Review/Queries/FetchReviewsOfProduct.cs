@@ -36,6 +36,8 @@ public class FetchReviewsOfProduct
                     .Where(s => s.User.DeletedAt == null)
                     .Where(s => s.Product.DeletedAt == null)
                     .Where(s => s.DeletedAt == null);
+            //sort
+            query = query.OrderByDescending(s => s.CreatedAt);
             // calculating total pages
             int totalPages = (int)Math.Ceiling((decimal)query.Count() / request.PageSize);
             // get result
