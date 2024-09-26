@@ -19,10 +19,7 @@ public static class Persistence_DI
                 option.EnableSensitiveDataLogging();
                 option.EnableDetailedErrors();
             });
-        services.AddScoped<IVitomDbContext, VitomDBContext>(option =>
-        {
-            return req;
-        });
+        services.AddScoped<IVitomDbContext, VitomDBContext>();
         return services;
     }
 }
