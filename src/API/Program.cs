@@ -75,7 +75,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization();
 // using Custom Interfaces
-builder.Services.AddScoped<IVitomDbContext, VitomDBContext>();
+
 //register validators
 // builder.Services.AddScoped<IValidator<CreateProductEndpointHandler.CreateProductRequest>, CreateProductRequestValidator>();
 // using SERILOG

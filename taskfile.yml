@@ -5,3 +5,7 @@ tasks:
     dir: './src/API'
     cmds:
       - dotnet watch
+  dropdb:
+    dir: './src/Persistence'
+    cmds:
+      - dotnet ef database drop -f --startup-project ../API

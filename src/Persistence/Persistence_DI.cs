@@ -1,3 +1,4 @@
+using Application.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,7 @@ public static class Persistence_DI
                 option.EnableSensitiveDataLogging();
                 option.EnableDetailedErrors();
             });
+        services.AddScoped<IVitomDbContext, VitomDBContext>();
         return services;
     }
 }
