@@ -22,7 +22,7 @@ public class PaymentCancelEndpointHandler
         //     new ProcessPaymentCancel.Command(code, id, cancel, status, orderCode),
         //     cancellationToken
         // );
-
+        await Task.Delay(0, cancellationToken);
         return Results.Redirect("/payment-cancelled"); // Redirect to a cancellation page
     }
 }
