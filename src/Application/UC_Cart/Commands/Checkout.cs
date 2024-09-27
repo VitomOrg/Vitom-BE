@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Application.Contracts;
 using Application.Responses.CartResponses;
 using Ardalis.Result;
@@ -32,6 +31,8 @@ public class Checkout
             string clientId = payOSSettings.ClientId;
             string apiKey = payOSSettings.ApiKey;
             string checkSumKey = payOSSettings.CheckSumKey;
+            string returnUrl = $"{request.BaseUrl}/payment/return";
+            string cancelUrl = $"{request.BaseUrl}/payment/cancel";
 
             PayOS? payOS = new(clientId, apiKey, checkSumKey);
 
@@ -45,46 +46,40 @@ public class Checkout
             if (cart is null)
                 return Result.NotFound("Cart not found");
 
+            // Generate a random order code based on the GUID
+            Task<int> randomTask = Task.Run(() =>
+            {
+                int returnValue = -1;
+                do
+                {
+                    returnValue = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
+                } while (returnValue <= 0);
+                return returnValue;
+            }, cancellationToken);
+
             int totalAmount = (int)cart.CartItems.Sum(ci => ci.PriceAtPurchase);
 
             // Add each product from CartItems to the productList
-            List<ItemData> productList = [];
-            foreach (var cartItem in cart.CartItems)
-            {
-                string productName = cartItem.Product.Name;
-                int quantity = 1;
-                int price = (int)cartItem.PriceAtPurchase;
+            List<ItemData> productList = cart.CartItems.Select(c => new ItemData(c.Product.Name, 1, (int)c.PriceAtPurchase)).ToList();
 
-                productList.Add(new ItemData(productName, quantity, price));
-            }
+            int orderCode = await randomTask;
 
-            string returnUrl = $"{request.BaseUrl}/payment/return";
-            string cancelUrl = $"{request.BaseUrl}/payment/cancel";
-
-            // Generate a random order code based on the GUID
-            int orderCode;
-            do
-            {
-                orderCode = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
-            } while (orderCode <= 0);
-
-            var paymentLinkRequest = new PaymentData(
+            PaymentData paymentLinkRequest = new(
                 orderCode: orderCode,
                 amount: totalAmount,
-                description: $"Don hang {GenerateDescriptionCode()}",
+                description: $"Order {GenerateDescriptionCode()}",
                 items: productList,
                 returnUrl: returnUrl,
                 cancelUrl: cancelUrl,
                 expiredAt: (int?)DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds()
             );
 
-            var response = await payOS.createPaymentLink(paymentLinkRequest);
-
+            CreatePaymentResult response = await payOS.createPaymentLink(paymentLinkRequest);
             cart.OrderCode = orderCode;
 
             await context.SaveChangesAsync(cancellationToken);
 
-            return Result<CheckoutResponse>.Success(new(response.checkoutUrl));
+            return Result.Success(new CheckoutResponse(response.checkoutUrl));
         }
 
         // Generate a random string for the description code
