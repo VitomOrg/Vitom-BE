@@ -46,23 +46,30 @@ public class Checkout
             if (cart is null)
                 return Result.NotFound("Cart not found");
 
-            // Generate a random order code based on the GUID
-            Task<int> randomTask = Task.Run(() =>
-            {
-                int returnValue = -1;
-                do
-                {
-                    returnValue = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
-                } while (returnValue <= 0);
-                return returnValue;
-            }, cancellationToken);
+            // Task<int> randomTask = Task.Run(() =>
+            // {
+            //     int returnValue = -1;
+            //     do
+            //     {
+            //         returnValue = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
+            //     } while (returnValue <= 0);
+            //     return returnValue;
+            // }, cancellationToken);
+
+
+
 
             int totalAmount = (int)cart.CartItems.Sum(ci => ci.PriceAtPurchase);
 
             // Add each product from CartItems to the productList
             List<ItemData> productList = cart.CartItems.Select(c => new ItemData(c.Product.Name, 1, (int)c.PriceAtPurchase)).ToList();
 
-            int orderCode = await randomTask;
+            long orderCode = (await context
+                            .Carts
+                            .AsNoTracking()
+                            .OrderByDescending(c => c.OrderCode)
+                            .Select(c => c.OrderCode)
+                            .FirstOrDefaultAsync(cancellationToken)) + 1;
 
             PaymentData paymentLinkRequest = new(
                 orderCode: orderCode,
