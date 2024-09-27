@@ -1,5 +1,4 @@
 using API.Endpoints;
-using API.Endpoints.CollectionEndpoints;
 
 namespace API.Middlewares;
 
