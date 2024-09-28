@@ -13,7 +13,7 @@ namespace Application.UC_Cart.Commands;
 
 public class Checkout
 {
-    public record Command(string BaseUrl) : IRequest<Result<CheckoutResponse>>;
+    public record Command() : IRequest<Result<CheckoutResponse>>;
 
     public class Handler(
         IVitomDbContext context,
@@ -31,8 +31,9 @@ public class Checkout
             string clientId = payOSSettings.ClientId;
             string apiKey = payOSSettings.ApiKey;
             string checkSumKey = payOSSettings.CheckSumKey;
-            string returnUrl = $"{request.BaseUrl}/payment/return";
-            string cancelUrl = $"{request.BaseUrl}/payment/cancel";
+            string domain = "https://vitom.persiehomeserver.com";
+            string returnUrl = $"{domain}/payment/return";
+            string cancelUrl = $"{domain}/payment/cancel";
 
             PayOS? payOS = new(clientId, apiKey, checkSumKey);
 
@@ -46,40 +47,27 @@ public class Checkout
             if (cart is null)
                 return Result.NotFound("Cart not found");
 
-            // Task<int> randomTask = Task.Run(() =>
-            // {
-            //     int returnValue = -1;
-            //     do
-            //     {
-            //         returnValue = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
-            //     } while (returnValue <= 0);
-            //     return returnValue;
-            // }, cancellationToken);
-
-
-
-
             int totalAmount = (int)cart.CartItems.Sum(ci => ci.PriceAtPurchase);
 
             // Add each product from CartItems to the productList
-            List<ItemData> productList = cart.CartItems.Select(c => new ItemData(c.Product.Name, 1, (int)c.PriceAtPurchase)).ToList();
+            List<ItemData> productList = cart
+                .CartItems.Select(c => new ItemData(c.Product.Name, 1, (int)c.PriceAtPurchase))
+                .ToList();
 
-            long orderCode = (await context
-                            .Carts
-                            .AsNoTracking()
-                            .OrderByDescending(c => c.OrderCode)
-                            .Select(c => c.OrderCode)
-                            .FirstOrDefaultAsync(cancellationToken)) + 1;
+            int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
 
-            PaymentData paymentLinkRequest = new(
-                orderCode: orderCode,
-                amount: totalAmount,
-                description: $"Order {GenerateDescriptionCode()}",
-                items: productList,
-                returnUrl: returnUrl,
-                cancelUrl: cancelUrl,
-                expiredAt: (int?)DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds()
-            );
+            payOS.confirmWebhook("https://vitom.persiehomeserver.com/");
+
+            PaymentData paymentLinkRequest =
+                new(
+                    orderCode: orderCode,
+                    amount: totalAmount,
+                    description: $"Order {GenerateDescriptionCode()}",
+                    items: productList,
+                    returnUrl: returnUrl,
+                    cancelUrl: cancelUrl,
+                    expiredAt: (int?)DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds()
+                );
 
             CreatePaymentResult response = await payOS.createPaymentLink(paymentLinkRequest);
             cart.OrderCode = orderCode;
