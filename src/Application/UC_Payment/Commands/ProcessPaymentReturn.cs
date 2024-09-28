@@ -64,12 +64,9 @@ public class ProcessPaymentReturn
                 .Where(p => p.DeletedAt == null)
                 .ToListAsync(cancellationToken);
 
+            // Update total purchases for each product
             foreach (var product in products)
-            {
-                product.TotalPurchases += cart
-                    .CartItems.Where(ci => ci.ProductId == product.Id)
-                    .Count();
-            }
+                product.TotalPurchases += cart.CartItems.Count(ci => ci.ProductId == product.Id);
 
             context.TransactionDetails.AddRange(transactionDetails);
             context.UserLibrarys.AddRange(userLibrary);
@@ -78,7 +75,7 @@ public class ProcessPaymentReturn
 
             await context.SaveChangesAsync(cancellationToken);
 
-            return Result.Success();
+            return Result.SuccessWithMessage("Payment processed successfully");
         }
     }
 }

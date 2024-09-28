@@ -1,3 +1,4 @@
+using API.Utils;
 using Application.UC_Payment.Commands;
 using Ardalis.Result;
 using MediatR;
@@ -23,8 +24,6 @@ public class PaymentReturnEndpointHandler
             cancellationToken
         );
 
-        return result.IsSuccess
-            ? Results.Redirect("/payment-success")
-            : Results.Redirect("/payment-failure");
+        return result.Check();
     }
 }

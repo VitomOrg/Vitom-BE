@@ -11,7 +11,7 @@ public static class PaymentEndpoints
             .MapGet("return", PaymentReturnEndpointHandler.Handle)
             .WithMetadata(
                 new SwaggerOperationAttribute(
-                    "Handle payment return, called after payment is successful (by PayOS)"
+                    "Handle payment return, called after payment is successful"
                 )
             );
 
@@ -19,7 +19,7 @@ public static class PaymentEndpoints
             .MapGet("cancel", PaymentCancelEndpointHandler.Handle)
             .WithMetadata(
                 new SwaggerOperationAttribute(
-                    "Handle payment cancellation, called after payment is cancelled (by PayOS)"
+                    "Handle payment cancellation, called after payment is cancelled"
                 )
             );
 
