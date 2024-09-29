@@ -7,9 +7,15 @@ public static class TypeEndpoints
 {
     public static RouteGroupBuilder MapTypeEndpoint(this RouteGroupBuilder group)
     {
+        // GET
         group
             .MapGet("", ViewListOfTypeEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get types"));
+
+        group
+            .MapGet("/{id}", ViewTypeByIdEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get detail of type"))
+            .RequireAuthorization();
 
         group
             .MapPost("", CreateTypeEndpointHandler.Handle)
