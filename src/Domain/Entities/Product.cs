@@ -31,6 +31,7 @@ public class Product : Entity
     public ICollection<ProductType> ProductTypes { get; set; } = [];
     public ICollection<ProductSoftware> ProductSoftwares { get; set; } = [];
     public ICollection<ProductImage> ProductImages { get; set; } = [];
+    public ICollection<ModelMaterial> ModelMaterials { get; set; } = [];
     public ICollection<TransactionDetail> TransactionDetails { get; set; } = [];
     public ICollection<Review> Reviews { get; set; } = [];
 

@@ -54,6 +54,7 @@ public class VitomDBContext(DbContextOptions<VitomDBContext> options)
         modelBuilder.Entity<Domain.Entities.Type>().HasQueryFilter(t => t.DeletedAt == null);
         modelBuilder.Entity<User>().HasQueryFilter(t => t.DeletedAt == null);
         modelBuilder.Entity<UserLibrary>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<ModelMaterial>().HasQueryFilter(t => t.DeletedAt == null);
         base.OnModelCreating(modelBuilder);
     }
 }
