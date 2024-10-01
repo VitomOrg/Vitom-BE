@@ -19,7 +19,7 @@ COPY ["src/Domain/Domain.csproj", "Domain/"]
 RUN dotnet restore "API/API.csproj"
 
 # Copy the rest of the project files and build the project
-COPY . /app
+COPY . /app  
 
 # Build the project
 WORKDIR /app
