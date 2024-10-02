@@ -26,7 +26,7 @@ public static class PayOSExtension
             httpClient.DefaultRequestHeaders.Add("x-client-id", clientId);
             httpClient.DefaultRequestHeaders.Add("x-api-key", apiKey);
             string url = "https://api-merchant.payos.vn/v2/payment-requests/";
-            var response = await httpClient.PostAsync(url, new StringContent("{\"webhookUrl\": \"https://vitom-api.persiehomeserver.com/payment/webhook/\"}", Encoding.UTF8, "application/json"));
+            var response = await httpClient.PostAsync(url, new StringContent("{\"webhookUrl\": \"https://vitom-api.persiehomeserver.com/payment/webhook\"}", Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
             {
                 webhook = await response.Content.ReadAsStringAsync();
