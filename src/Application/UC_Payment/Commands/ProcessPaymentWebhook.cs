@@ -22,7 +22,7 @@ public class ProcessPaymentWebhook
             string apiKey = payOSSettings.CurrentValue.ApiKey;
             string checkSumKey = payOSSettings.CurrentValue.CheckSumKey;
             PayOS payOS = new(clientId, apiKey, checkSumKey);
-            WebhookData webhookData = payOS.verifyPaymentWebhookData(request.WebhookData);
+            WebhookData webhookData = request.WebhookData.data;
             // if (!(WebhookData.Success && request.WebhookData.Data.Code == "00"))
             //     return Result.Success();
 
