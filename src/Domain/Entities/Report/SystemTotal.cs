@@ -16,4 +16,13 @@ public class SystemTotal
     public int TotalUsers { get; set; }
 
     public DateTimeOffset? UpdatedAt { get; set; }
+
+    public void Update(decimal totalIncome, int totalTransactions, int totalProducts, int totalUsers)
+    {
+        TotalIncome = totalIncome;
+        TotalTransactions = totalTransactions;
+        TotalProducts = totalProducts;
+        TotalUsers = totalUsers;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }
