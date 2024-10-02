@@ -36,7 +36,7 @@ public class ProcessPaymentWebhook
                 );
 
             if (cart is null)
-                return Result.NotFound("Cart not found");
+                return Result.SuccessWithMessage("Cart not found");
 
             // Create transaction
             Domain.Entities.Transaction transaction =
