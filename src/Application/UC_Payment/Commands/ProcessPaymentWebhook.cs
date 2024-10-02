@@ -4,26 +4,34 @@ using Domain.Entities;
 using Domain.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Net.payOS;
+using Net.payOS.Types;
 
 namespace Application.UC_Payment.Commands;
 
 public class ProcessPaymentWebhook
 {
-    public record Command(PaymentWebhookData WebhookData) : IRequest<Result>;
+    public record Command(WebhookType WebhookData) : IRequest<Result>;
 
-    public class Handler(IVitomDbContext context) : IRequestHandler<Command, Result>
+    public class Handler(IVitomDbContext context, IOptionsMonitor<PayOSSettings> payOSSettings) : IRequestHandler<Command, Result>
     {
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
-            if (!(request.WebhookData.Success && request.WebhookData.Data.Code == "00"))
-                return Result.Success();
+            string clientId = payOSSettings.CurrentValue.ClientId;
+            string apiKey = payOSSettings.CurrentValue.ApiKey;
+            string checkSumKey = payOSSettings.CurrentValue.CheckSumKey;
+            PayOS payOS = new(clientId, apiKey, checkSumKey);
+            WebhookData webhookData = payOS.verifyPaymentWebhookData(request.WebhookData);
+            // if (!(WebhookData.Success && request.WebhookData.Data.Code == "00"))
+            //     return Result.Success();
 
             // Process successful payment
             Cart? cart = await context
                 .Carts.Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(
-                    c => c.Id == Guid.Parse(request.WebhookData.Data.PaymentLinkId),
+                    c => c.Id == Guid.Parse(webhookData.paymentLinkId),
                     cancellationToken
                 );
 
@@ -31,7 +39,7 @@ public class ProcessPaymentWebhook
                 return Result.NotFound("Cart not found");
 
             // Create transaction
-            Transaction transaction =
+            Domain.Entities.Transaction transaction =
                 new()
                 {
                     UserId = cart.UserId,

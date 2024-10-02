@@ -57,7 +57,6 @@ public class Checkout
             int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
 
             payOS.confirmWebhook("https://vitom.persiehomeserver.com/");
-
             PaymentData paymentLinkRequest =
                 new(
                     orderCode: orderCode,
