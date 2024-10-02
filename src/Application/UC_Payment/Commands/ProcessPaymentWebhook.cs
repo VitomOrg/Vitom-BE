@@ -27,7 +27,7 @@ public class ProcessPaymentWebhook
             //     return Result.Success();
 
             // Process successful payment
-            Cart? cart = await context
+            var cart = await context
                 .Carts.Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(
@@ -60,7 +60,27 @@ public class ProcessPaymentWebhook
                 })
                 .ToList();
 
+            // Add each product from CartItems to the user library
+            var userLibrary = cart
+                .CartItems.Select(cartItem => new UserLibrary
+                {
+                    UserId = cart.UserId,
+                    ProductId = cartItem.ProductId
+                })
+                .ToList();
+
+            // Select each product from productId in CartItems to update total purchase count
+            var products = await context
+                .Products.Where(p => cart.CartItems.Select(ci => ci.ProductId).Contains(p.Id))
+                .Where(p => p.DeletedAt == null)
+                .ToListAsync(cancellationToken);
+
+            // Update total purchases for each product
+            foreach (var product in products)
+                product.TotalPurchases += cart.CartItems.Count(ci => ci.ProductId == product.Id);
+
             context.TransactionDetails.AddRange(transactionDetails);
+            context.UserLibrarys.AddRange(userLibrary);
 
             context.CartItems.RemoveRange(cart.CartItems);
 
