@@ -1,9 +1,7 @@
 using Application.UC_Payment.Commands;
 using Ardalis.Result;
-using Domain.Primitives;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Net.payOS;
 using Net.payOS.Types;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 
@@ -25,6 +23,6 @@ public class PaymentWebhookEndpointHandler
 
         return result.IsSuccess
             ? Results.Ok(new { success = true })
-            : Results.BadRequest(new { success = false, message = result.Errors });
+            : Results.Ok(new { success = false, message = result.Errors });
     }
 }
