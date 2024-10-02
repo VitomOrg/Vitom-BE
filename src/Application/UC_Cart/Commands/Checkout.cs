@@ -32,8 +32,8 @@ public class Checkout
             string apiKey = payOSSettings.ApiKey;
             string checkSumKey = payOSSettings.CheckSumKey;
             string domain = "https://vitom.persiehomeserver.com";
-            string returnUrl = $"{domain}/payment/return";
-            string cancelUrl = $"{domain}/payment/cancel";
+            string returnUrl = $"{domain}/blogs?PageSize=10&PageIndex=1";
+            string cancelUrl = $"{domain}/blogs?PageSize=10&PageIndex=1";
 
             PayOS? payOS = new(clientId, apiKey, checkSumKey);
 
@@ -55,9 +55,6 @@ public class Checkout
                 .ToList();
 
             int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
-
-            payOS.confirmWebhook("https://vitom.persiehomeserver.com/");
-
             PaymentData paymentLinkRequest =
                 new(
                     orderCode: orderCode,

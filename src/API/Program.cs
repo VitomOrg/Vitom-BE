@@ -96,6 +96,7 @@ else
     app.UseSwaggerUI(option => option.DisplayRequestDuration());
     app.MigrateDatabase<VitomDBContext>(async (dbContext, _) => await dbContext.Seed());
 }
+// await app.AddPayOS();
 app.UseCors();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
