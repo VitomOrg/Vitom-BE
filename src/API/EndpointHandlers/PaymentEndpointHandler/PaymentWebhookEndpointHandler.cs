@@ -15,7 +15,6 @@ public class PaymentWebhookEndpointHandler
         CancellationToken cancellationToken = default
     )
     {
-        return Results.Ok();
         Result result = await sender.Send(
             new ProcessPaymentWebhook.Command(webhookBody),
             cancellationToken
