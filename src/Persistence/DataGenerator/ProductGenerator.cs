@@ -19,7 +19,7 @@ public class ProductGenerator
             .RuleFor(e=>e.License,f=>f.PickRandom<LicenseEnum>())
             .RuleFor(e=>e.Name,f=>f.Vehicle.Model())
             .RuleFor(e=>e.Description,f=>f.Lorem.Word())
-            .RuleFor(e=>e.Price,f=>f.PickRandom<decimal>(1,100))
+            .RuleFor(e=>e.Price,f=>f.PickRandom<decimal>(1,10000))
             .RuleFor(e=>e.DownloadUrl,f=>f.Image.PlaceImgUrl())
             .RuleFor(e=>e.TotalPurchases,f=>f.PickRandom(1,int.MaxValue))
             .RuleFor(e=>e.TotalLiked,f=>f.PickRandom(1,int.MaxValue))
