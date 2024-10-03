@@ -26,6 +26,10 @@ public class CreateUser
                 Email = clerkUser.EmailAddresses.FirstOrDefault()?.EmailAddress ?? string.Empty,
                 PhoneNumber = clerkUser.PhoneNumbers.FirstOrDefault()?.PhoneNumber ?? string.Empty,
                 ImageUrl = clerkUser.ImageUrl ?? string.Empty,
+                Cart = new()
+                {
+                    UserId = clerkUser.Id ?? string.Empty,
+                },
                 Role = Domain.Enums.RolesEnum.Customer
             };
             if (user.Id.Equals(string.Empty))
