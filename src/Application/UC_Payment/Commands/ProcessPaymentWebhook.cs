@@ -22,7 +22,7 @@ public class ProcessPaymentWebhook
             string apiKey = payOSSettings.CurrentValue.ApiKey;
             string checkSumKey = payOSSettings.CurrentValue.CheckSumKey;
             PayOS payOS = new(clientId, apiKey, checkSumKey);
-            WebhookData webhookData = payOS.verifyPaymentWebhookData(request.WebhookData);
+            WebhookData webhookData = request.WebhookData.data;
             // if (!(WebhookData.Success && request.WebhookData.Data.Code == "00"))
             //     return Result.Success();
 
@@ -31,7 +31,7 @@ public class ProcessPaymentWebhook
                 .Carts.Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(
-                    c => c.Id == Guid.Parse(webhookData.paymentLinkId),
+                    c => c.OrderCode == webhookData.orderCode,
                     cancellationToken
                 );
 
@@ -39,26 +39,26 @@ public class ProcessPaymentWebhook
                 return Result.NotFound("Cart not found");
 
             // Create transaction
+            Guid addingTransactionId = Guid.NewGuid();
             Domain.Entities.Transaction transaction =
                 new()
                 {
+                    Id = addingTransactionId,
                     UserId = cart.UserId,
                     TotalAmount = cart.CartItems.Sum(ci => ci.PriceAtPurchase),
                     PaymentMethod = Domain.Enums.PaymentMethodEnum.PayOS,
-                    TransactionStatus = Domain.Enums.TransactionStatusEnum.Completed
-                };
-
-            context.Transactions.Add(transaction);
-
-            // Create transaction details
-            var transactionDetails = cart
+                    TransactionStatus = Domain.Enums.TransactionStatusEnum.Completed,
+                    TransactionDetails = cart
                 .CartItems.Select(cartItem => new TransactionDetail
                 {
-                    TransactionId = transaction.Id,
+                    TransactionId = addingTransactionId,
                     ProductId = cartItem.ProductId,
                     PriceAtPurchase = cartItem.PriceAtPurchase
                 })
-                .ToList();
+                .ToArray()
+                };
+
+            context.Transactions.Add(transaction);
 
             // Add each product from CartItems to the user library
             var userLibrary = cart
@@ -79,7 +79,6 @@ public class ProcessPaymentWebhook
             foreach (var product in products)
                 product.TotalPurchases += cart.CartItems.Count(ci => ci.ProductId == product.Id);
 
-            context.TransactionDetails.AddRange(transactionDetails);
             context.UserLibrarys.AddRange(userLibrary);
 
             context.CartItems.RemoveRange(cart.CartItems);
