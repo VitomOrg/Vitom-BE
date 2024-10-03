@@ -37,6 +37,7 @@ public class CreateUser
             if (user.Id.Equals(string.Empty) || user.Username.Equals(string.Empty) || user.Email.Equals(string.Empty))
                 return Result.NotFound("User is not found !");
             await context.Users.AddAsync(user, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
             await mediator.Publish(new UserCreatedEvent.Event(user.Email), cancellationToken);
             return Result.Success();
             // return Result.Success();
