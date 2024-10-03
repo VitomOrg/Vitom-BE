@@ -40,6 +40,7 @@ public static class VitomDBContextSeed
         CollectionProduct[] collectionProducts = CollectionProductGenerator.Generate(collections, products);
         CartItem[] cartItems = CartItemGenerator.Generate(carts, products);
         ProductImage[] productImages = ProductImageGenerator.Generate(products);
+        ModelMaterial[] modelMaterials = ModelMaterialGenerator.Generate(products);
         ProductSoftware[] productSoftwares = ProductSoftwareGenerator.Generate(products, softwares);
         ProductType[] productTypes = ProductTypeGenerator.Generate(products, types);
         TransactionDetail[] transactionDetails = TransactionDetailGenerator.Generate(transactions, products);
@@ -59,6 +60,7 @@ public static class VitomDBContextSeed
         tasks.Add(context.AddRangeAsync(collectionProducts));
         tasks.Add(context.AddRangeAsync(cartItems));
         tasks.Add(context.AddRangeAsync(productImages));
+        tasks.Add(context.AddRangeAsync(modelMaterials));
         tasks.Add(context.AddRangeAsync(productSoftwares));
         tasks.Add(context.AddRangeAsync(productTypes));
         tasks.Add(context.AddRangeAsync(transactionDetails));
