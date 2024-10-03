@@ -10,13 +10,13 @@ namespace Application.UC_User.Command;
 
 public class CreateUser
 {
-    public record Command(ClerkUser AddingEvent) : IRequest<Result>;
+    public record Command(Event AddingEvent) : IRequest<Result>;
 
     public class Handler(IVitomDbContext context, IMediator mediator) : IRequestHandler<Command, Result>
     {
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
-            ClerkUser clerkUser = request.AddingEvent;
+            ClerkUser clerkUser = request.AddingEvent.Data!;
             User? checkingUser = await context.Users.FirstOrDefaultAsync(u => u.Id.Equals(clerkUser.Id), cancellationToken);
             if (checkingUser is not null) return Result.Success();
             User user = new()
