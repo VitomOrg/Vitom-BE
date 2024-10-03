@@ -28,6 +28,12 @@ public class CreateUser
                 ImageUrl = clerkUser.ImageUrl ?? string.Empty,
                 Role = Domain.Enums.RolesEnum.Customer
             };
+            Console.WriteLine("user.Id: " + user.Id);
+            Console.WriteLine("user.Email: " + user.Email);
+            Console.WriteLine("user.Username: " + user.Username);
+            Console.WriteLine("user.Phone: " + user.PhoneNumber);
+            Console.WriteLine("user.ImageUrl: " + user.ImageUrl);
+
             if (user.Id.Equals(string.Empty) || user.Username.Equals(string.Empty) || user.Email.Equals(string.Empty))
                 return Result.NotFound("User is not found !");
             await context.Users.AddAsync(user, cancellationToken);
