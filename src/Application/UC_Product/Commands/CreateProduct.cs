@@ -24,7 +24,8 @@ public class CreateProduct
         string DownloadUrl,
         Guid[] TypeIds,
         Guid[] SoftwareIds,
-        IFormFileCollection Images
+        List<IFormFile> Images,
+        List<IFormFile> ModelMaterials
     ) : IRequest<Result<CreateProductResponse>>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser, IFirebaseService firebaseService) : IRequestHandler<Command, Result<CreateProductResponse>>
@@ -47,27 +48,37 @@ public class CreateProduct
             //check product types are existed
             IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
             if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound($"Types with id {string.Join(", ", request.TypeIds)}  are not existed");
-            // add product types
+            // types - add product types
             newProduct.ProductTypes = checkingTypes.Select(t => new ProductType { ProductId = newProduct.Id, TypeId = t.Id }).ToList();
 
             //check product softwares are existed
             IEnumerable<Software> checkingSoftwares = context.Softwares.Where(s => request.SoftwareIds.Contains(s.Id) && s.DeletedAt == null);
             if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound($"Softwares with id {string.Join(", ", request.SoftwareIds)} are not existed");
-            // add product softwares
+            // software - add product softwares
             newProduct.ProductSoftwares = checkingSoftwares.Select(s => new ProductSoftware { ProductId = newProduct.Id, SoftwareId = s.Id }).ToList();
-
-            // add product images
+            // images - add product images
             List<Task<string>> tasks = [];
             // upload images
             foreach (var image in request.Images)
             {
-                tasks.Add(firebaseService.UploadFile(image.Name, image, "products"));
+                tasks.Add(firebaseService.UploadFile(image.FileName, image, "products"));
             }
             // await all tasks are finished
             string[] imageUrls = await Task.WhenAll(tasks);
             foreach (var imageUrl in imageUrls)
             {
                 newProduct.ProductImages.Add(new ProductImage { ProductId = newProduct.Id, Url = imageUrl });
+            }
+            // material - add product model materials
+            List<Task<string>> modelMaterialTasks = [];
+            foreach (var modelMaterial in request.ModelMaterials)
+            {
+                modelMaterialTasks.Add(firebaseService.UploadFile(modelMaterial.FileName, modelMaterial, "model-materials"));
+            }
+            string[] modelMaterialUrls = await Task.WhenAll(modelMaterialTasks);
+            foreach (var materialUrl in modelMaterialUrls)
+            {
+                newProduct.ModelMaterials.Add(new ModelMaterial { ProductId = newProduct.Id, Url = materialUrl });
             }
             // save changes
             await context.SaveChangesAsync(cancellationToken);
@@ -96,14 +107,8 @@ public class CreateProduct
             return decimal.Round(price, 2) == price;
         }
 
-        private bool HaveValidFiles(IFormFileCollection images)
+        private bool HaveValidFiles(List<IFormFile> images)
             => images.All(image => image.Length < 10240000);
-
-        private bool IsValidHexColorCode(string code)
-        {
-            Regex HexColorRegex = new Regex(@"^#[0-9A-Fa-f]{6}$", RegexOptions.Compiled);
-            return !string.IsNullOrWhiteSpace(code) && HexColorRegex.IsMatch(code);
-        }
     }
 
 }
