@@ -17,7 +17,7 @@ public class ClerkUser
     [JsonPropertyName("username")]
     public string? Username { get; set; }
     [JsonPropertyName("email_addresses")]
-    public List<ClerkEmailAddress> EmailAddresses { get; set; } = new List<ClerkEmailAddress>();
+    public List<ClerkEmailAddress> EmailAddresses { get; set; } = [];
     [JsonPropertyName("phone_numbers")]
     public List<ClerkPhoneNumber> PhoneNumbers { get; set; } = [];
     [JsonPropertyName("image_url")]

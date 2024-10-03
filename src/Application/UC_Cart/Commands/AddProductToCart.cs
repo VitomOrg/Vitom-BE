@@ -38,10 +38,12 @@ public class AddProductToCart
                 );
 
             if (cartItem is not null)
-                return Result.NoContent();
+                return Result.Error("Product already in the cart");
 
             Cart? currentUserCart = await context
-                .Carts.Include(c => c.CartItems)
+                .Carts
+                .AsNoTracking()
+                .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.UserId == currentUser.User!.Id, cancellationToken);
 
             if (currentUserCart is null)
