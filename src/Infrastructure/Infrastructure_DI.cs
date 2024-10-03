@@ -5,6 +5,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
 using Infrastructure.Cache;
 using Infrastructure.Firebase;
+using Infrastructure.Mail;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,9 +24,11 @@ public static class Infrastructure_DI
         {
             options.Configuration = configuration.GetConnectionString("Cache");
         });
+        services.AddScoped<IMailServices, MailServices>();
         services.AddSingleton<ICacheServices, CacheServices>();
         services.AddDistributedMemoryCache();
 
+        services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
         // register firebase storage
         services.AddSingleton<IFirebaseService>(s => new FirebaseStorageService(
             StorageClient.Create()
