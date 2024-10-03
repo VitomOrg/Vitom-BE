@@ -3,11 +3,9 @@ using Application.Responses.ProductResponses;
 using Application.UC_Product.Commands;
 using Ardalis.Result;
 using Domain.Enums;
-using FluentValidation;
-using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
+using System.ComponentModel;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 
 namespace API.EndpointHandlers.ProductEndpointHandlers;
@@ -22,9 +20,12 @@ public class CreateProductEndpointHandler
         [FromForm] string DownloadUrl,
         [FromForm] Guid[] TypeIds,
         [FromForm] Guid[] SoftwareIds,
-        IFormFileCollection Files,
+        [FromForm] IFormFileCollection Files, //param for upload file in swagger
+        [FromForm] IFormFileCollection ModelMaterialFiles, // param for upload model material in swagger
+        HttpContext httpContext,
         CancellationToken cancellationToken = default)
     {
+        var form = await httpContext.Request.ReadFormAsync();
         Result<CreateProductResponse> result = await sender.Send(new CreateProduct.Command(
             License: License,
             Name: Name,
@@ -33,7 +34,8 @@ public class CreateProductEndpointHandler
             DownloadUrl: DownloadUrl,
             TypeIds: TypeIds,
             SoftwareIds: SoftwareIds,
-            Images: Files
+            Images: (List<IFormFile>)form.Files.GetFiles("Files"),
+            ModelMaterials: (List<IFormFile>)form.Files.GetFiles("ModelMaterialFiles")
         ), cancellationToken);
         return result.Check();
     }
