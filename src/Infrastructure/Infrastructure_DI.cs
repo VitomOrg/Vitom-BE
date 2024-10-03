@@ -1,4 +1,5 @@
 using Application.Contracts;
+using Clerk.Net.Client;
 using Domain.Primitives;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -26,6 +27,7 @@ public static class Infrastructure_DI
         services.AddSingleton<ICacheServices, CacheServices>();
         services.AddDistributedMemoryCache();
 
+        services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
         // register firebase storage
         services.AddSingleton<IFirebaseService>(s => new FirebaseStorageService(
             StorageClient.Create()

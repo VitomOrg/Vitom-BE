@@ -20,13 +20,16 @@ public static class UserEndpoints
             return "Hello World";
         }).RequireAuthorization();
 
-        group.MapPut("/artist/{Id}", AssignUserToArtistEndpointHandler.Handle)
+        group.MapPut("/artist", AssignUserToArtistEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Assign user to artist"))
             .RequireAuthorization();
 
-        group.MapPut("/admin/{Id}", AssignUserToAdminEndpointHandler.Handle)
+        group.MapPut("/admin", AssignUserToAdminEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Assign user to admin"))
             .RequireAuthorization();
+
+        group.MapPost("/created", CreateUserEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Create new user"));
         return group;
     }
 }

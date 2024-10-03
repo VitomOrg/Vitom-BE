@@ -1,6 +1,7 @@
 using Application.Contracts;
 using Ardalis.Result;
 using Domain.Entities;
+using Domain.ExternalEntities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,33 +9,30 @@ namespace Application.UC_User.Command;
 
 public class CreateUser
 {
-    public record CreateUserCommand(
-        string Id,
-        string Username,
-        string PhoneNumber,
-        string ImageUrl,
-        string Email
-    ) : IRequest<Result<User>>;
+    public record Command(UserCreatedClerkEvent AddingEvent) : IRequest<Result>;
 
-    public class CreateUserHandler(IVitomDbContext context) : IRequestHandler<CreateUserCommand, Result<User>>
+    public class Handler(IVitomDbContext context, IMediator mediator) : IRequestHandler<Command, Result>
     {
-        public async Task<Result<User>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
-            User? checkingUser = await context.Users.SingleOrDefaultAsync(u => u.Id.Equals(request.Id), cancellationToken);
-            if (checkingUser is not null) return Result.Success(checkingUser);
-            checkingUser = new()
+            ClerkUser clerkUser = request.AddingEvent.data;
+            User? checkingUser = await context.Users.FirstOrDefaultAsync(u => u.Id.Equals(clerkUser.id), cancellationToken);
+            if (checkingUser is not null) return Result.Success();
+            User user = new()
             {
-                Id = request.Id,
-                Username = request.Username,
-                PhoneNumber = request.PhoneNumber,
-                ImageUrl = request.ImageUrl,
-                Email = request.Email,
+                Id = clerkUser.id,
+                Username = clerkUser.username,
+                Email = clerkUser.email_addresses.FirstOrDefault()?.email_address ?? string.Empty,
+                PhoneNumber = clerkUser.phone_numbers.FirstOrDefault() ?? string.Empty,
+                ImageUrl = clerkUser.image_url ?? string.Empty,
                 Role = Domain.Enums.RolesEnum.Customer
             };
-            await context.Users.AddAsync(checkingUser, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-            return Result.Success(checkingUser);
+
+            await context.Users.AddAsync(user, cancellationToken);
+            await mediator.Publish(new UserCreatedClerkEvent(), cancellationToken);
+            return Result.Success();
+            // return Result.Success();
+
         }
     }
-
 }
