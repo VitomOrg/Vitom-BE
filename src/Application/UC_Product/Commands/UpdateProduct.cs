@@ -22,7 +22,8 @@ public class UpdateProduct
         string DownloadUrl,
         Guid[] TypeIds,
         Guid[] SoftwareIds,
-        IFormFileCollection Images
+        List<IFormFile> Images,
+        List<IFormFile> ModelMaterials
     ) : IRequest<Result>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser, IFirebaseService firebaseService) : IRequestHandler<Command, Result>
@@ -37,6 +38,7 @@ public class UpdateProduct
             .Include(product => product.ProductSoftwares)
             .Include(product => product.ProductTypes)
             .Include(product => product.ProductImages)
+            .Include(product => product.ModelMaterials)
             .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
             if (updatingProduct is null) return Result.NotFound();
             // check if user is owner
@@ -46,10 +48,15 @@ public class UpdateProduct
             context.ProductTypes.RemoveRange(updatingProduct.ProductTypes);
             context.ProductSoftwares.RemoveRange(updatingProduct.ProductSoftwares);
             context.ProductImages.RemoveRange(updatingProduct.ProductImages);
+            context.ModelMaterials.RemoveRange(updatingProduct.ModelMaterials);
             List<Task<bool>> tasksDelete = [];
             foreach (var productImage in updatingProduct.ProductImages)
             {
                 tasksDelete.Add(firebaseService.DeleteFile(productImage.Url));
+            }
+            foreach (var modelMaterial in updatingProduct.ModelMaterials)
+            {
+                tasksDelete.Add(firebaseService.DeleteFile(modelMaterial.Url));
             }
             await Task.WhenAll(tasksDelete);
             if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete images failed");
@@ -57,7 +64,7 @@ public class UpdateProduct
             //check product types are existed
             IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
             if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound($"Types with id {string.Join("", request.TypeIds)} are not existed");
-            // add product types
+            // types - add product types
             foreach (Type type in checkingTypes)
             {
                 context.ProductTypes.Add(new ProductType { ProductId = updatingProduct.Id, TypeId = type.Id });
@@ -65,23 +72,36 @@ public class UpdateProduct
             //check product softwares are existed
             IEnumerable<Software> checkingSoftwares = context.Softwares.Where(s => request.SoftwareIds.Contains(s.Id) && s.DeletedAt == null);
             if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound($"Softwares with id {string.Join("", request.SoftwareIds)} are not existed");
-            // add product softwares
+            // softwares - add product softwares
             foreach (Software software in checkingSoftwares)
             {
                 context.ProductSoftwares.Add(new ProductSoftware { ProductId = updatingProduct.Id, SoftwareId = software.Id });
             }
-            // add product images
+            // images - add product images
             List<Task<string>> tasks = [];
             // upload images
             foreach (var image in request.Images)
             {
-                tasks.Add(firebaseService.UploadFile(image.Name, image, "products"));
+                tasks.Add(firebaseService.UploadFile(image.FileName, image, "products"));
             }
             // await all tasks are finished
             string[] imageUrls = await Task.WhenAll(tasks);
             foreach (var imageUrl in imageUrls)
             {
                 context.ProductImages.Add(new ProductImage { ProductId = updatingProduct.Id, Url = imageUrl });
+            }
+            // model materials - add product model materials
+            List<Task<string>> tasksModelMaterials = [];
+            // upload model materials
+            foreach (var modelMaterial in request.ModelMaterials)
+            {
+                tasksModelMaterials.Add(firebaseService.UploadFile(modelMaterial.FileName, modelMaterial, "model-materials"));
+            }
+            // await all tasks are finished
+            string[] modelMaterialUrls = await Task.WhenAll(tasksModelMaterials);
+            foreach (var modelMaterialUrl in modelMaterialUrls)
+            {
+                context.ModelMaterials.Add(new ModelMaterial { ProductId = updatingProduct.Id, Url = modelMaterialUrl });
             }
             //update product
             updatingProduct.Update(
@@ -102,10 +122,14 @@ public class UpdateProduct
     {
         public Validator()
         {
+            RuleFor(x => x.License).IsInEnum().WithMessage("License must be 0, 1, Free, or Pro");
             RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
             RuleFor(x => x.Price).GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative number")
                 .Must(HaveValidDecimalPlaces).WithMessage("Price must have up to two decimal places"); ;
             RuleFor(x => x.DownloadUrl).Must(url => Uri.IsWellFormedUriString(url, UriKind.Absolute)).WithMessage("DownloadUrl must be a valid URL");
+            RuleFor(x => x.Images)
+                .Must(HaveValidFiles)
+                .WithMessage("Each ImageUrl must be a valid URL");
         }
 
         private bool HaveValidDecimalPlaces(decimal price)
@@ -113,5 +137,8 @@ public class UpdateProduct
             // Ensure that price has at most two decimal places
             return decimal.Round(price, 2) == price;
         }
+
+        private bool HaveValidFiles(List<IFormFile> images)
+            => images.All(image => image.Length < 10240000);
     }
 }

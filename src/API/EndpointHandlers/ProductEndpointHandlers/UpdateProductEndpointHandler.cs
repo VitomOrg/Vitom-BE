@@ -19,9 +19,12 @@ public class UpdateProductEndpointHandler
         [FromForm] string DownloadUrl,
         [FromForm] Guid[] TypeIds,
         [FromForm] Guid[] SoftwareIds,
-        IFormFileCollection Files,
+        [FromForm] IFormFileCollection Files, //param for upload file in swagger
+        [FromForm] IFormFileCollection ModelMaterialFiles, // param for upload model material in swagger
+        HttpContext httpContext,
         CancellationToken cancellationToken = default)
     {
+        var form = await httpContext.Request.ReadFormAsync(cancellationToken);
         Result result = await sender.Send(new UpdateProduct.Command(
             Id: Id,
             License: License,
@@ -31,7 +34,8 @@ public class UpdateProductEndpointHandler
             DownloadUrl: DownloadUrl,
             TypeIds: TypeIds,
             SoftwareIds: SoftwareIds,
-            Images: Files
+            Images: (List<IFormFile>)form.Files.GetFiles("Files"),
+            ModelMaterials: (List<IFormFile>)form.Files.GetFiles("ModelMaterialFiles")
         ), cancellationToken);
         return result.Check();
     }

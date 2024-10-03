@@ -24,6 +24,7 @@ public class DeleteProduct
             .Include(product => product.ProductSoftwares)
             .Include(product => product.ProductTypes)
             .Include(product => product.ProductImages)
+            .Include(product => product.ModelMaterials)
             .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
             if (deletingProduct is null) return Result.NotFound();
             //if deleted at is not null means already deleted
@@ -44,6 +45,11 @@ public class DeleteProduct
             foreach (ProductImage productImage in deletingProduct.ProductImages)
             {
                 productImage.Delete();
+            }
+            //soft delete for model materials
+            foreach (ModelMaterial modelMaterial in deletingProduct.ModelMaterials)
+            {
+                modelMaterial.Delete();
             }
 
             //soft delete product
