@@ -1,4 +1,5 @@
 using Application.Contracts;
+using Application.UC_User.Events;
 using Ardalis.Result;
 using Domain.Entities;
 using Domain.ExternalEntities;
@@ -29,7 +30,7 @@ public class CreateUser
             };
 
             await context.Users.AddAsync(user, cancellationToken);
-            await mediator.Publish(new UserCreatedClerkEvent(), cancellationToken);
+            await mediator.Publish(new UserCreatedEvent.Event(user.Email), cancellationToken);
             return Result.Success();
             // return Result.Success();
 
