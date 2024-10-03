@@ -1,5 +1,4 @@
 using Application.Contracts;
-using Clerk.Net.Client;
 using Domain.Primitives;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
