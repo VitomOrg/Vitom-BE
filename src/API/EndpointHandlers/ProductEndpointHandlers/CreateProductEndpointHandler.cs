@@ -25,7 +25,7 @@ public class CreateProductEndpointHandler
         HttpContext httpContext,
         CancellationToken cancellationToken = default)
     {
-        var form = await httpContext.Request.ReadFormAsync();
+        var form = await httpContext.Request.ReadFormAsync(cancellationToken);
         Result<CreateProductResponse> result = await sender.Send(new CreateProduct.Command(
             License: License,
             Name: Name,
