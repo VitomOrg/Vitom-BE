@@ -15,6 +15,7 @@ public interface IVitomDbContext
     DbSet<LikeProduct> LikeProducts { get; set; }
     DbSet<Product> Products { get; set; }
     DbSet<ProductImage> ProductImages { get; set; }
+    DbSet<ModelMaterial> ModelMaterials { get; set; }
     DbSet<ProductSoftware> ProductSoftwares { get; set; }
     DbSet<ProductType> ProductTypes { get; set; }
     DbSet<Review> Reviews { get; set; }

@@ -17,6 +17,7 @@ public class VitomDBContext(DbContextOptions<VitomDBContext> options)
     public DbSet<LikeProduct> LikeProducts { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductImage> ProductImages { get; set; }
+    public DbSet<ModelMaterial> ModelMaterials { get; set; }
     public DbSet<ProductSoftware> ProductSoftwares { get; set; }
     public DbSet<ProductType> ProductTypes { get; set; }
     public DbSet<Review> Reviews { get; set; }
