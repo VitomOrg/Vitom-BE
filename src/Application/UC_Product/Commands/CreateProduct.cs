@@ -109,12 +109,6 @@ public class CreateProduct
 
         private bool HaveValidFiles(List<IFormFile> images)
             => images.All(image => image.Length < 10240000);
-
-        private bool IsValidHexColorCode(string code)
-        {
-            Regex HexColorRegex = new Regex(@"^#[0-9A-Fa-f]{6}$", RegexOptions.Compiled);
-            return !string.IsNullOrWhiteSpace(code) && HexColorRegex.IsMatch(code);
-        }
     }
 
 }
