@@ -10,11 +10,13 @@
     <PackageReference Include="Ardalis.Result" Version="9.1.0" />
     <PackageReference Include="FirebaseAdmin" Version="3.0.1" />
     <PackageReference Include="Google.Cloud.Storage.V1" Version="4.10.0" />
+    <PackageReference Include="MailKit" Version="4.8.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
   </ItemGroup>
