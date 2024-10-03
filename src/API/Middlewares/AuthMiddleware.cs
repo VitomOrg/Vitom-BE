@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Application.Contracts;
 using Domain.Entities;
 using Domain.Primitives;
@@ -11,91 +12,36 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
+        // configure issuer
         string issuer = "https://exotic-squid-32.clerk.accounts.dev";
-        var authHeader = context.Request.Headers.Authorization.ToString();
+        string? authHeader = context.Request.Headers.Authorization.ToString();
         if (authHeader.IsNullOrEmpty() || !authHeader.Contains("Bearer "))
         {
             await next.Invoke(context);
             return;
         }
+        // get token
         authHeader = authHeader.Replace("Bearer ", "");
-        var handler = new JwtSecurityTokenHandler();
-        var jwtSecurityToken = handler.ReadJwtToken(authHeader);
-        var claims = jwtSecurityToken.Claims;
-        // var issuercc = claims.FirstOrDefault(c => c.Issuer.Equals(issuer, StringComparison.InvariantCultureIgnoreCase));
+        JwtSecurityTokenHandler? handler = new();
+        JwtSecurityToken? jwtSecurityToken = handler.ReadJwtToken(authHeader);
+        IEnumerable<Claim>? claims = jwtSecurityToken.Claims;
         if (!claims.Any(c => c.Issuer.Equals(issuer, StringComparison.InvariantCultureIgnoreCase)))
         {
             await next.Invoke(context);
             return;
         }
-        // foreach (var claim in claims)
-        // {
-        //     Console.WriteLine(claim.Type + "-" + claim.Value);
-        // }
-        string? id =
-            claims
-                .FirstOrDefault(c =>
+        // check user
+        string? id = claims.FirstOrDefault(c =>
                     c.Type.Equals("id", StringComparison.InvariantCultureIgnoreCase)
                 )
                 ?.Value ?? string.Empty;
-        // Console.WriteLine($"id : {id}");
-        string? username =
-            claims
-                .FirstOrDefault(c =>
-                    c.Type.Equals("username", StringComparison.InvariantCultureIgnoreCase)
-                )
-                ?.Value ?? string.Empty;
-        string? email =
-            claims
-                .FirstOrDefault(c =>
-                    c.Type.Equals("email", StringComparison.InvariantCultureIgnoreCase)
-                )
-                ?.Value ?? string.Empty;
-        string? phoneNumber =
-            claims
-                .FirstOrDefault(c =>
-                    c.Type.Equals("phonenumber", StringComparison.InvariantCultureIgnoreCase)
-                )
-                ?.Value ?? string.Empty;
-        string? imageUrl =
-            claims
-                .FirstOrDefault(c =>
-                    c.Type.Equals("imageurl", StringComparison.InvariantCultureIgnoreCase)
-                )
-                ?.Value ?? string.Empty;
-
-        User? checkingUser = await vitomDbContext.Users.SingleOrDefaultAsync(u => u.Id.Equals(id));
+        User? checkingUser = await vitomDbContext
+            .Users
+            .AsNoTracking().SingleOrDefaultAsync(u => u.Id.Equals(id));
         if (checkingUser is null)
         {
-            checkingUser = new()
-            {
-                Id = id,
-                Username = username,
-                PhoneNumber = phoneNumber,
-                ImageUrl = imageUrl,
-                Email = email,
-                Role = Domain.Enums.RolesEnum.Customer,
-                Cart = new() { UserId = id }
-            };
-            vitomDbContext.Users.Add(checkingUser);
-            await vitomDbContext.SaveChangesAsync(cancellationToken: default);
-        }
-        // then checking user is not null
-        else
-        {
-            if (
-                checkingUser.Username != username
-                || checkingUser.Email != email
-                || checkingUser.PhoneNumber != phoneNumber
-                || checkingUser.ImageUrl != imageUrl
-            )
-            {
-                checkingUser.Username = username;
-                checkingUser.Email = email;
-                checkingUser.PhoneNumber = phoneNumber;
-                checkingUser.ImageUrl = imageUrl;
-                await vitomDbContext.SaveChangesAsync(cancellationToken: default);
-            }
+            await next.Invoke(context);
+            return;
         }
         CurrentUser currentUser = context.RequestServices.GetRequiredService<CurrentUser>();
         currentUser.User = checkingUser;
