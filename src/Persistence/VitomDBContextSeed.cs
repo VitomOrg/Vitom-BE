@@ -46,6 +46,7 @@ public static class VitomDBContextSeed
         TransactionDetail[] transactionDetails = TransactionDetailGenerator.Generate(transactions, products);
         Blog[] blogs = BlogGenerator.Generate(users);
         BlogImage[] blogImages = BlogImageGenerator.Generate(blogs);
+        Model[] models = ModelGenerator.Generate(products);
         tasks.Add(context.AddRangeAsync(users));
         tasks.Add(context.AddRangeAsync(products));
         tasks.Add(context.AddRangeAsync(types));
@@ -66,6 +67,7 @@ public static class VitomDBContextSeed
         tasks.Add(context.AddRangeAsync(transactionDetails));
         tasks.Add(context.AddRangeAsync(blogs));
         tasks.Add(context.AddRangeAsync(blogImages));
+        tasks.Add(context.AddRangeAsync(models));
         await Task.WhenAll(tasks);
         await context.SaveChangesAsync();
     }

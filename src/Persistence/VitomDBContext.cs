@@ -31,6 +31,7 @@ public class VitomDBContext(DbContextOptions<VitomDBContext> options)
     public DbSet<SystemTotal> SystemTotals { get; set; }
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<BlogImage> BlogImages { get; set; }
+    public DbSet<Model> Models { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +57,7 @@ public class VitomDBContext(DbContextOptions<VitomDBContext> options)
         modelBuilder.Entity<User>().HasQueryFilter(t => t.DeletedAt == null);
         modelBuilder.Entity<UserLibrary>().HasQueryFilter(t => t.DeletedAt == null);
         modelBuilder.Entity<ModelMaterial>().HasQueryFilter(t => t.DeletedAt == null);
+        modelBuilder.Entity<Model>().HasQueryFilter(t => t.DeletedAt == null);
         base.OnModelCreating(modelBuilder);
     }
 }
