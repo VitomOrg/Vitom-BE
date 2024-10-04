@@ -1,6 +1,5 @@
 using Application.Contracts;
 using Ardalis.Result;
-using Domain.Entities;
 using Domain.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -20,42 +19,21 @@ public class DeleteProduct
             //check if current user is organization
             if (!currentUser.User!.IsOrganization() || currentUser.User.DeletedAt != null) return Result.Forbidden();
             //get deleting product
-            Product? deletingProduct = await context.Products
+            int result = await context.Products
             .Include(product => product.ProductSoftwares)
             .Include(product => product.ProductTypes)
             .Include(product => product.ProductImages)
             .Include(product => product.ModelMaterials)
-            .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
-            if (deletingProduct is null) return Result.NotFound();
-            //if deleted at is not null means already deleted
-            if (deletingProduct.DeletedAt is not null) return Result.Error($"Product with id {request.Id} has already been deleted");
-            //check if user is owner
-            if (!deletingProduct.UserId.Equals(currentUser.User.Id)) return Result.Forbidden();
-            //soft delete for product types
-            foreach (ProductType productType in deletingProduct.ProductTypes)
-            {
-                productType.Delete();
-            }
-            //soft delete for product softwares
-            foreach (ProductSoftware productSoftware in deletingProduct.ProductSoftwares)
-            {
-                productSoftware.Delete();
-            }
-            //soft delete for product images
-            foreach (ProductImage productImage in deletingProduct.ProductImages)
-            {
-                productImage.Delete();
-            }
-            //soft delete for model materials
-            foreach (ModelMaterial modelMaterial in deletingProduct.ModelMaterials)
-            {
-                modelMaterial.Delete();
-            }
-
-            //soft delete product
-            deletingProduct.Delete();
-            await context.SaveChangesAsync(cancellationToken);
-            //return result
+            .Where(p => p.Id.Equals(request.Id) && p.DeletedAt == null)
+            .ExecuteUpdateAsync(e =>
+                e.SetProperty(p => p.ProductTypes.Any(pt => pt.DeletedAt == null), false)
+                    .SetProperty(p => p.ProductSoftwares.Any(ps => ps.DeletedAt == null), false)
+                    .SetProperty(p => p.ProductImages.Any(pi => pi.DeletedAt == null), false)
+                    .SetProperty(p => p.ModelMaterials.Any(mm => mm.DeletedAt == null), false)
+                    .SetProperty(p => p.DeletedAt, DateTime.Now)
+               , cancellationToken)
+            ;
+            if (result < 0) return Result.NotFound();
             return Result.NoContent();
         }
     }
