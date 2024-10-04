@@ -8,6 +8,7 @@ public class User : Entity
 {
     public new string Id { get; set; } = string.Empty;
     public required RolesEnum Role { get; set; }
+    public bool IsLicense { get; set; } = false;
 
     [MaxLength(25)]
     public required string Username { get; set; }

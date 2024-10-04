@@ -25,6 +25,7 @@ public class Product : Entity
     [Range(0, int.MaxValue)]
     public int TotalLiked { get; set; } = 0;
     public User User { get; set; } = null!;
+    public Model Model { get; set; } = null!;
     public ICollection<UserLibrary> UserLibraries { get; set; } = [];
     public ICollection<LikeProduct> LikeProducts { get; set; } = [];
     public ICollection<CollectionProduct> CollectionProducts { get; set; } = [];
