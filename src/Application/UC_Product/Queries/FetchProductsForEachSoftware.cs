@@ -31,9 +31,10 @@ public class FetchProductsForEachSoftware
             //query
             IQueryable<Software> query =
                 context.Softwares
-                    .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.LikeProducts)
+                    .AsSplitQuery()
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ProductTypes).ThenInclude(p => p.Type)
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ProductImages)
+                    .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ModelMaterials)
                     .Where(s => s.DeletedAt == null)
                     .Where(s => s.ProductSoftwares.Any(ps => ps.Product.ProductTypes.Any(p => p.Type.Name.ToLower().Contains(request.Type.ToLower()))))
                     .Where(s => s.ProductSoftwares.Any(ps => ps.Product.DeletedAt == null));
