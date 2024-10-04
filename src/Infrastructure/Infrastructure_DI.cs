@@ -1,4 +1,5 @@
 using Application.Contracts;
+using Domain.ExternalEntities;
 using Domain.Primitives;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -6,9 +7,11 @@ using Google.Cloud.Storage.V1;
 using Infrastructure.Cache;
 using Infrastructure.Firebase;
 using Infrastructure.Mail;
+using Infrastructure.PayOSService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Net.payOS;
 
 namespace Infrastructure;
 
@@ -24,10 +27,12 @@ public static class Infrastructure_DI
         {
             options.Configuration = configuration.GetConnectionString("Cache");
         });
-        services.AddScoped<IMailServices, MailServices>();
         services.AddSingleton<ICacheServices, CacheServices>();
+        services.AddScoped<IMailServices, MailServices>();
+        services.AddScoped<IPayOSServices, PayOSServices>();
         services.AddDistributedMemoryCache();
 
+        services.Configure<UrlSettings>(configuration.GetSection("UrlSettings"));
         services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
         // register firebase storage
         services.AddSingleton<IFirebaseService>(s => new FirebaseStorageService(
@@ -57,12 +62,8 @@ public static class Infrastructure_DI
         string checkSumKey =
             configuration["ApiSettings:PayOS:CheckSumKey"] ?? throw new Exception();
 
-        services.Configure<PayOSSettings>(model =>
-        {
-            model.ClientId = clientId;
-            model.ApiKey = apiKey;
-            model.CheckSumKey = checkSumKey;
-        });
+        PayOS payOS = new(clientId, apiKey, checkSumKey);
+        services.AddScoped(s => payOS);
 
         return services;
     }
