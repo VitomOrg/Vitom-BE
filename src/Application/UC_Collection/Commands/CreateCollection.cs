@@ -4,6 +4,7 @@ using Application.Responses.CollectionResponses;
 using Ardalis.Result;
 using Domain.Entities;
 using Domain.Primitives;
+using FluentValidation;
 using MediatR;
 
 namespace Application.UC_Collection.Commands;
@@ -32,6 +33,17 @@ public class CreateCollection
             await context.SaveChangesAsync(cancellationToken);
 
             return Result.Success(addingCollection.MapToCreateCollectionResponse());
+        }
+    }
+
+    public class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required")
+                .MaximumLength(100).WithMessage("Please enter a valid name maxiumum 100 characters");
+            RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required")
+                .MaximumLength(250).WithMessage("Please enter a valid name maxiumum 250 characters");
         }
     }
 }

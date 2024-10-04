@@ -3,6 +3,7 @@ using Application.Mappers.TypeMappers;
 using Application.Responses.TypeResponses;
 using Ardalis.Result;
 using Domain.Primitives;
+using FluentValidation;
 using MediatR;
 using Type = Domain.Entities.Type;
 
@@ -34,6 +35,17 @@ public class CreateType
                 newType.MapToCreateTypeResponse(),
                 $"Create new {request.Name} type successfully"
             );
+        }
+    }
+
+    public class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required")
+                .MaximumLength(100).WithMessage("Please enter a valid name maxiumum 100 characters");
+            RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required")
+                .MaximumLength(250).WithMessage("Please enter a valid name maxiumum 250 characters");
         }
     }
 }
