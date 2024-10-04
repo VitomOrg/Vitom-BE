@@ -26,6 +26,7 @@ public class DeleteProduct
             .Include(product => product.ProductImages)
             .Include(product => product.ModelMaterials)
             .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
+
             if (deletingProduct is null) return Result.NotFound();
             //if deleted at is not null means already deleted
             if (deletingProduct.DeletedAt is not null) return Result.Error($"Product with id {request.Id} has already been deleted");
@@ -51,7 +52,6 @@ public class DeleteProduct
             {
                 modelMaterial.Delete();
             }
-
             //soft delete product
             deletingProduct.Delete();
             await context.SaveChangesAsync(cancellationToken);
