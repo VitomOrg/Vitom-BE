@@ -36,6 +36,7 @@ public class FetchLikedProductByUserId
                 .Include(p => p.ProductTypes).ThenInclude(p => p.Type)
                 .Include(p => p.ProductSoftwares)
                 .Include(p => p.ProductImages)
+                .Include(p => p.ModelMaterials)
                 .Where(p => p.LikeProducts.Any(lp => lp.UserId == currentUser.User!.Id && lp.DeletedAt == null))
                 .Where(p => p.DeletedAt == null);
 

@@ -16,6 +16,7 @@ public static class ProductDetailsResponseMapper
             Description: product.Description,
             Types: product.ProductTypes.Where(pt => pt.DeletedAt == null).Select(p => p.Type.Name),
             ImageUrls: product.ProductImages.Where(pi => pi.DeletedAt == null).Select(p => p.Url),
+            ModelMaterialUrls: product.ModelMaterials.Where(mm => mm.DeletedAt == null).Select(p => p.Url),
             Price: product.Price,
             DownloadUrl: product.DownloadUrl,
             TotalPurchases: product.TotalPurchases,

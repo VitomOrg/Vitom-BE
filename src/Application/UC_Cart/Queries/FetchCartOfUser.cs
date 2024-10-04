@@ -32,7 +32,9 @@ public class FetchCartOfUser
             //get data from db
             IQueryable<CartItem> items = context.CartItems
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(ci => ci.Product).ThenInclude(ci => ci.ProductImages)
+                .Include(ci => ci.Product).ThenInclude(ci => ci.ModelMaterials)
                 .Include(ci => ci.Product).ThenInclude(ci => ci.ProductTypes).ThenInclude(ci => ci.Type)
                 .Include(ci => ci.Cart)
                 .Where(ci => ci.Cart.UserId == currentUser.User!.Id)

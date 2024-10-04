@@ -12,6 +12,7 @@ public record ProductDetailsResponse
     string Description,
     IEnumerable<string> Types,
     IEnumerable<string> ImageUrls,
+    IEnumerable<string> ModelMaterialUrls,
     decimal Price,
     string DownloadUrl,
     int TotalPurchases,
