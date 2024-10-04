@@ -30,12 +30,14 @@ public class ViewDetailOfProduct
 
             IQueryable<Product> query = context
                 .Products.AsNoTracking()
+                .AsSplitQuery()
                 .Include(p => p.LikeProducts)
                 .Include(p => p.CollectionProducts)
                 .Include(p => p.ProductTypes)
                 .ThenInclude(p => p.Type)
                 .Include(p => p.ProductSoftwares)
                 .Include(p => p.ProductImages)
+                .Include(p => p.ModelMaterials)
                 .Include(p => p.Reviews)
                 .ThenInclude(p => p.User)
                 .Where(p => p.DeletedAt == null)
