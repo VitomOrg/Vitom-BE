@@ -32,7 +32,7 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
         }
         // check user
         string? id = claims.FirstOrDefault(c =>
-                    c.Type.Equals("id", StringComparison.InvariantCultureIgnoreCase)
+                    c.Type.Equals("sub", StringComparison.InvariantCultureIgnoreCase)
                 )
                 ?.Value ?? string.Empty;
         User? checkingUser = await vitomDbContext
