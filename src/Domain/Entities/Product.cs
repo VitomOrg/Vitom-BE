@@ -1,3 +1,4 @@
+
 using System.ComponentModel.DataAnnotations;
 using Domain.Enums;
 using Domain.Primitives;
