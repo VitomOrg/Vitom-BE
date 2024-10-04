@@ -1,5 +1,7 @@
 using Application.Contracts;
+using Application.Mappers.RatingMappers;
 using Application.Mappers.ReviewMappers;
+using Application.Responses.RatingResponse.cs;
 using Application.Responses.ReviewResponses;
 using Application.Responses.Shared;
 using Ardalis.Result;
@@ -16,15 +18,15 @@ public class FetchReviewsOfProduct
         Guid ProductId,
         int PageSize,
         int PageIndex
-    ) : IRequest<Result<PaginatedResponse<ReviewDetailsResponse>>>;
-    public class Handler(IVitomDbContext context, ICacheServices cacheServices) : IRequestHandler<Query, Result<PaginatedResponse<ReviewDetailsResponse>>>
+    ) : IRequest<Result<PaginatedResponse<RatingWithReviewResponse>>>;
+    public class Handler(IVitomDbContext context, ICacheServices cacheServices) : IRequestHandler<Query, Result<PaginatedResponse<RatingWithReviewResponse>>>
     {
-        public async Task<Result<PaginatedResponse<ReviewDetailsResponse>>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<PaginatedResponse<RatingWithReviewResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
             // set key
             string key = $"reviews-pagesize{request.PageSize}-pageindex-{request.PageIndex}";
             // get cache result
-            PaginatedResponse<ReviewDetailsResponse>? cacheResult = await cacheServices.GetAsync<PaginatedResponse<ReviewDetailsResponse>>(key, cancellationToken);
+            PaginatedResponse<RatingWithReviewResponse>? cacheResult = await cacheServices.GetAsync<PaginatedResponse<RatingWithReviewResponse>>(key, cancellationToken);
             if (cacheResult is not null) return Result.Success(cacheResult, "Get reviews Successfully");
             // query
             IQueryable<Review> query =
@@ -41,14 +43,15 @@ public class FetchReviewsOfProduct
             // calculating total pages
             int totalPages = (int)Math.Ceiling((decimal)query.Count() / request.PageSize);
             // get result
-            IEnumerable<ReviewDetailsResponse> result =
+            IEnumerable<IGrouping<int, Review>> result =
                 await query.Skip((request.PageIndex - 1) * request.PageSize)
                     .Take(request.PageSize)
-                    .Select(s => s.MapToReviewDetailsResponse())
+                    .GroupBy(r => r.Rating)
                     .ToListAsync(cancellationToken);
+
             // map to paginated result
             cacheResult = new(
-                Data: result,
+                Data: result.Select(s => s.MapToRatingWithReviewResponse()),
                 PageIndex: request.PageIndex,
                 PageSize: request.PageSize,
                 TotalPages: totalPages
