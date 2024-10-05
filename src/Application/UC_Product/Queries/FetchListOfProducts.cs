@@ -14,12 +14,13 @@ namespace Application.UC_Product.Queries
     public class FetchListOfProducts
     {
         public record Query(
+            string? Search,
             decimal PriceFrom,
             decimal PriceTo,
             bool AscByCreatedAt,
             int PageSize,
             int PageIndex,
-            string Type,
+            string? Type,
             LicenseEnum? License
         ) : IRequest<Result<PaginatedResponse<ProductDetailsResponse>>>;
 
@@ -41,8 +42,9 @@ namespace Application.UC_Product.Queries
                 .Include(p => p.ProductImages)
                 .Include(p => p.ModelMaterials)
                 .Where(p => p.DeletedAt == null)
+                .Where(p => request.Search == null || p.Name.ToLower().Contains(request.Search.ToLower()))
                 // .Where(p => p.ProductTypes.Any(pt => EF.Functions.Like(pt.Type.Name, $"%{request.Type}%")))
-                .Where(p => p.ProductTypes.Any(pt => pt.Type.Name.ToLower().Contains(request.Type.ToLower())))
+                .Where(p => request.Type == null || p.ProductTypes.Any(pt => pt.Type.Name.ToLower().Contains(request.Type.ToLower())))
                 // .Where(p => EF.Functions.Like((string)(object)p.License, $"%{request.License}%"))
                 // .Where(p => ((string)(object)p.License).Contains(request.License))
                 .Where(p => p.License == request.License || request.License == null)
