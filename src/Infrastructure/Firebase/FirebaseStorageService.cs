@@ -47,7 +47,7 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         // var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
 
         // return publicUrl;
-        return image.MediaLink;
+        return image.SelfLink;
     }
 
     public async Task<string> UploadFile(string fileName, IFormFile file, string folderSave)
@@ -85,7 +85,7 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         // var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
 
         // return publicUrl;
-        return image.MediaLink;
+        return image.SelfLink;
     }
 
     public async Task<bool> DeleteFile(string imageUrl)
