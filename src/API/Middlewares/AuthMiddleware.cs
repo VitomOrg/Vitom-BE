@@ -40,8 +40,17 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
             .AsNoTracking().SingleOrDefaultAsync(u => u.Id.Equals(id));
         if (checkingUser is null)
         {
-            await next.Invoke(context);
-            return;
+            checkingUser = new()
+            {
+                Id = id,
+                Username = "admin",
+                Email = "admin",
+                PhoneNumber = "admin",
+                ImageUrl = "admin",
+                Role = Domain.Enums.RolesEnum.Admin
+            };
+            await vitomDbContext.Users.AddAsync(checkingUser);
+            await vitomDbContext.SaveChangesAsync(cancellationToken: default);
         }
         CurrentUser currentUser = context.RequestServices.GetRequiredService<CurrentUser>();
         currentUser.User = checkingUser;
