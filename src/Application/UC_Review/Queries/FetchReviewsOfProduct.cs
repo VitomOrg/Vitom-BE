@@ -43,7 +43,7 @@ public class FetchReviewsOfProduct
             if (request.AscByRating)
                 query = query
                     .OrderBy(s => s.Rating)
-                    .ThenBy(s => s.CreatedAt);
+                    .ThenByDescending(s => s.CreatedAt);
             else
                 query = query
                     .OrderByDescending(s => s.Rating)
