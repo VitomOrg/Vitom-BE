@@ -43,10 +43,11 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
             ]
         });
 
-        // Construct and return the public URL for the uploaded image
-        var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
+        // // Construct and return the public URL for the uploaded image
+        // var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
 
-        return publicUrl;
+        // return publicUrl;
+        return image.MediaLink;
     }
 
     public async Task<string> UploadFile(string fileName, IFormFile file, string folderSave)
@@ -80,10 +81,11 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
             ]
         });
 
-        // Construct and return the public URL for the uploaded image
-        var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
+        // // Construct and return the public URL for the uploaded image
+        // var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
 
-        return publicUrl;
+        // return publicUrl;
+        return image.MediaLink;
     }
 
     public async Task<bool> DeleteFile(string imageUrl)
@@ -118,7 +120,7 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         MemoryStream zipMemoryStream = new MemoryStream();
 
         // Create the zip archive in the memory stream
-        using (ZipArchive archive = new ZipArchive(zipMemoryStream, ZipArchiveMode.Create, true))
+        using (ZipArchive archive = new(zipMemoryStream, ZipArchiveMode.Create, true))
         {
             for (int i = 0; i < fileStreams.Length; i++)
             {
@@ -154,7 +156,7 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         });
 
         // Construct and return the public URL for the uploaded image
-        var publicUrl = $"https://storage.googleapis.com/products/{BucketName}/{objectName}";
+        var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
 
         return publicUrl;
 
