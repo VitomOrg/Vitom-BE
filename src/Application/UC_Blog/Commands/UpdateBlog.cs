@@ -36,7 +36,7 @@ public class UpdateBlog
             List<Task<string>> tasks = [];
             foreach (var image in request.Images)
             {
-                tasks.Add(firebaseService.UploadFile(image.Name, image, "blogs"));
+                tasks.Add(firebaseService.UploadFile(image.FileName, image, "blogs"));
             }
             // update the blog
             updatingBlog.Update(
@@ -46,6 +46,14 @@ public class UpdateBlog
             // remove old images
             if (updatingBlog.Images.Count > 0)
                 context.BlogImages.RemoveRange(updatingBlog.Images);
+            //remove images from firebase
+            List<Task<bool>> deleteTasks = [];
+            foreach (var image in updatingBlog.Images)
+            {
+                deleteTasks.Add(firebaseService.DeleteFile(image.Url));
+            }
+            await Task.WhenAll(deleteTasks);
+            if (deleteTasks.Any(t => !t.Result)) return Result.Error("Delete images failed");
             // AWAIT get image urls
             string[] urls = await Task.WhenAll(tasks);
             // add new images
