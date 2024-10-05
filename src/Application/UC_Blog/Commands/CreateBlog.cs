@@ -34,7 +34,7 @@ public class CreateBlog
             List<Task<string>> tasks = [];
             foreach (var image in request.Images)
             {
-                tasks.Add(firebaseService.UploadFile(image.Name, image, "blogs"));
+                tasks.Add(firebaseService.UploadFile(image.FileName, image, "blogs"));
             }
             string[] imageUrls = await Task.WhenAll(tasks);
             newBlog.Images = imageUrls.Select(i => new BlogImage()

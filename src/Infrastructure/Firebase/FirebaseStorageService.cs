@@ -43,11 +43,10 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
             ]
         });
 
-        // // Construct and return the public URL for the uploaded image
-        // var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
+        // Construct and return the public URL for the uploaded image
+        var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
 
-        // return publicUrl;
-        return image.SelfLink;
+        return publicUrl;
     }
 
     public async Task<string> UploadFile(string fileName, IFormFile file, string folderSave)
@@ -81,11 +80,10 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
             ]
         });
 
-        // // Construct and return the public URL for the uploaded image
-        // var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
+        // Construct and return the public URL for the uploaded image
+        var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
 
-        // return publicUrl;
-        return image.SelfLink;
+        return publicUrl;
     }
 
     public async Task<bool> DeleteFile(string imageUrl)
@@ -117,7 +115,7 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         var randomGuid = Guid.NewGuid();
         Stream[] fileStreams = files.Select(f => f.OpenReadStream()).ToArray();
         // Create a memory stream to hold the zip file
-        MemoryStream zipMemoryStream = new MemoryStream();
+        MemoryStream zipMemoryStream = new();
 
         // Create the zip archive in the memory stream
         using (ZipArchive archive = new(zipMemoryStream, ZipArchiveMode.Create, true))

@@ -10,12 +10,18 @@ namespace API.EndpointHandlers.ReviewEndpointHandler;
 
 public class FetchReviewsByProductEndpointHandler
 {
-    public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender, Guid productId, int pageSize = 10, int pageIndex = 1, CancellationToken cancellationToken = default)
+    public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender,
+        Guid productId,
+        int pageSize = 10,
+        int pageIndex = 1,
+        bool AscByRating = false,
+        CancellationToken cancellationToken = default)
     {
-        Result<PaginatedResponse<RatingWithReviewResponse>> result = await sender.Send(new FetchReviewsOfProduct.Query(
+        Result<PaginatedResponse<ReviewDetailsResponse>> result = await sender.Send(new FetchReviewsOfProduct.Query(
             ProductId: productId,
             PageSize: pageSize,
-            PageIndex: pageIndex
+            PageIndex: pageIndex,
+            AscByRating: AscByRating
         ), cancellationToken);
         return result.Check();
     }

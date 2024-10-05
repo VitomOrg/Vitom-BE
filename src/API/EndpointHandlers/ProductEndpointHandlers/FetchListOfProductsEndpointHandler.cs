@@ -12,7 +12,8 @@ public class FetchListOfProductsEndpointHandler
 {
     public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender,
         LicenseEnum? license,
-        string type = "",
+        string? search,
+        string? type,
         decimal priceFrom = 0,
         decimal priceTo = int.MaxValue,
         bool ascByCreatedAt = false,
@@ -21,6 +22,7 @@ public class FetchListOfProductsEndpointHandler
         CancellationToken cancellationToken = default)
     {
         Result<PaginatedResponse<ProductDetailsResponse>> result = await sender.Send(new FetchListOfProducts.Query(
+            Search: search,
             Type: type,
             License: license,
             PriceFrom: priceFrom,

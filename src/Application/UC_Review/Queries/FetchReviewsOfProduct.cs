@@ -17,16 +17,17 @@ public class FetchReviewsOfProduct
     public record Query(
         Guid ProductId,
         int PageSize,
-        int PageIndex
-    ) : IRequest<Result<PaginatedResponse<RatingWithReviewResponse>>>;
-    public class Handler(IVitomDbContext context, ICacheServices cacheServices) : IRequestHandler<Query, Result<PaginatedResponse<RatingWithReviewResponse>>>
+        int PageIndex,
+        bool AscByRating
+    ) : IRequest<Result<PaginatedResponse<ReviewDetailsResponse>>>;
+    public class Handler(IVitomDbContext context, ICacheServices cacheServices) : IRequestHandler<Query, Result<PaginatedResponse<ReviewDetailsResponse>>>
     {
-        public async Task<Result<PaginatedResponse<RatingWithReviewResponse>>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<PaginatedResponse<ReviewDetailsResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
             // set key
             string key = $"reviews-pagesize{request.PageSize}-pageindex-{request.PageIndex}";
             // get cache result
-            PaginatedResponse<RatingWithReviewResponse>? cacheResult = await cacheServices.GetAsync<PaginatedResponse<RatingWithReviewResponse>>(key, cancellationToken);
+            PaginatedResponse<ReviewDetailsResponse>? cacheResult = await cacheServices.GetAsync<PaginatedResponse<ReviewDetailsResponse>>(key, cancellationToken);
             if (cacheResult is not null) return Result.Success(cacheResult, "Get reviews Successfully");
             // query
             IQueryable<Review> query =
@@ -39,19 +40,27 @@ public class FetchReviewsOfProduct
                     .Where(s => s.Product.DeletedAt == null)
                     .Where(s => s.DeletedAt == null);
             //sort
-            query = query.OrderByDescending(s => s.CreatedAt);
+            if (request.AscByRating)
+                query = query
+                    .OrderBy(s => s.Rating)
+                    .ThenByDescending(s => s.CreatedAt);
+            else
+                query = query
+                    .OrderByDescending(s => s.Rating)
+                    .ThenByDescending(s => s.CreatedAt);
             // calculating total pages
             int totalPages = (int)Math.Ceiling((decimal)query.Count() / request.PageSize);
             // get result
-            IEnumerable<IGrouping<int, Review>> result =
-                await query.Skip((request.PageIndex - 1) * request.PageSize)
+            IEnumerable<ReviewDetailsResponse> result =
+                await query
+                    .Skip((request.PageIndex - 1) * request.PageSize)
                     .Take(request.PageSize)
-                    .GroupBy(r => r.Rating)
+                    .Select(r => r.MapToReviewDetailsResponse())
                     .ToListAsync(cancellationToken);
 
             // map to paginated result
             cacheResult = new(
-                Data: result.Select(s => s.MapToRatingWithReviewResponse()),
+                Data: result,
                 PageIndex: request.PageIndex,
                 PageSize: request.PageSize,
                 TotalPages: totalPages

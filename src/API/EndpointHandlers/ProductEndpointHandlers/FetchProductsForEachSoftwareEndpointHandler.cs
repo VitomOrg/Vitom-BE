@@ -11,7 +11,7 @@ namespace API.EndpointHandlers.ProductEndpointHandlers;
 public class FetchProductsForEachSoftwareEndpointHandler
 {
     public static async Task<IResult> Handle(ISender sender,
-        string type = "",
+        string? type,
         bool ascByCreatedAt = false,
         int pageIndex = 1,
         int pageSize = 10,

@@ -13,7 +13,7 @@ public class FetchProductsForEachSoftware
 {
     public record Query(
         bool AscByCreatedAt,
-        string Type,
+        string? Type,
         int PageIndex,
         int PageSize
     ) : IRequest<Result<PaginatedResponse<FetchProductsForEachSoftwareResponse>>>;
@@ -36,7 +36,7 @@ public class FetchProductsForEachSoftware
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ProductImages)
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ModelMaterials)
                     .Where(s => s.DeletedAt == null)
-                    .Where(s => s.ProductSoftwares.Any(ps => ps.Product.ProductTypes.Any(p => p.Type.Name.ToLower().Contains(request.Type.ToLower()))))
+                    .Where(s => request.Type == null || s.ProductSoftwares.Any(ps => ps.Product.ProductTypes.Any(p => p.Type.Name.ToLower().Contains(request.Type.ToLower()))))
                     .Where(s => s.ProductSoftwares.Any(ps => ps.Product.DeletedAt == null));
 
             int count = await query.CountAsync();
