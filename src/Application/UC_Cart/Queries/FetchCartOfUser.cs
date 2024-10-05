@@ -25,7 +25,7 @@ public class FetchCartOfUser
             //check if user is null
             if (currentUser.User is null || currentUser.User.DeletedAt != null) return Result.Forbidden();
             //set key
-            string key = $"cart:{currentUser.User!.Id}-sortascbycreateat{request.AscByCreatedAt}";
+            string key = $"cart:{currentUser.User!.Id}-sortascbycreateat{request.AscByCreatedAt}-pageindex{request.PageIndex}-pagesize{request.PageSize}";
             //get data from cache
             PaginatedResponse<CartItemResponse>? cacheResponse = await services.GetAsync<PaginatedResponse<CartItemResponse>>(key, cancellationToken);
             if (cacheResponse is not null) return Result.Success(cacheResponse, $"fetch cart items of user {currentUser.User!.Username} successfully");
