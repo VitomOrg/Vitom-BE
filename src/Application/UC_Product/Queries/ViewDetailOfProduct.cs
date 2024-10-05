@@ -31,6 +31,7 @@ public class ViewDetailOfProduct
             IQueryable<Product> query = context
                 .Products.AsNoTracking()
                 .AsSplitQuery()
+                .Include(p => p.UserLibraries)
                 .Include(p => p.LikeProducts)
                 .Include(p => p.CollectionProducts)
                 .Include(p => p.ProductTypes)
@@ -44,7 +45,7 @@ public class ViewDetailOfProduct
                 .Where(p => p.Id == request.Id);
 
             ProductDetailsResponse? result = await query
-                .Select(p => p.MapToProductDetailsResponse())
+                .Select(p => p.MapForProductDetail())
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (result is null)
