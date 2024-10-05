@@ -25,7 +25,7 @@ public class FetchReviewsOfProduct
         public async Task<Result<PaginatedResponse<ReviewDetailsResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
             // set key
-            string key = $"reviews-pagesize{request.PageSize}-pageindex-{request.PageIndex}";
+            string key = $"reviews-pagesize{request.PageSize}-pageindex-{request.PageIndex}-productid{request.ProductId}-orderascbyrating{request.AscByRating}";
             // get cache result
             PaginatedResponse<ReviewDetailsResponse>? cacheResult = await cacheServices.GetAsync<PaginatedResponse<ReviewDetailsResponse>>(key, cancellationToken);
             if (cacheResult is not null) return Result.Success(cacheResult, "Get reviews Successfully");
