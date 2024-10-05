@@ -1,6 +1,7 @@
 using Application.Contracts;
 using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Http;
+using System.IO.Compression;
 
 namespace Infrastructure.Firebase;
 
@@ -11,16 +12,20 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
     private const string BucketName = "vitom-firebase.appspot.com";
     private static readonly string[] separator = ["/o/"];
 
-    public async Task<string> UploadFile(string name, IFormFile file)
+    public async Task<string> UploadFile(string fileName, IFormFile file)
     {
         // Create Guid to make the name of image unique
         var randomGuid = Guid.NewGuid();
+
+        // Split the name into two parts: before and after the dot
+        var nameParts = fileName.Split('.');
+        var newName = $"{nameParts[0]}-{randomGuid}.{nameParts[1]}";
 
         using var stream = new MemoryStream();
         await file.CopyToAsync(stream);
 
         // Uploading image to FireBase
-        var objectName = $"images/{name}-{randomGuid}";
+        var objectName = $"images/{newName}";
         var image = await _storageClient.UploadObjectAsync(BucketName, objectName, file.ContentType, stream);
 
         // Make the object publicly accessible
@@ -44,16 +49,20 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         return publicUrl;
     }
 
-    public async Task<string> UploadFile(string name, IFormFile file, string folderSave)
+    public async Task<string> UploadFile(string fileName, IFormFile file, string folderSave)
     {
         // Create Guid to make the name of image unique
         var randomGuid = Guid.NewGuid();
+
+        // Split the name into two parts: before and after the dot
+        var nameParts = fileName.Split('.');
+        var newName = $"{nameParts[0]}-{randomGuid}.{nameParts[1]}";
 
         using var stream = new MemoryStream();
         await file.CopyToAsync(stream);
 
         // Uploading image to FireBase
-        var objectName = $"images/{folderSave}/{name}-{randomGuid}";
+        var objectName = $"images/{folderSave}/{newName}";
         var image = await _storageClient.UploadObjectAsync(BucketName, objectName, file.ContentType, stream);
 
         // Make the object publicly accessible
@@ -101,4 +110,53 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         }
     }
 
+    public async Task<string> UploadFiles(List<IFormFile> files, string folderSave)
+    {
+        var randomGuid = Guid.NewGuid();
+        Stream[] fileStreams = files.Select(f => f.OpenReadStream()).ToArray();
+        // Create a memory stream to hold the zip file
+        MemoryStream zipMemoryStream = new MemoryStream();
+
+        // Create the zip archive in the memory stream
+        using (ZipArchive archive = new ZipArchive(zipMemoryStream, ZipArchiveMode.Create, true))
+        {
+            for (int i = 0; i < fileStreams.Length; i++)
+            {
+                // Add each file to the zip archive
+                ZipArchiveEntry zipEntry = archive.CreateEntry(files[i].Name);
+
+                using (Stream entryStream = zipEntry.Open())
+                {
+                    // Copy the file stream to the zip entry
+                    fileStreams[i].CopyTo(entryStream);
+                }
+            }
+        }
+        // Reset the position of the memory stream to the beginning before returning it
+        zipMemoryStream.Seek(0, SeekOrigin.Begin);
+        // Uploading image to FireBase
+        var objectName = $"images/{folderSave}/DownloadProduct-{randomGuid}.zip";
+        var image = await _storageClient.UploadObjectAsync(BucketName, objectName, "application/zip", zipMemoryStream);
+
+        // Make the object publicly accessible
+        await _storageClient.UpdateObjectAsync(new Google.Apis.Storage.v1.Data.Object
+        {
+            Bucket = BucketName,
+            Name = objectName,
+            Acl =
+            [
+                new Google.Apis.Storage.v1.Data.ObjectAccessControl
+                {
+                    Entity = "allUsers",
+                    Role = "READER"
+                }
+            ]
+        });
+
+        // Construct and return the public URL for the uploaded image
+        var publicUrl = $"https://storage.googleapis.com/products/{BucketName}/{objectName}";
+
+        return publicUrl;
+
+    }
 }

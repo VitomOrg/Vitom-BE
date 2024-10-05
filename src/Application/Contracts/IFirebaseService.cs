@@ -4,9 +4,11 @@ namespace Application.Contracts;
 
 public interface IFirebaseService
 {
-    Task<string> UploadFile(string name, IFormFile file);
+    Task<string> UploadFile(string fileName, IFormFile file);
 
-    Task<string> UploadFile(string name, IFormFile file, string folderSave);
+    Task<string> UploadFile(string fileName, IFormFile file, string folderSave);
 
     Task<bool> DeleteFile(string imageUrl);
+
+    Task<string> UploadFiles(List<IFormFile> files, string folderSave);
 }

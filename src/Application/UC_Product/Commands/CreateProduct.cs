@@ -21,7 +21,6 @@ public class CreateProduct
         string Name,
         string Description,
         decimal Price,
-        string DownloadUrl,
         Guid[] TypeIds,
         Guid[] SoftwareIds,
         List<IFormFile> Images,
@@ -42,7 +41,7 @@ public class CreateProduct
                 Name = request.Name,
                 Description = request.Description,
                 Price = request.Price,
-                DownloadUrl = request.DownloadUrl
+                DownloadUrl = string.Empty
             };
             context.Products.Add(newProduct);
             //check product types are existed
@@ -80,6 +79,11 @@ public class CreateProduct
             {
                 newProduct.ModelMaterials.Add(new ModelMaterial { ProductId = newProduct.Id, Url = materialUrl });
             }
+            // zip all images, materials and upload zip file to firebase service
+            request.Images.AddRange(request.ModelMaterials);
+            string zipUrl = await firebaseService.UploadFiles(request.Images, "download-zip-product");
+            //update download url for product
+            newProduct.DownloadUrl = zipUrl;
             // save changes
             await context.SaveChangesAsync(cancellationToken);
             // return result with mapped object
@@ -94,8 +98,7 @@ public class CreateProduct
             RuleFor(x => x.License).IsInEnum().WithMessage("License must be 0, 1, Free, or Pro");
             RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
             RuleFor(x => x.Price).GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative number")
-                .Must(HaveValidDecimalPlaces).WithMessage("Price must have up to two decimal places"); ;
-            RuleFor(x => x.DownloadUrl).Must(url => Uri.IsWellFormedUriString(url, UriKind.Absolute)).WithMessage("DownloadUrl must be a valid URL");
+                .Must(HaveValidDecimalPlaces).WithMessage("Price must have up to two decimal places");
             RuleFor(x => x.Images)
                 .Must(HaveValidFiles)
                 .WithMessage("Each ImageUrl must be a valid URL");

@@ -17,7 +17,6 @@ public class CreateProductEndpointHandler
         [FromForm] string Name,
         [FromForm] string Description,
         [FromForm] decimal Price,
-        [FromForm] string DownloadUrl,
         [FromForm] Guid[] TypeIds,
         [FromForm] Guid[] SoftwareIds,
         [FromForm] IFormFileCollection Files, //param for upload file in swagger
@@ -31,7 +30,6 @@ public class CreateProductEndpointHandler
             Name: Name,
             Description: Description,
             Price: Price,
-            DownloadUrl: DownloadUrl,
             TypeIds: TypeIds,
             SoftwareIds: SoftwareIds,
             Images: (List<IFormFile>)form.Files.GetFiles("Files"),
