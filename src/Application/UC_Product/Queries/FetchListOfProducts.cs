@@ -42,6 +42,7 @@ namespace Application.UC_Product.Queries
                 .Include(p => p.ProductSoftwares)
                 .Include(p => p.ProductImages)
                 .Include(p => p.ModelMaterials)
+                .Include(p => p.Model)
                 .Where(p => p.DeletedAt == null)
                 .Where(p => request.Search == null || p.Name.ToLower().Contains(request.Search.ToLower()))
                 .Where(p => request.SoftwareIds.Length == 0 || p.ProductSoftwares.Any(ps => request.SoftwareIds.Contains(ps.SoftwareId)))
