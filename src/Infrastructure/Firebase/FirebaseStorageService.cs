@@ -123,7 +123,7 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
             for (int i = 0; i < fileStreams.Length; i++)
             {
                 // Add each file to the zip archive
-                ZipArchiveEntry zipEntry = archive.CreateEntry(files[i].Name);
+                ZipArchiveEntry zipEntry = archive.CreateEntry(files[i].FileName);
 
                 using (Stream entryStream = zipEntry.Open())
                 {

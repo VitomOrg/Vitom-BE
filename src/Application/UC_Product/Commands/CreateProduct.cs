@@ -24,7 +24,10 @@ public class CreateProduct
         Guid[] TypeIds,
         Guid[] SoftwareIds,
         List<IFormFile> Images,
-        List<IFormFile> ModelMaterials
+        List<IFormFile> ModelMaterials,
+        IFormFile Fbx,
+        IFormFile Obj,
+        IFormFile Glb
     ) : IRequest<Result<CreateProductResponse>>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser, IFirebaseService firebaseService) : IRequestHandler<Command, Result<CreateProductResponse>>
@@ -79,9 +82,25 @@ public class CreateProduct
             {
                 newProduct.ModelMaterials.Add(new ModelMaterial { ProductId = newProduct.Id, Url = materialUrl });
             }
+            // Add model files
+            List<Task<string>> modelTasks = [];
+            modelTasks.Add(firebaseService.UploadFile(request.Fbx.FileName, request.Fbx, "models"));
+            modelTasks.Add(firebaseService.UploadFile(request.Obj.FileName, request.Obj, "models"));
+            modelTasks.Add(firebaseService.UploadFile(request.Glb.FileName, request.Glb, "models"));
+            string[] modelUrls = await Task.WhenAll(modelTasks);
+            newProduct.Model = new Model
+            {
+                ProductId = newProduct.Id,
+                Fbx = modelUrls[0],
+                Obj = modelUrls[1],
+                Glb = modelUrls[2]
+            };
             // zip all images, materials and upload zip file to firebase service
-            request.Images.AddRange(request.ModelMaterials);
-            string zipUrl = await firebaseService.UploadFiles(request.Images, "download-zip-product");
+            List<IFormFile> zipFiles = request.Images;
+            zipFiles.AddRange(request.ModelMaterials);
+            zipFiles.AddRange([request.Fbx, request.Obj, request.Glb]);
+
+            string zipUrl = await firebaseService.UploadFiles(zipFiles, "download-zip-product");
             //update download url for product
             newProduct.DownloadUrl = zipUrl;
             // save changes
@@ -102,6 +121,15 @@ public class CreateProduct
             RuleFor(x => x.Images)
                 .Must(HaveValidFiles)
                 .WithMessage("Each ImageUrl must be a valid URL");
+            RuleFor(x => x.Fbx)
+                .Must(HaveValidFile).WithMessage("Fbx file must be a valid file")
+                .Must(BeFbxFile).WithMessage("Fbx file must be a Fbx file");
+            RuleFor(x => x.Obj)
+                .Must(HaveValidFile).WithMessage("Obj file must be a valid file")
+                .Must(BeObjFile).WithMessage("Obj file must be a obj file");
+            RuleFor(x => x.Glb)
+                .Must(HaveValidFile).WithMessage("Glb file must be a valid file")
+                .Must(BeGlbFile).WithMessage("Glb file must be a glb file");
         }
 
         private bool HaveValidDecimalPlaces(decimal price)
@@ -112,6 +140,18 @@ public class CreateProduct
 
         private bool HaveValidFiles(List<IFormFile> images)
             => images.All(image => image.Length < 10240000);
+
+        private bool HaveValidFile(IFormFile file)
+            => file.Length < 10240000;
+
+        private bool BeGlbFile(IFormFile formFile)
+            => formFile.FileName.ToLower().EndsWith(".glb");
+
+        private bool BeObjFile(IFormFile formFile)
+            => formFile.FileName.ToLower().EndsWith(".obj");
+
+        private bool BeFbxFile(IFormFile formFile)
+            => formFile.FileName.ToLower().EndsWith(".fbx");
     }
 
 }

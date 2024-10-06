@@ -37,13 +37,12 @@ public class Product : Entity
     public ICollection<TransactionDetail> TransactionDetails { get; set; } = [];
     public ICollection<Review> Reviews { get; set; } = [];
 
-    public void Update(LicenseEnum license, string name, string description, decimal price, string downloadUrl)
+    public void Update(LicenseEnum license, string name, string description, decimal price)
     {
         License = license;
         Name = name;
         Description = description;
         Price = price;
-        DownloadUrl = downloadUrl;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

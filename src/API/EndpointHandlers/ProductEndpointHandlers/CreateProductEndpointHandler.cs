@@ -21,6 +21,9 @@ public class CreateProductEndpointHandler
         [FromForm] Guid[] SoftwareIds,
         [FromForm] IFormFileCollection Files, //param for upload file in swagger
         [FromForm] IFormFileCollection ModelMaterialFiles, // param for upload model material in swagger
+        IFormFile Fbx,
+        IFormFile Obj,
+        IFormFile Glb,
         HttpContext httpContext,
         CancellationToken cancellationToken = default)
     {
@@ -33,7 +36,10 @@ public class CreateProductEndpointHandler
             TypeIds: TypeIds,
             SoftwareIds: SoftwareIds,
             Images: (List<IFormFile>)form.Files.GetFiles("Files"),
-            ModelMaterials: (List<IFormFile>)form.Files.GetFiles("ModelMaterialFiles")
+            ModelMaterials: (List<IFormFile>)form.Files.GetFiles("ModelMaterialFiles"),
+            Fbx: Fbx,
+            Obj: Obj,
+            Glb: Glb
         ), cancellationToken);
         return result.Check();
     }
