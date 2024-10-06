@@ -31,13 +31,15 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
             return;
         }
         // check user
-        string? id = claims.FirstOrDefault(c =>
+        string? id =
+            claims
+                .FirstOrDefault(c =>
                     c.Type.Equals("sub", StringComparison.InvariantCultureIgnoreCase)
                 )
                 ?.Value ?? string.Empty;
         User? checkingUser = await vitomDbContext
-            .Users
-            .AsNoTracking().SingleOrDefaultAsync(u => u.Id.Equals(id));
+            .Users.AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Id.Equals(id));
         if (checkingUser is null)
         {
             checkingUser = new()
@@ -47,7 +49,8 @@ public class AuthMiddleware(IVitomDbContext vitomDbContext) : IMiddleware
                 Email = "admin",
                 PhoneNumber = "admin",
                 ImageUrl = "admin",
-                Role = Domain.Enums.RolesEnum.Admin
+                Role = Domain.Enums.RolesEnum.Admin,
+                Cart = new() { UserId = id }
             };
             await vitomDbContext.Users.AddAsync(checkingUser);
             await vitomDbContext.SaveChangesAsync(cancellationToken: default);
