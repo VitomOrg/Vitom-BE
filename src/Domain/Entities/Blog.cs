@@ -8,6 +8,7 @@ public class Blog : Entity
     public required string UserId { get; set; }
     public required string Title { get; set; }
     public string Content { get; set; } = string.Empty;
+    public int TotalVisit { get; set; } = 0;
     // Relations
     public ICollection<BlogImage> Images { get; set; } = [];
     [ForeignKey(nameof(UserId))]

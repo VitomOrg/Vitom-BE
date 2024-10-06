@@ -27,14 +27,14 @@ public class ViewListOfType
                 $"type-keyword{request.Keyword}-pagesize{request.PageSize}-pageindex-{request.PageIndex}";
 
             PaginatedResponse<TypeDetailsResponse>? cacheResult = await cacheServices.GetAsync<
-                PaginatedResponse<TypeDetailsResponse>
-            >(key, cancellationToken);
+                PaginatedResponse<TypeDetailsResponse>>(key, cancellationToken);
 
             if (cacheResult is not null)
                 return Result.Success(cacheResult, "Get types successfully !");
 
             IQueryable<Type> query = context
-                .Types.AsNoTracking()
+                .Types.AsNoTracking().IgnoreQueryFilters()
+                .Where(t => t.DeletedAt == null)
                 .Where(t =>
                     t.Name.ToLower().Contains(request.Keyword.ToLower()) && t.DeletedAt == null
                 );
