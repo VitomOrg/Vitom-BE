@@ -145,13 +145,13 @@ public class CreateProduct
             => file.Length < 10240000;
 
         private bool BeGlbFile(IFormFile formFile)
-         => formFile.FileName.ToLower().EndsWith(".glb");
+            => formFile.FileName.ToLower().EndsWith(".glb");
 
         private bool BeObjFile(IFormFile formFile)
-         => formFile.FileName.ToLower().EndsWith(".obj");
+            => formFile.FileName.ToLower().EndsWith(".obj");
 
         private bool BeFbxFile(IFormFile formFile)
-         => formFile.FileName.ToLower().EndsWith(".fbx");
+            => formFile.FileName.ToLower().EndsWith(".fbx");
     }
 
 }
