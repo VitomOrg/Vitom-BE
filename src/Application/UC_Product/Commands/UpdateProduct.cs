@@ -19,11 +19,13 @@ public class UpdateProduct
         string Name,
         string Description,
         decimal Price,
-        string DownloadUrl,
         Guid[] TypeIds,
         Guid[] SoftwareIds,
         List<IFormFile> Images,
-        List<IFormFile> ModelMaterials
+        List<IFormFile> ModelMaterials,
+        IFormFile Fbx,
+        IFormFile Obj,
+        IFormFile Glb
     ) : IRequest<Result>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser, IFirebaseService firebaseService) : IRequestHandler<Command, Result>
@@ -39,6 +41,7 @@ public class UpdateProduct
             .Include(product => product.ProductTypes)
             .Include(product => product.ProductImages)
             .Include(product => product.ModelMaterials)
+            .Include(product => product.Model)
             .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
             if (updatingProduct is null) return Result.NotFound();
             // check if user is owner
@@ -49,6 +52,7 @@ public class UpdateProduct
             context.ProductSoftwares.RemoveRange(updatingProduct.ProductSoftwares);
             context.ProductImages.RemoveRange(updatingProduct.ProductImages);
             context.ModelMaterials.RemoveRange(updatingProduct.ModelMaterials);
+            //remove files in firebase directory
             List<Task<bool>> tasksDelete = [];
             foreach (var productImage in updatingProduct.ProductImages)
             {
@@ -58,8 +62,11 @@ public class UpdateProduct
             {
                 tasksDelete.Add(firebaseService.DeleteFile(modelMaterial.Url));
             }
+            tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Fbx));
+            tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Obj));
+            tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Glb));
             await Task.WhenAll(tasksDelete);
-            if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete images failed");
+            if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete files failed");
 
             //check product types are existed
             IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
@@ -103,13 +110,23 @@ public class UpdateProduct
             {
                 context.ModelMaterials.Add(new ModelMaterial { ProductId = updatingProduct.Id, Url = modelMaterialUrl });
             }
+            // Add model files
+            List<Task<string>> modelTasks = [];
+            modelTasks.Add(firebaseService.UploadFile(request.Fbx.FileName, request.Fbx, "models"));
+            modelTasks.Add(firebaseService.UploadFile(request.Obj.FileName, request.Obj, "models"));
+            modelTasks.Add(firebaseService.UploadFile(request.Glb.FileName, request.Glb, "models"));
+            string[] modelUrls = await Task.WhenAll(modelTasks);
+            updatingProduct.Model.Update(
+                modelUrls[0],
+                modelUrls[1],
+                modelUrls[2]
+            );
             //update product
             updatingProduct.Update(
                 license: request.License,
                 name: request.Name,
                 description: request.Description,
-                price: request.Price,
-                downloadUrl: request.DownloadUrl
+                price: request.Price
             );
             //save to db
             await context.SaveChangesAsync(cancellationToken);
@@ -125,11 +142,19 @@ public class UpdateProduct
             RuleFor(x => x.License).IsInEnum().WithMessage("License must be 0, 1, Free, or Pro");
             RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
             RuleFor(x => x.Price).GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative number")
-                .Must(HaveValidDecimalPlaces).WithMessage("Price must have up to two decimal places"); ;
-            RuleFor(x => x.DownloadUrl).Must(url => Uri.IsWellFormedUriString(url, UriKind.Absolute)).WithMessage("DownloadUrl must be a valid URL");
+                .Must(HaveValidDecimalPlaces).WithMessage("Price must have up to two decimal places");
             RuleFor(x => x.Images)
                 .Must(HaveValidFiles)
                 .WithMessage("Each ImageUrl must be a valid URL");
+            RuleFor(x => x.Fbx)
+                .Must(HaveValidFile).WithMessage("Fbx file must be a valid file")
+                .Must(BeFbxFile).WithMessage("Fbx file must be a Fbx file");
+            RuleFor(x => x.Obj)
+                .Must(HaveValidFile).WithMessage("Obj file must be a valid file")
+                .Must(BeObjFile).WithMessage("Obj file must be a obj file");
+            RuleFor(x => x.Glb)
+                .Must(HaveValidFile).WithMessage("Glb file must be a valid file")
+                .Must(BeGlbFile).WithMessage("Glb file must be a glb file");
         }
 
         private bool HaveValidDecimalPlaces(decimal price)
@@ -140,5 +165,17 @@ public class UpdateProduct
 
         private bool HaveValidFiles(List<IFormFile> images)
             => images.All(image => image.Length < 10240000);
+
+        private bool HaveValidFile(IFormFile file)
+            => file.Length < 10240000;
+
+        private bool BeGlbFile(IFormFile formFile)
+            => formFile.FileName.ToLower().EndsWith(".glb");
+
+        private bool BeObjFile(IFormFile formFile)
+            => formFile.FileName.ToLower().EndsWith(".obj");
+
+        private bool BeFbxFile(IFormFile formFile)
+            => formFile.FileName.ToLower().EndsWith(".fbx");
     }
 }

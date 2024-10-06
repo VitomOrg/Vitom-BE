@@ -25,6 +25,7 @@ public class DeleteProduct
             .Include(product => product.ProductTypes)
             .Include(product => product.ProductImages)
             .Include(product => product.ModelMaterials)
+            .Include(product => product.Model)
             .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
 
             if (deletingProduct is null) return Result.NotFound();
@@ -52,6 +53,8 @@ public class DeleteProduct
             {
                 modelMaterial.Delete();
             }
+            //soft delete for model
+            deletingProduct.Model?.Delete();
             //soft delete product
             deletingProduct.Delete();
             await context.SaveChangesAsync(cancellationToken);

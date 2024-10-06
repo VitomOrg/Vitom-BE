@@ -16,11 +16,13 @@ public class UpdateProductEndpointHandler
         [FromForm] string Name,
         [FromForm] string Description,
         [FromForm] decimal Price,
-        [FromForm] string DownloadUrl,
         [FromForm] Guid[] TypeIds,
         [FromForm] Guid[] SoftwareIds,
         [FromForm] IFormFileCollection Files, //param for upload file in swagger
         [FromForm] IFormFileCollection ModelMaterialFiles, // param for upload model material in swagger
+        IFormFile Fbx,
+        IFormFile Obj,
+        IFormFile Glb,
         HttpContext httpContext,
         CancellationToken cancellationToken = default)
     {
@@ -31,11 +33,13 @@ public class UpdateProductEndpointHandler
             Name: Name,
             Description: Description,
             Price: Price,
-            DownloadUrl: DownloadUrl,
             TypeIds: TypeIds,
             SoftwareIds: SoftwareIds,
             Images: (List<IFormFile>)form.Files.GetFiles("Files"),
-            ModelMaterials: (List<IFormFile>)form.Files.GetFiles("ModelMaterialFiles")
+            ModelMaterials: (List<IFormFile>)form.Files.GetFiles("ModelMaterialFiles"),
+            Fbx: Fbx,
+            Obj: Obj,
+            Glb: Glb
         ), cancellationToken);
         return result.Check();
     }

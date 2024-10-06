@@ -15,4 +15,11 @@ public class Model : Entity
     public required string Glb { get; set; }
     [ForeignKey(nameof(ProductId))]
     public Product Product { get; set; } = null!;
+    public void Update(string fbx, string obj, string glb)
+    {
+        Fbx = fbx;
+        Obj = obj;
+        Glb = glb;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }
