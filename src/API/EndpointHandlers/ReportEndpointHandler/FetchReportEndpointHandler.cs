@@ -10,18 +10,18 @@ namespace API.EndpointHandlers.ReportEndpointHandler;
 public class FetchReportEndpointHandler
 {
     public static async Task<IResult> Handle(ISender sender,
-        int? Year,
-        int? Month,
-        int PageIndex = 1,
-        int PageSize = 10,
+        int? year,
+        int? month,
+        int pageIndex = 1,
+        int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
         Result<ReportDetailResponse> result = await sender.Send(
             new FetchReport.Query(
-                Year: Year,
-                Month: Month,
-                PageIndex: PageIndex,
-                PageSize: PageSize
+                Year: year,
+                Month: month,
+                PageIndex: pageIndex,
+                PageSize: pageSize
             ), cancellationToken);
 
         return result.Check();

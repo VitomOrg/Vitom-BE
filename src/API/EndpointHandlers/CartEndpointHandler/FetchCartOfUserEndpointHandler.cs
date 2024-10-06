@@ -12,13 +12,13 @@ namespace API.EndpointHandlers.CartEndpointHandler;
 public class FetchCartOfUserEndpointHandler
 {
     public static async Task<IResult> Handle(ISender sender,
-        bool AscByCreatedAt = false,
+        bool ascByCreatedAt = false,
         int pageIndex = 1,
         int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
         Result<PaginatedResponse<CartItemResponse>> result = await sender.Send(new FetchCartOfUser.Query(
-            AscByCreatedAt: AscByCreatedAt,
+            AscByCreatedAt: ascByCreatedAt,
             PageIndex: pageIndex,
             PageSize: pageSize
         ), cancellationToken);

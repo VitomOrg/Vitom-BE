@@ -10,13 +10,18 @@ namespace API.EndpointHandlers.BlogEndpointHandler;
 
 public class GetBlogsEndpointHandler
 {
-    public static async Task<IResult> Handle(ISender sender, int PageSize = 10, int PageIndex = 1, string Keyword = "", CancellationToken cancellationToken = default)
+    public static async Task<IResult> Handle(
+        ISender sender,
+        int pageSize = 10,
+        int pageIndex = 1,
+        string Keyword = "",
+        CancellationToken cancellationToken = default
+    )
     {
-        Result<PaginatedResponse<BlogDetailResponse>> result = await sender.Send(new GetBlogs.Query(
-            PageSize: PageSize,
-            PageIndex: PageIndex,
-            Keyword: Keyword
-        ), cancellationToken);
+        Result<PaginatedResponse<BlogDetailResponse>> result = await sender.Send(
+            new GetBlogs.Query(PageSize: pageSize, PageIndex: pageIndex, Keyword: Keyword),
+            cancellationToken
+        );
         return result.Check();
     }
 }

@@ -11,15 +11,15 @@ namespace API.EndpointHandlers.ProductEndpointHandlers;
 public class FetchLikedProductByUserIdEndpointHandler
 {
     public static async Task<IResult> Handle(ISender sender,
-        bool AscByCreatedAt = false,
-        int PageIndex = 1,
-        int PageSize = 10,
+        bool ascByCreatedAt = false,
+        int pageIndex = 1,
+        int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
         Result<PaginatedResponse<ProductDetailsResponse>> result = await sender.Send(new FetchLikedProductByUserId.Query(
-            AscByCreatedAt: AscByCreatedAt,
-            PageIndex: PageIndex,
-            PageSize: PageSize
+            AscByCreatedAt: ascByCreatedAt,
+            PageIndex: pageIndex,
+            PageSize: pageSize
         ), cancellationToken);
         return result.Check();
     }
