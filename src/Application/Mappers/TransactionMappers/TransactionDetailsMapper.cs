@@ -12,7 +12,9 @@ public static class TransactionDetailsMapper
             UserId: transaction.UserId,
             TotalAmount: transaction.TotalAmount,
             PaymentMethod: Enum.TryParse(transaction.PaymentMethod.ToString(), out PaymentMethodEnum result) ? result.ToString() : "unknown payment method",
-            TransactionStatus: Enum.TryParse(transaction.TransactionStatus.ToString(), out TransactionStatusEnum status) ? status.ToString() : "unknown transaction status"
+            TransactionStatus: Enum.TryParse(transaction.TransactionStatus.ToString(), out TransactionStatusEnum status) ? status.ToString() : "unknown transaction status",
+            CreatedAt: transaction.CreatedAt,
+            ProductImage: transaction.TransactionDetails.FirstOrDefault()?.Product.ProductImages.FirstOrDefault()?.Url ?? string.Empty
         );
     }
 }
