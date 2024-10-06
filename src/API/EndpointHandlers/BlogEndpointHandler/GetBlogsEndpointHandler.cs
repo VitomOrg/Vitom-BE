@@ -14,12 +14,12 @@ public class GetBlogsEndpointHandler
         ISender sender,
         int pageSize = 10,
         int pageIndex = 1,
-        string Keyword = "",
+        string keyword = "",
         CancellationToken cancellationToken = default
     )
     {
         Result<PaginatedResponse<BlogDetailResponse>> result = await sender.Send(
-            new GetBlogs.Query(PageSize: pageSize, PageIndex: pageIndex, Keyword: Keyword),
+            new GetBlogs.Query(PageSize: pageSize, PageIndex: pageIndex, Keyword: keyword),
             cancellationToken
         );
         return result.Check();
