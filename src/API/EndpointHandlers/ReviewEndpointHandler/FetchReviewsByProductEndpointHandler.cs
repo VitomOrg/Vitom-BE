@@ -1,5 +1,4 @@
 using API.Utils;
-using Application.Responses.RatingResponse.cs;
 using Application.Responses.ReviewResponses;
 using Application.Responses.Shared;
 using Application.UC_Review.Queries;
@@ -14,14 +13,14 @@ public class FetchReviewsByProductEndpointHandler
         Guid productId,
         int pageSize = 10,
         int pageIndex = 1,
-        bool AscByRating = false,
+        bool ascByRating = false,
         CancellationToken cancellationToken = default)
     {
         Result<PaginatedResponse<ReviewDetailsResponse>> result = await sender.Send(new FetchReviewsOfProduct.Query(
             ProductId: productId,
             PageSize: pageSize,
             PageIndex: pageIndex,
-            AscByRating: AscByRating
+            AscByRating: ascByRating
         ), cancellationToken);
         return result.Check();
     }

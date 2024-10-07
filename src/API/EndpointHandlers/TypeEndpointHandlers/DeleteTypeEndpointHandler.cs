@@ -9,11 +9,11 @@ public class DeleteTypeEndpointHandler
 {
     public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(
         ISender sender,
-        Guid Id,
+        Guid id,
         CancellationToken cancellationToken = default
     )
     {
-        Result result = await sender.Send(new DeleteType.Command(Id: Id), cancellationToken);
+        Result result = await sender.Send(new DeleteType.Command(Id: id), cancellationToken);
 
         return result.Check();
     }

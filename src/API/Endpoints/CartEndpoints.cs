@@ -17,7 +17,7 @@ public static class CartEndpoints
             .RequireAuthorization();
 
         group
-            .MapDelete("{ProductId}", DeleteProductFromCartEndpointHandler.Handle)
+            .MapDelete("{productId}", DeleteProductFromCartEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Delete product from cart"))
             .RequireAuthorization();
 

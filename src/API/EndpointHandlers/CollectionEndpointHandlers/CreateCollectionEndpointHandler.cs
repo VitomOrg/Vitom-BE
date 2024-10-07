@@ -10,9 +10,9 @@ namespace API.EndpointHandlers.CollectionEndpointHandlers;
 public class CreateCollectionEndpointHandler
 {
     public record CreateCollectionRequest(
-        string Name = "",
-        string Description = "",
-        bool IsPublic = true
+        string name = "",
+        string description = "",
+        bool isPublic = true
     );
     public static async Task<IResult> Handle(
         ISender sender,
@@ -22,9 +22,9 @@ public class CreateCollectionEndpointHandler
     {
         Result<CreateCollectionResponse> result = await sender.Send(
             new CreateCollection.Command(
-                Name: request.Name,
-                Description: request.Description,
-                IsPublic: request.IsPublic
+                Name: request.name,
+                Description: request.description,
+                IsPublic: request.isPublic
             ),
             cancellationToken
         );

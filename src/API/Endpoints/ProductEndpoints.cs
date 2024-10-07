@@ -9,7 +9,7 @@ public static class ProductEndpoints
     public static RouteGroupBuilder MapProductEndpoint(this RouteGroupBuilder group)
     {
         group
-            .MapGet("/{Id}", ViewDetailOfProductEndpointHandler.Handle)
+            .MapGet("/{id}", ViewDetailOfProductEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get detail of product"));
 
         group
@@ -27,13 +27,13 @@ public static class ProductEndpoints
             .DisableAntiforgery();
 
         group
-            .MapPut("/{Id}", UpdateProductEndpointHandler.Handle)
+            .MapPut("/{id}", UpdateProductEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Organization update existing product"))
             .RequireAuthorization()
             .DisableAntiforgery(); ;
 
         group
-            .MapDelete("/{Id}", DeleteProductEndpointHandler.Handle)
+            .MapDelete("/{id}", DeleteProductEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Organization delete existing product"))
             .RequireAuthorization()
             .DisableAntiforgery();

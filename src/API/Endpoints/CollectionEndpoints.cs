@@ -28,7 +28,7 @@ public static class CollectionEndpoints
             .WithMetadata(new SwaggerOperationAttribute("Update a collection"))
             .RequireAuthorization();
         // DELETE
-        group.MapDelete("{Id}", DeleteCollectionEndpointHandler.Handle)
+        group.MapDelete("{id}", DeleteCollectionEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Delete a collection"))
             .RequireAuthorization();
         return group;
