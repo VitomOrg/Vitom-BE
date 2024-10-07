@@ -16,7 +16,7 @@ public class TransactionGenerator
             .RuleFor(e=>e.UpdatedAt,f=>f.Random.Bool() ? f.Date.Past():null!)
             .RuleFor(e=>e.DeletedAt,(f,e) => f.Random.Bool() ? f.Date.Past():null!)
             .RuleFor(e=>e.UserId,f=>f.PickRandom(users).Id)
-            .RuleFor(e=>e.TotalAmount,f=>f.PickRandom<decimal>(1,9999999999))
+            .RuleFor(e=>e.TotalAmount,f=>f.Random.Decimal(1,9999999999))
             .RuleFor(e=>e.PaymentMethod,f=>f.PickRandom<PaymentMethodEnum>())
             .RuleFor(e=>e.TransactionStatus,f=>f.PickRandom<TransactionStatusEnum>())
             .Generate(100)

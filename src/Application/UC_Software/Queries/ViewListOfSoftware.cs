@@ -33,7 +33,7 @@ public class ViewListOfSoftware
                 return Result.Success(cacheResult, "Get softwares Successfully");
             // query
             IQueryable<Software> query = context
-                .Softwares.AsNoTracking()
+                .Softwares.AsNoTracking().IgnoreQueryFilters()
                 .Where(s => s.Name.ToLower().Contains(request.Keyword.ToLower()))
                 .Where(s => s.DeletedAt == null);
             // calculating total pages
