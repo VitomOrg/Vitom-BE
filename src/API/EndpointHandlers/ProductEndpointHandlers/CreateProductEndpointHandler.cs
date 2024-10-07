@@ -13,33 +13,33 @@ namespace API.EndpointHandlers.ProductEndpointHandlers;
 public class CreateProductEndpointHandler
 {
     public static async Task<IResult> Handle(ISender sender,
-        [FromForm] LicenseEnum License,
-        [FromForm] string Name,
-        [FromForm] string Description,
-        [FromForm] decimal Price,
-        [FromForm] Guid[] TypeIds,
-        [FromForm] Guid[] SoftwareIds,
-        [FromForm] IFormFileCollection Files, //param for upload file in swagger
-        [FromForm] IFormFileCollection ModelMaterialFiles, // param for upload model material in swagger
-        IFormFile Fbx,
-        IFormFile Obj,
-        IFormFile Glb,
+        [FromForm] LicenseEnum license,
+        [FromForm] string name,
+        [FromForm] string description,
+        [FromForm] decimal price,
+        [FromForm] Guid[] typeIds,
+        [FromForm] Guid[] softwareIds,
+        [FromForm] IFormFileCollection files, //param for upload file in swagger
+        [FromForm] IFormFileCollection modelMaterialFiles, // param for upload model material in swagger
+        IFormFile fbx,
+        IFormFile obj,
+        IFormFile glb,
         HttpContext httpContext,
         CancellationToken cancellationToken = default)
     {
         var form = await httpContext.Request.ReadFormAsync(cancellationToken);
         Result<CreateProductResponse> result = await sender.Send(new CreateProduct.Command(
-            License: License,
-            Name: Name,
-            Description: Description,
-            Price: Price,
-            TypeIds: TypeIds,
-            SoftwareIds: SoftwareIds,
+            License: license,
+            Name: name,
+            Description: description,
+            Price: price,
+            TypeIds: typeIds,
+            SoftwareIds: softwareIds,
             Images: (List<IFormFile>)form.Files.GetFiles("Files"),
             ModelMaterials: (List<IFormFile>)form.Files.GetFiles("ModelMaterialFiles"),
-            Fbx: Fbx,
-            Obj: Obj,
-            Glb: Glb
+            Fbx: fbx,
+            Obj: obj,
+            Glb: glb
         ), cancellationToken);
         return result.Check();
     }
