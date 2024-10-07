@@ -12,11 +12,11 @@ public class UpdateBlogEndpointHandler
 {
     public static async Task<IResult> Handle(
         ISender sender,
-        [FromRoute] Guid id,
-        [FromForm] string Title,
-        [FromForm] string Content,
-        IFormFileCollection Images,
-        CancellationToken cancellationToken = default
+        [FromRoute] Guid Id,
+        [FromForm] string title,
+        [FromForm] string content,
+        IFormFileCollection images,
+      CancellationToken cancellationToken = default
     )
     {
         Result<UpdateBlogResponse> result = await sender.Send(new UpdateBlog.Command(
