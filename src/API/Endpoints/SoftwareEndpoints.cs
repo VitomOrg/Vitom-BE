@@ -15,10 +15,10 @@ public static class SoftwareEndpoints
         group.MapPost("", CreateSoftwareEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Admin create new software"))
             .RequireAuthorization();
-        group.MapPut("/{Id}", UpdateSoftwareEndpointHandler.Handle)
+        group.MapPut("/{id}", UpdateSoftwareEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Admin update existing software"))
             .RequireAuthorization();
-        group.MapDelete("/{Id}", DeleteSoftwareEndpointHandler.Handle)
+        group.MapDelete("/{id}", DeleteSoftwareEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Admin delete existing software"))
             .RequireAuthorization();
         return group;

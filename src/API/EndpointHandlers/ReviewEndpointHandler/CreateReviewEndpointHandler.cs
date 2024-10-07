@@ -12,17 +12,17 @@ public class CreateReviewEndpointHandler
     public static async Task<IResult> Handle(ISender sender, CreateReviewRequest request, CancellationToken cancellationToken = default)
     {
         Result<CreateReviewResponse> result = await sender.Send(new CreateReview.Command(
-            ProductId: request.ProductId,
-            Rating: request.Rating,
-            Content: request.Content
+            ProductId: request.productId,
+            Rating: request.rating,
+            Content: request.content
         ), cancellationToken);
         return result.Check();
     }
 
     public record CreateReviewRequest
     {
-        public Guid ProductId { get; init; }
-        public int Rating { get; init; }
-        public string Content { get; init; } = "";
+        public Guid productId { get; init; }
+        public int rating { get; init; }
+        public string content { get; init; } = "";
     }
 }

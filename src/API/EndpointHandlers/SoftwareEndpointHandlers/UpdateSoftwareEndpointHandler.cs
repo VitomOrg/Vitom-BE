@@ -7,10 +7,10 @@ namespace API.EndpointHandlers.SoftwareEndpointHandlers;
 
 public class UpdateSoftwareEndpointHandler
 {
-    public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender, Guid Id, UpdateSoftwareRequest request, CancellationToken cancellationToken = default)
+    public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender, Guid id, UpdateSoftwareRequest request, CancellationToken cancellationToken = default)
     {
         Result result = await sender.Send(new UpdateSoftware.Command(
-            Id: Id,
+            Id: id,
             Name: request.Name,
             Description: request.Description
         ), cancellationToken);

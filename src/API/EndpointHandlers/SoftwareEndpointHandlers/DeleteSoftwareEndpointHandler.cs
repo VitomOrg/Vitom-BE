@@ -7,9 +7,9 @@ namespace API.EndpointHandlers.SoftwareEndpointHandlers;
 
 public class DeleteSoftwareEndpointHandler
 {
-    public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender, Guid Id, CancellationToken cancellationToken = default)
+    public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender, Guid id, CancellationToken cancellationToken = default)
     {
-        Result result = await sender.Send(new DeleteSoftware.Command(Id: Id), cancellationToken);
+        Result result = await sender.Send(new DeleteSoftware.Command(Id: id), cancellationToken);
         return result.Check();
     }
 }

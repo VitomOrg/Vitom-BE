@@ -10,12 +10,12 @@ public class DeleteProductFromCartEndpointHandler
 {
     public static async Task<IResult> Handle(
         ISender sender,
-        Guid ProductId,
+        Guid productId,
         CancellationToken cancellationToken = default
     )
     {
         Result result = await sender.Send(
-            new DeleteProductFromCart.Command(ProductId),
+            new DeleteProductFromCart.Command(productId),
             cancellationToken
         );
 
