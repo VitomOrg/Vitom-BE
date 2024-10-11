@@ -30,7 +30,7 @@ namespace Application.UC_Product.Queries
             public async Task<Result<PaginatedResponse<ProductDetailsResponse>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 //set key
-                string key = $"products-productpage-pagesize{request.PageSize}-pageindex{request.PageIndex}-sortascbycreateddate{request.AscByCreatedAt}-type{request.Type}-license{request.License}-pricefrom{request.PriceFrom}-priceto{request.PriceTo}-search{request.Search}-softwares{string.Join(",", request.SoftwareIds)}";
+                string key = $"products-productpage-pagesize{request.PageSize}-pageindex{request.PageIndex}-sortascbycreateddate{request.AscByCreatedAt}-types{string.Join(",", request.TypeIds)}-license{request.License}-pricefrom{request.PriceFrom}-priceto{request.PriceTo}-search{request.Search}-softwares{string.Join(",", request.SoftwareIds)}";
                 //get cache response
                 PaginatedResponse<ProductDetailsResponse>? cacheResponse = await cacheServices.GetAsync<PaginatedResponse<ProductDetailsResponse>>(key, cancellationToken);
                 if (cacheResponse is not null) return Result.Success(cacheResponse, "Get products successfully!");
@@ -46,7 +46,6 @@ namespace Application.UC_Product.Queries
                 .Where(p => p.DeletedAt == null)
                 .Where(p => request.Search == null || p.Name.ToLower().Contains(request.Search.ToLower()))
                 .Where(p => request.SoftwareIds.Length == 0 || p.ProductSoftwares.Any(ps => request.SoftwareIds.Contains(ps.SoftwareId)))
-                // .Where(p => p.ProductTypes.Any(pt => EF.Functions.Like(pt.Type.Name, $"%{request.Type}%")))
                 .Where(p => request.TypeIds.Length == 0 || p.ProductTypes.Any(ps => request.TypeIds.Contains(ps.TypeId)))
                 // .Where(p => EF.Functions.Like((string)(object)p.License, $"%{request.License}%"))
                 // .Where(p => ((string)(object)p.License).Contains(request.License))
