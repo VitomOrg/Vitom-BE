@@ -9,11 +9,11 @@ using Persistence;
 
 #nullable disable
 
-namespace Persistence.Migrations
+namespace Persistence.Database
 {
     [DbContext(typeof(VitomDBContext))]
-    [Migration("20241004162120_AddIsLicenseInUseAndModelTable")]
-    partial class AddIsLicenseInUseAndModelTable
+    [Migration("20241006114330_AddTotalVisitToBlog")]
+    partial class AddTotalVisitToBlog
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,9 @@ namespace Persistence.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("TotalVisit")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

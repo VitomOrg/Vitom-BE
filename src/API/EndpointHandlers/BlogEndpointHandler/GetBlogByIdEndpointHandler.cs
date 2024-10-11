@@ -9,9 +9,9 @@ namespace API.EndpointHandlers.BlogEndpointHandler;
 
 public class GetBlogByIdEndpointHandler
 {
-    public static async Task<IResult> Handle(ISender sender, Guid Id, CancellationToken cancellationToken = default)
+    public static async Task<IResult> Handle(ISender sender, Guid id, CancellationToken cancellationToken = default)
     {
-        Result<BlogDetailResponse> result = await sender.Send(new GetBlogById.Query(Id), cancellationToken);
+        Result<BlogDetailResponse> result = await sender.Send(new GetBlogById.Query(id), cancellationToken);
         return result.Check();
     }
 }

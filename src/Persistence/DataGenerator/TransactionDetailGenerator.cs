@@ -16,7 +16,7 @@ public class TransactionDetailGenerator
             .RuleFor(e=>e.DeletedAt,(f,e) => f.Random.Bool() ? f.Date.Past():null!)
             .RuleFor(e=>e.TransactionId,f=>f.PickRandom(transactions).Id)
             .RuleFor(e=>e.ProductId,f=>f.PickRandom(products).Id)
-            .RuleFor(e=>e.PriceAtPurchase,f=>f.PickRandom<decimal>(1,9999999999))
+            .RuleFor(e=>e.PriceAtPurchase,f=>f.Random.Decimal(1,9999999999))
             .Generate(100)
             .ToArray()
             .DistinctBy(e=>new {e.TransactionId,e.ProductId})

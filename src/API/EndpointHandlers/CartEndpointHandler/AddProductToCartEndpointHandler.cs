@@ -9,7 +9,7 @@ namespace API.EndpointHandlers.CartEndpointHandler;
 
 public class AddProductToCartEndpointHandler
 {
-    public record AddProductToCartRequest(Guid ProductId);
+    public record AddProductToCartRequest(Guid productId);
 
     public static async Task<IResult> Handle(
         ISender sender,
@@ -18,7 +18,7 @@ public class AddProductToCartEndpointHandler
     )
     {
         Result<AddProductToCartResponse> result = await sender.Send(
-            new AddProductToCart.Command(ProductId: request.ProductId),
+            new AddProductToCart.Command(ProductId: request.productId),
             cancellationToken
         );
 

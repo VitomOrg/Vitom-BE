@@ -18,7 +18,7 @@ public class CollectionGenerator
             .RuleFor(e=> e.Name,f=>f.Person.FirstName)
             .RuleFor(e=>e.Description,f=>f.Lorem.Word())
             .RuleFor(e=>e.IsPublic,f=>f.Random.Bool())
-            .RuleFor(e=>e.TotalLiked,f=>f.PickRandom(1,int.MaxValue))
+            .RuleFor(e=>e.TotalLiked,f=>f.Random.Number(1,int.MaxValue))
             .Generate(100)
             .ToArray()
             .DistinctBy(e=>new {e.UserId,e.Name})

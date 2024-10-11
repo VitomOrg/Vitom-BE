@@ -8,9 +8,9 @@ namespace API.EndpointHandlers.ProductEndpointHandlers;
 
 public class DeleteProductEndpointHandler
 {
-    public static async Task<IResult> Handle(ISender sender, Guid Id, CancellationToken cancellationToken = default)
+    public static async Task<IResult> Handle(ISender sender, Guid id, CancellationToken cancellationToken = default)
     {
-        Result result = await sender.Send(new DeleteProduct.Command(Id: Id), cancellationToken);
+        Result result = await sender.Send(new DeleteProduct.Command(Id: id), cancellationToken);
         return result.Check();
     }
 }

@@ -11,12 +11,12 @@ public class ViewDetailOfProductEndpointHandler
 {
     public static async Task<IResult> Handle(
         ISender sender,
-        Guid Id,
+        Guid id,
         CancellationToken cancellationToken = default
     )
     {
         Result<ProductDetailsResponse> result = await sender.Send(
-            new ViewDetailOfProduct.Query(Id),
+            new ViewDetailOfProduct.Query(id),
             cancellationToken
         );
 

@@ -16,7 +16,7 @@ public class SoftwareGenerator
             .RuleFor(e=>e.DeletedAt,(f,e) => f.Random.Bool() ? f.Date.Past():null!)
             .RuleFor(e=>e.Name,f=>f.Person.FirstName)
             .RuleFor(e=>e.Description,f=>f.Lorem.Word())
-            .RuleFor(e=>e.TotalPurchases,f=>f.PickRandom(1,int.MaxValue))
+            .RuleFor(e=>e.TotalPurchases,f=>f.Random.Number(1,int.MaxValue))
             .Generate(100)
             .ToArray()
             .DistinctBy(e=>e.Name)

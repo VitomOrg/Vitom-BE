@@ -10,11 +10,11 @@ public class DeleteBlogEndpointHandler
 {
     public static async Task<IResult> Handle(
         ISender sender,
-        Guid Id,
+        Guid id,
         CancellationToken cancellationToken = default
     )
     {
-        Result result = await sender.Send(new DeleteBlog.Command(Id: Id), cancellationToken);
+        Result result = await sender.Send(new DeleteBlog.Command(Id: id), cancellationToken);
         return result.Check();
     }
 }

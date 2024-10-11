@@ -11,11 +11,11 @@ public class ViewTypeByIdEndpointHandler
 {
     public static async Task<IResult> Handle(
         ISender sender,
-        Guid Id,
+        Guid id,
         CancellationToken cancellationToken = default
     )
     {
-        Result<TypeDetailsResponse> result = await sender.Send(new ViewTypeById.Query(Id), cancellationToken);
+        Result<TypeDetailsResponse> result = await sender.Send(new ViewTypeById.Query(id), cancellationToken);
         return result.Check();
     }
 }

@@ -2,25 +2,22 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistence;
 
 #nullable disable
 
-namespace Persistence.Migrations
+namespace Persistence.Database
 {
     [DbContext(typeof(VitomDBContext))]
-    [Migration("20241003063612_FixModelMaterialsTable")]
-    partial class FixModelMaterialsTable
+    partial class VitomDBContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -44,6 +41,9 @@ namespace Persistence.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("TotalVisit")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -283,6 +283,44 @@ namespace Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("LikeProducts");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Model", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Fbx")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Glb")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Obj")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique();
+
+                    b.ToTable("Models");
                 });
 
             modelBuilder.Entity("Domain.Entities.ModelMaterial", b =>
@@ -699,6 +737,9 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsLicense")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -871,6 +912,17 @@ namespace Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Model", b =>
+                {
+                    b.HasOne("Domain.Entities.Product", "Product")
+                        .WithOne("Model")
+                        .HasForeignKey("Domain.Entities.Model", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Domain.Entities.ModelMaterial", b =>
                 {
                     b.HasOne("Domain.Entities.Product", "Product")
@@ -1034,6 +1086,9 @@ namespace Persistence.Migrations
                     b.Navigation("CollectionProducts");
 
                     b.Navigation("LikeProducts");
+
+                    b.Navigation("Model")
+                        .IsRequired();
 
                     b.Navigation("ModelMaterials");
 

@@ -32,8 +32,10 @@ public class GetBlogs
             IQueryable<Blog> query = context
                 .Blogs
                 .AsNoTracking()
+                .IgnoreQueryFilters()
                 .Include(b => b.User)
                 .Include(b => b.Images)
+                .Where(b => b.DeletedAt == null)
                 .Where(b => (b.Title.ToLower().Contains(request.Keyword.ToLower()) || b.Content.ToLower().Contains(request.Keyword.ToLower())) && b.DeletedAt == null);
 
             // get total pages

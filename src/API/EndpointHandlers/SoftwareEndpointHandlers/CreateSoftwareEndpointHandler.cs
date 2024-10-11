@@ -11,10 +11,10 @@ public class CreateSoftwareEndpointHandler
     public static async Task<Microsoft.AspNetCore.Http.IResult> Handle(ISender sender, CreateSoftwareRequest request, CancellationToken cancellationToken = default)
     {
         Result<CreateSoftwareResponse> result = await sender.Send(new CreateSoftware.Command(
-            Name: request.Name,
-            Description: request.Description
+            Name: request.name,
+            Description: request.description
         ), cancellationToken);
         return result.Check();
     }
-    public record CreateSoftwareRequest(string Name, string Description);
+    public record CreateSoftwareRequest(string name, string description);
 }
