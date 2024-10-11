@@ -50,23 +50,13 @@ public class UpdateProduct
             //remove all current relationships
             context.ProductTypes.RemoveRange(updatingProduct.ProductTypes);
             context.ProductSoftwares.RemoveRange(updatingProduct.ProductSoftwares);
-            context.ProductImages.RemoveRange(updatingProduct.ProductImages);
-            context.ModelMaterials.RemoveRange(updatingProduct.ModelMaterials);
-            //remove files in firebase directory
+            //remove model files in firebase directory
             List<Task<bool>> tasksDelete = [];
-            foreach (var productImage in updatingProduct.ProductImages)
-            {
-                tasksDelete.Add(firebaseService.DeleteFile(productImage.Url));
-            }
-            foreach (var modelMaterial in updatingProduct.ModelMaterials)
-            {
-                tasksDelete.Add(firebaseService.DeleteFile(modelMaterial.Url));
-            }
             tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Fbx));
             tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Obj));
             tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Glb));
             await Task.WhenAll(tasksDelete);
-            if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete files failed");
+            if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete model files failed");
 
             //check product types are existed
             IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
