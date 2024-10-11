@@ -7,6 +7,11 @@ public static class UserEndpoints
 {
     public static RouteGroupBuilder MapUserEndpoint(this RouteGroupBuilder group)
     {
+        // GET
+        group
+            .MapGet("", GetUserRoleEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get current users Role"))
+            .RequireAuthorization();
         // PUT
         group.MapPut("/artist", AssignUserToArtistEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Assign user to artist"))
