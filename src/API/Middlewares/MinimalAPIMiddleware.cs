@@ -17,6 +17,8 @@ public static class MinimalAPIMiddleware
         host.MapGroup("blogs").MapBlogEndpoint().WithTags("Blogs");
         host.MapGroup("payment").MapPaymentEndpoint().WithTags("Payments");
         host.MapGroup("report").MapReportEndpoint().WithTags("Reports");
+        host.MapGroup("images").MapImageEndpoint().WithTags("Images");
+        host.MapGroup("materials").MapModelMaterialEndpoint().WithTags("Materials");
         return host;
     }
 }
