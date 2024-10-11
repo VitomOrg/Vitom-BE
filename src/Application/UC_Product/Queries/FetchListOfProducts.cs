@@ -21,7 +21,7 @@ namespace Application.UC_Product.Queries
             bool AscByCreatedAt,
             int PageSize,
             int PageIndex,
-            string? Type,
+            Guid[] TypeIds,
             LicenseEnum? License
         ) : IRequest<Result<PaginatedResponse<ProductDetailsResponse>>>;
 
@@ -47,7 +47,7 @@ namespace Application.UC_Product.Queries
                 .Where(p => request.Search == null || p.Name.ToLower().Contains(request.Search.ToLower()))
                 .Where(p => request.SoftwareIds.Length == 0 || p.ProductSoftwares.Any(ps => request.SoftwareIds.Contains(ps.SoftwareId)))
                 // .Where(p => p.ProductTypes.Any(pt => EF.Functions.Like(pt.Type.Name, $"%{request.Type}%")))
-                .Where(p => request.Type == null || p.ProductTypes.Any(pt => pt.Type.Name.ToLower().Contains(request.Type.ToLower())))
+                .Where(p => request.TypeIds.Length == 0 || p.ProductTypes.Any(ps => request.TypeIds.Contains(ps.TypeId)))
                 // .Where(p => EF.Functions.Like((string)(object)p.License, $"%{request.License}%"))
                 // .Where(p => ((string)(object)p.License).Contains(request.License))
                 .Where(p => p.License == request.License || request.License == null)
