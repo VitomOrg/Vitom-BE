@@ -18,17 +18,12 @@ public class FetchCartOfUser
         int PageSize = 10
     ) : IRequest<Result<PaginatedResponse<CartItemResponse>>>;
 
-    public class Handler(IVitomDbContext context, ICacheServices services, CurrentUser currentUser) : IRequestHandler<Query, Result<PaginatedResponse<CartItemResponse>>>
+    public class Handler(IVitomDbContext context, CurrentUser currentUser) : IRequestHandler<Query, Result<PaginatedResponse<CartItemResponse>>>
     {
         public async Task<Result<PaginatedResponse<CartItemResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
             //check if user is null
             if (currentUser.User is null || currentUser.User.DeletedAt != null) return Result.Forbidden();
-            //set key
-            string key = $"cart:{currentUser.User!.Id}-sortascbycreateat{request.AscByCreatedAt}-pageindex{request.PageIndex}-pagesize{request.PageSize}";
-            //get data from cache
-            PaginatedResponse<CartItemResponse>? cacheResponse = await services.GetAsync<PaginatedResponse<CartItemResponse>>(key, cancellationToken);
-            if (cacheResponse is not null) return Result.Success(cacheResponse, $"fetch cart items of user {currentUser.User!.Username} successfully");
             //get data from db
             IQueryable<CartItem> items = context.CartItems
                 .AsNoTracking()
@@ -60,14 +55,11 @@ public class FetchCartOfUser
                 .Select(ci => ci.MapToCartItemResponse())
                 .ToListAsync(cancellationToken);
             //map to paginated response
-            cacheResponse = new(
+            PaginatedResponse<CartItemResponse> cacheResponse = new(
                 Data: result,
                 PageIndex: request.PageIndex,
                 PageSize: request.PageSize,
-                TotalPages: totalPages
-            );
-            //set cache
-            await services.SetAsync(key, cacheResponse, cancellationToken);
+                TotalPages: totalPages);
             return Result.Success(cacheResponse, $"fetch cart items of user {currentUser.User!.Username} successfully");
         }
     }
