@@ -26,6 +26,7 @@ public class FetchCartOfUser
             if (currentUser.User is null || currentUser.User.DeletedAt != null) return Result.Forbidden();
             //get data from db
             IQueryable<CartItem> items = context.CartItems
+                .IgnoreQueryFilters()
                 .AsNoTracking()
                 .AsSplitQuery()
                 .Include(ci => ci.Product).ThenInclude(ci => ci.ProductImages)
