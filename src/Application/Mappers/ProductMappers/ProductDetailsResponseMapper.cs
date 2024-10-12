@@ -1,3 +1,5 @@
+using Application.Mappers.ImageMappers;
+using Application.Mappers.MaterialMappers;
 using Application.Responses.ProductResponses;
 using Domain.Entities;
 using Domain.Enums;
@@ -15,8 +17,8 @@ public static class ProductDetailsResponseMapper
             Name: product.Name,
             Description: product.Description,
             Types: product.ProductTypes.Where(pt => pt.DeletedAt == null).Select(p => p.Type.Name),
-            ImageUrls: product.ProductImages.Where(pi => pi.DeletedAt == null).Select(p => p.Url),
-            ModelMaterialUrls: product.ModelMaterials.Where(mm => mm.DeletedAt == null).Select(p => p.Url),
+            Images: product.ProductImages.Where(pi => pi.DeletedAt == null).Select(p => p.MapToImageDetailResponse()),
+            ModelMaterials: product.ModelMaterials.Where(mm => mm.DeletedAt == null).Select(p => p.MapToMaterialDetailResponse()),
             FbxUrl: product.Model?.Fbx,
             ObjUrl: product.Model?.Obj,
             GlbUrl: product.Model?.Glb,
@@ -35,8 +37,8 @@ public static class ProductDetailsResponseMapper
             Name: product.Name,
             Description: product.Description,
             Types: product.ProductTypes.Where(pt => pt.DeletedAt == null).Select(p => p.Type.Name),
-            ImageUrls: product.ProductImages.Where(pi => pi.DeletedAt == null).Select(p => p.Url),
-            ModelMaterialUrls: product.ModelMaterials.Where(mm => mm.DeletedAt == null).Select(p => p.Url),
+            Images: product.ProductImages.Where(pi => pi.DeletedAt == null).Select(p => p.MapToImageDetailResponse()),
+            ModelMaterials: product.ModelMaterials.Where(mm => mm.DeletedAt == null).Select(p => p.MapToMaterialDetailResponse()),
             FbxUrl: product.Model?.Fbx,
             ObjUrl: product.Model?.Obj,
             GlbUrl: product.Model?.Glb,

@@ -50,27 +50,17 @@ public class UpdateProduct
             //remove all current relationships
             context.ProductTypes.RemoveRange(updatingProduct.ProductTypes);
             context.ProductSoftwares.RemoveRange(updatingProduct.ProductSoftwares);
-            context.ProductImages.RemoveRange(updatingProduct.ProductImages);
-            context.ModelMaterials.RemoveRange(updatingProduct.ModelMaterials);
-            //remove files in firebase directory
+            //remove model files in firebase directory
             List<Task<bool>> tasksDelete = [];
-            foreach (var productImage in updatingProduct.ProductImages)
-            {
-                tasksDelete.Add(firebaseService.DeleteFile(productImage.Url));
-            }
-            foreach (var modelMaterial in updatingProduct.ModelMaterials)
-            {
-                tasksDelete.Add(firebaseService.DeleteFile(modelMaterial.Url));
-            }
             tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Fbx));
             tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Obj));
             tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Glb));
             await Task.WhenAll(tasksDelete);
-            if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete files failed");
+            if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete model files failed");
 
             //check product types are existed
             IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
-            if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound($"Types with id {string.Join("", request.TypeIds)} are not existed");
+            if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound("Some types are not found");
             // types - add product types
             foreach (Type type in checkingTypes)
             {
@@ -78,7 +68,7 @@ public class UpdateProduct
             }
             //check product softwares are existed
             IEnumerable<Software> checkingSoftwares = context.Softwares.Where(s => request.SoftwareIds.Contains(s.Id) && s.DeletedAt == null);
-            if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound($"Softwares with id {string.Join("", request.SoftwareIds)} are not existed");
+            if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound("Some softwares are not found");
             // softwares - add product softwares
             foreach (Software software in checkingSoftwares)
             {
