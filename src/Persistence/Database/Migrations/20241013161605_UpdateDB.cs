@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Persistence.Database
+namespace Persistence.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class AddTotalVisitToBlog : Migration
+    public partial class UpdateDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

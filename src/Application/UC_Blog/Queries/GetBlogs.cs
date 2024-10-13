@@ -36,7 +36,7 @@ public class GetBlogs
                 .Include(b => b.User)
                 .Include(b => b.Images)
                 .Where(b => b.DeletedAt == null)
-                .Where(b => (b.Title.ToLower().Contains(request.Keyword.ToLower()) || b.Content.ToLower().Contains(request.Keyword.ToLower())) && b.DeletedAt == null);
+                .Where(b => (b.Title.ToLower().Contains(request.Keyword.ToLower()) || b.Content.ToLower().Contains(request.Keyword.ToLower())));
 
             // get total pages
             int totalPages = (int)Math.Ceiling((decimal)query.Count() / request.PageSize);
