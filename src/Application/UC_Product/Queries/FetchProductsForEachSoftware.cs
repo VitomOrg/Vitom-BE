@@ -33,6 +33,7 @@ public class FetchProductsForEachSoftware
                 context.Softwares
                     .AsSplitQuery()
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ProductTypes).ThenInclude(p => p.Type)
+                    .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ProductSoftwares).ThenInclude(p => p.Software)
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ProductImages)
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.ModelMaterials)
                     .Include(p => p.ProductSoftwares).ThenInclude(ps => ps.Product).ThenInclude(p => p.Model)
