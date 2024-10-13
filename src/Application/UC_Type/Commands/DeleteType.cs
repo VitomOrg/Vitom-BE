@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Ardalis.Result;
 using Domain.Primitives;
@@ -31,7 +32,7 @@ public class DeleteType
                 return Result.Error($"Type with id {request.Id} has already been deleted");
 
             deletingType.Delete();
-
+            deletingType.AddDomainEvent(new EntityRemove.Event("type"));
             await context.SaveChangesAsync(cancellationToken);
 
             return Result.NoContent();

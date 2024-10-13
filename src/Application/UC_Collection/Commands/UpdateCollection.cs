@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Application.Responses.CollectionResponses;
 using Ardalis.Result;
@@ -38,6 +39,7 @@ public class UpdateCollection
                 isPublic: request.IsPublic
             );
             //Save changes to the database
+            collection.AddDomainEvent(new EntityUpdated.Event("collection"));
             await context.SaveChangesAsync(cancellationToken);
             return Result.NoContent();
         }

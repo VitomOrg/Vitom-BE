@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Application.Mappers.ProductMappers;
 using Application.Responses.ProductResponses;
@@ -103,6 +104,7 @@ public class CreateProduct
             string zipUrl = await firebaseService.UploadFiles(zipFiles, "download-zip-product");
             //update download url for product
             newProduct.DownloadUrl = zipUrl;
+            newProduct.AddDomainEvent(new EntityCreated.Event("product"));
             // save changes
             await context.SaveChangesAsync(cancellationToken);
             // return result with mapped object

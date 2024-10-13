@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Ardalis.Result;
 using Domain.Entities;
@@ -23,6 +24,7 @@ public class DeleteSoftware
             if (deletingSoftware.DeletedAt is not null) return Result.Error($"Software with id {request.Id} has already been deleted");
             // soft delete software
             deletingSoftware.Delete();
+            deletingSoftware.AddDomainEvent(new EntityRemove.Event("software"));
             await context.SaveChangesAsync(cancellationToken);
             // return result
             return Result.NoContent();

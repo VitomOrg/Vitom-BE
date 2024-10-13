@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Ardalis.Result;
 using Domain.Entities;
@@ -118,6 +119,7 @@ public class UpdateProduct
                 description: request.Description,
                 price: request.Price
             );
+            updatingProduct.AddDomainEvent(new EntityUpdated.Event("product"));
             //save to db
             await context.SaveChangesAsync(cancellationToken);
             //return final result
