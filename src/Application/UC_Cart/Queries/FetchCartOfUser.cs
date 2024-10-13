@@ -32,6 +32,7 @@ public class FetchCartOfUser
                 .Include(ci => ci.Product).ThenInclude(ci => ci.ModelMaterials)
                 .Include(ci => ci.Product).ThenInclude(ci => ci.Model)
                 .Include(ci => ci.Product).ThenInclude(ci => ci.ProductTypes).ThenInclude(ci => ci.Type)
+                .Include(ci => ci.Product).ThenInclude(ci => ci.ProductSoftwares).ThenInclude(ci => ci.Software)
                 .Include(ci => ci.Cart)
                 .Where(ci => ci.Cart.UserId == currentUser.User!.Id)
                 .Where(ci => ci.Cart.DeletedAt == null)

@@ -34,7 +34,7 @@ public class FetchLikedProductByUserId
                 .AsNoTracking()
                 .Include(p => p.LikeProducts)
                 .Include(p => p.ProductTypes).ThenInclude(p => p.Type)
-                .Include(p => p.ProductSoftwares)
+                .Include(p => p.ProductSoftwares).ThenInclude(p => p.Software)
                 .Include(p => p.ProductImages)
                 .Include(p => p.ModelMaterials)
                 .Include(p => p.Model)

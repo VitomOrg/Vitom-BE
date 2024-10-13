@@ -13,6 +13,7 @@ public record ProductDetailsResponse
     string Name,
     string Description,
     IEnumerable<string> Types,
+    IEnumerable<string> Softwares,
     IEnumerable<ImageDetailResponse> Images,
     IEnumerable<MaterialDetailResponse> ModelMaterials,
     string? FbxUrl,
