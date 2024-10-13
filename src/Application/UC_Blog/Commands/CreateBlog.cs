@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Application.Mappers.BlogMappers;
 using Application.Responses.BlogResponses;
@@ -43,6 +44,7 @@ public class CreateBlog
                 BlogId = newBlog.Id
             }).ToList();
             context.Blogs.Add(newBlog);
+            newBlog.AddDomainEvent(new EntityCreated.Event("blog"));
             await context.SaveChangesAsync(cancellationToken);
             return Result.Success(newBlog.MapToCreateBlogResponse(), "Create new blog successfully");
         }

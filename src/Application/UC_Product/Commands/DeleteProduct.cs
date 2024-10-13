@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Ardalis.Result;
 using Domain.Entities;
@@ -57,6 +58,7 @@ public class DeleteProduct
             deletingProduct.Model?.Delete();
             //soft delete product
             deletingProduct.Delete();
+            deletingProduct.AddDomainEvent(new EntityRemove.Event("product"));
             await context.SaveChangesAsync(cancellationToken);
             //return result
             return Result.NoContent();

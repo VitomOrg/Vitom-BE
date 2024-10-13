@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Application.Mappers.SoftwareMappers;
 using Application.Responses.SoftwareResponses;
@@ -30,7 +31,7 @@ public class CreateSoftware
             // add to db
             context.Softwares.Add(newSoftware);
             // save changes
-            newSoftware.AddDomainEvent(new SoftwareCreated.Event());
+            newSoftware.AddDomainEvent(new EntityCreated.Event("software"));
             await context.SaveChangesAsync(cancellationToken);
             // return result with mapped object
             return Result.Success(newSoftware.MapToCreateSoftwareResponse(), $"Create new {request.Name} software successfully");

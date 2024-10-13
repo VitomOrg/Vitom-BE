@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Application.Mappers.CollectionMappers;
 using Application.Responses.CollectionResponses;
@@ -30,6 +31,8 @@ public class CreateCollection
             };
 
             context.Collections.Add(addingCollection);
+
+            addingCollection.AddDomainEvent(new EntityCreated.Event("collection"));
             await context.SaveChangesAsync(cancellationToken);
 
             return Result.Success(addingCollection.MapToCreateCollectionResponse());

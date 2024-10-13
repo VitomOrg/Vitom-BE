@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Application.Mappers.ReviewMappers;
 using Application.Responses.ReviewResponses;
@@ -38,6 +39,7 @@ public class CreateReview
             };
             //add new review and save changes to database
             context.Reviews.Add(newReview);
+            newReview.AddDomainEvent(new EntityCreated.Event("review"));
             await context.SaveChangesAsync(cancellationToken);
             return Result.Success(newReview.MapToCreateReviewResponse(), "Review created successfully");
         }

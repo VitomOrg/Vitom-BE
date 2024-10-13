@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Application.Responses.BlogResponses;
 using Ardalis.Result;
@@ -64,6 +65,7 @@ public class UpdateBlog
                     BlogId = updatingBlog.Id
                 })
                 .ToArray());
+            updatingBlog.AddDomainEvent(new EntityUpdated.Event("blog"));
             // save to db
             await context.SaveChangesAsync(cancellationToken);
             // return result
