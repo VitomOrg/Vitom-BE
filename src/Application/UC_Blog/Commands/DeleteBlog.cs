@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Ardalis.Result;
 using Domain.Entities;
@@ -22,6 +23,7 @@ public class DeleteBlog
             if (!deletingBlog.UserId.Equals(currentUser.User!.Id)) return Result.Forbidden();
             // delete blog
             deletingBlog.Delete();
+            deletingBlog.AddDomainEvent(new EntityRemove.Event("blog"));
             await context.SaveChangesAsync(cancellationToken);
             return Result.NoContent();
         }

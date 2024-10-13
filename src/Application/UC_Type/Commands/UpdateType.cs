@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Ardalis.Result;
 using Domain.Primitives;
@@ -28,7 +29,7 @@ public class UpdateType
                 return Result.NotFound();
 
             updatingType.Update(name: request.Name, description: request.Description);
-
+            updatingType.AddDomainEvent(new EntityUpdated.Event("type"));
             await context.SaveChangesAsync(cancellationToken);
 
             return Result.NoContent();

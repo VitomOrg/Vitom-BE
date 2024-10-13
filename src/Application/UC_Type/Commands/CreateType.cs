@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Application.Mappers.TypeMappers;
 using Application.Responses.TypeResponses;
@@ -28,7 +29,7 @@ public class CreateType
             Type newType = new() { Name = request.Name, Description = request.Description };
 
             context.Types.Add(newType);
-
+            newType.AddDomainEvent(new EntityCreated.Event("type"));
             await context.SaveChangesAsync(cancellationToken);
 
             return Result.Success(

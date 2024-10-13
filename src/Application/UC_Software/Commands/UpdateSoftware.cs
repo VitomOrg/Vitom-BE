@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Ardalis.Result;
 using Domain.Entities;
@@ -29,6 +30,7 @@ public class UpdateSoftware
                 name: request.Name,
                 description: request.Description
             );
+            updatingSoftware.AddDomainEvent(new EntityUpdated.Event("software"));
             // save to db
             await context.SaveChangesAsync(cancellationToken);
             // return final result

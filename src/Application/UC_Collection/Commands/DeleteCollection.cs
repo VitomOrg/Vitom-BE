@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Ardalis.Result;
 using Domain.Entities;
@@ -25,6 +26,7 @@ public class DeleteCollection
             if (gettingColletion.UserId != currentUser.User!.Id) return Result.Forbidden();
             // soft delete collection
             gettingColletion.Delete();
+            gettingColletion.AddDomainEvent(new EntityRemove.Event("collection"));
             await context.SaveChangesAsync(cancellationToken);
             return Result.NoContent();
         }
