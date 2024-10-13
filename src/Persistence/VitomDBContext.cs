@@ -1,13 +1,14 @@
 using Application.Contracts;
 using Domain.Entities;
 using Domain.Entities.Report;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Extensions;
 
 namespace Persistence;
 
-public class VitomDBContext(DbContextOptions<VitomDBContext> options)
-    : DbContext(options),
-        IVitomDbContext
+public class VitomDBContext(DbContextOptions<VitomDBContext> options, IMediator mediator)
+    : DbContext(options), IVitomDbContext
 {
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
@@ -32,6 +33,12 @@ public class VitomDBContext(DbContextOptions<VitomDBContext> options)
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<BlogImage> BlogImages { get; set; }
     public DbSet<Model> Models { get; set; }
+
+    async Task<int> IVitomDbContext.SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        await mediator.DispatchDomainEvents(this, cancellationToken);
+        return await base.SaveChangesAsync(cancellationToken);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

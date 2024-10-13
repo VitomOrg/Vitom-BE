@@ -18,7 +18,11 @@ public abstract class Entity
     [NotMapped]
     public IReadOnlyCollection<BaseEvent> DomainEvents => _domainEvents.AsReadOnly();
 
-    public void AddDomainEvent(BaseEvent domainEvent) => _domainEvents.Add(domainEvent);
+    public void AddDomainEvent(BaseEvent domainEvent)
+    {
+        _domainEvents ??= [];
+        _domainEvents.Add(domainEvent);
+    }
 
     public void ClearDomainEvents() => _domainEvents.Clear();
 }

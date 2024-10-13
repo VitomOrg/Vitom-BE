@@ -5,6 +5,10 @@ tasks:
     dir: './src/API'
     cmds:
       - dotnet watch
+  run:
+    dir: './src/API'
+    cmds:
+      - dotnet run
   dropdb:
     dir: './src/Persistence'
     cmds:

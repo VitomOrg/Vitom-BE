@@ -1,4 +1,5 @@
 using Application.Contracts;
+using Application.UC_Cart.Events;
 using Ardalis.Result;
 using Domain.Entities;
 using Domain.Primitives;
@@ -32,7 +33,7 @@ public class DeleteProductFromCart
                 return Result.NotFound("Product not found in the cart");
 
             context.CartItems.Remove(cartItem);
-
+            cartItem.AddDomainEvent(new CartUpdated.Event());
             await context.SaveChangesAsync(cancellationToken);
 
             return Result.NoContent();

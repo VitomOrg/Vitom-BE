@@ -27,8 +27,9 @@ public class CacheServices(IDistributedCache distributedCache) : ICacheServices
 
     public async Task RemoveByPrefixAsync(string prefixKey, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Task> tasks = CacheKeys.Keys.Where(k => k.StartsWith(prefixKey)).Select(k => RemoveAsync(k, cancellationToken));
-        await Task.WhenAll();
+        IEnumerable<Task> tasks = CacheKeys.Keys.Where(k => k.Contains(prefixKey, StringComparison.OrdinalIgnoreCase))
+            .Select(k => RemoveAsync(k, cancellationToken));
+        await Task.WhenAll(tasks);
     }
 
     public async Task SetAsync<T>(string key, T value, CancellationToken cancellationToken = default) where T : class
