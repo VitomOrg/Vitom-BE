@@ -69,6 +69,6 @@ public static class VitomDBContextSeed
         tasks.Add(context.AddRangeAsync(blogImages));
         tasks.Add(context.AddRangeAsync(models));
         await Task.WhenAll(tasks);
-        await context.SaveChangesAsync();
+        await ((Application.Contracts.IVitomDbContext)context).SaveChangesAsync();
     }
 }

@@ -1,9 +1,9 @@
 using Application.Contracts;
 using Application.Mappers.SoftwareMappers;
 using Application.Responses.SoftwareResponses;
+using Application.UC_Software.Event;
 using Ardalis.Result;
 using Domain.Entities;
-using Domain.Enums;
 using Domain.Primitives;
 using MediatR;
 
@@ -30,6 +30,7 @@ public class CreateSoftware
             // add to db
             context.Softwares.Add(newSoftware);
             // save changes
+            newSoftware.AddDomainEvent(new SoftwareCreated.Event());
             await context.SaveChangesAsync(cancellationToken);
             // return result with mapped object
             return Result.Success(newSoftware.MapToCreateSoftwareResponse(), $"Create new {request.Name} software successfully");

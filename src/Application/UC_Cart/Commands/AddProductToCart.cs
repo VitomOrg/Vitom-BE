@@ -1,5 +1,6 @@
 using Application.Contracts;
 using Application.Responses.CartResponses;
+using Application.UC_Cart.Events;
 using Ardalis.Result;
 using Domain.Entities;
 using Domain.Primitives;
@@ -57,9 +58,8 @@ public class AddProductToCart
             };
 
             await context.CartItems.AddAsync(cartItem, cancellationToken);
-
+            cartItem.AddDomainEvent(new CartUpdated.Event());
             await context.SaveChangesAsync(cancellationToken);
-
             return Result<AddProductToCartResponse>.Success(
                 new(cartItem.Id, cartItem.ProductId, cartItem.PriceAtPurchase)
             );

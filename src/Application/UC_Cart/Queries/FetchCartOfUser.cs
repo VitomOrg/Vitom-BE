@@ -18,12 +18,17 @@ public class FetchCartOfUser
         int PageSize = 10
     ) : IRequest<Result<PaginatedResponse<CartItemResponse>>>;
 
-    public class Handler(IVitomDbContext context, CurrentUser currentUser) : IRequestHandler<Query, Result<PaginatedResponse<CartItemResponse>>>
+    public class Handler(IVitomDbContext context, CurrentUser currentUser, ICacheServices cacheServices) : IRequestHandler<Query, Result<PaginatedResponse<CartItemResponse>>>
     {
         public async Task<Result<PaginatedResponse<CartItemResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
             //check if user is null
             if (currentUser.User is null || currentUser.User.DeletedAt != null) return Result.Forbidden();
+            //set key
+            string key = $"user-cart-pageindex{request.PageIndex}-pagesize{request.PageSize}-orderascbycreatat{request.AscByCreatedAt}-userid{currentUser.User!.Id}";
+            //get cache result
+            PaginatedResponse<CartItemResponse>? cacheResult = await cacheServices.GetAsync<PaginatedResponse<CartItemResponse>>(key, cancellationToken);
+            if (cacheResult is not null) return Result.Success(cacheResult, "Get cart successfully");
             //get data from db
             IQueryable<CartItem> items = context.CartItems
                 .AsNoTracking()
@@ -61,6 +66,8 @@ public class FetchCartOfUser
                 PageIndex: request.PageIndex,
                 PageSize: request.PageSize,
                 TotalPages: totalPages);
+            //set cache
+            await cacheServices.SetAsync(key, cacheResponse, cancellationToken);
             return Result.Success(cacheResponse, $"fetch cart items of user {currentUser.User!.Username} successfully");
         }
     }

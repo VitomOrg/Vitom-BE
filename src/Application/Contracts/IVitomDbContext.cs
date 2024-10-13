@@ -30,5 +30,5 @@ public interface IVitomDbContext
     DbSet<Blog> Blogs { get; set; }
     DbSet<BlogImage> BlogImages { get; set; }
     DbSet<Model> Models { get; set; }
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken=default);
 }
