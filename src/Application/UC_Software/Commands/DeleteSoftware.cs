@@ -1,5 +1,6 @@
 using Application.Caches.Events;
 using Application.Contracts;
+using Application.UC_Software.Event;
 using Ardalis.Result;
 using Domain.Entities;
 using Domain.Primitives;
@@ -27,6 +28,7 @@ public class DeleteSoftware
             // soft delete software
             deletingSoftware.Delete();
             deletingSoftware.AddDomainEvent(new EntityRemove.Event("software"));
+            deletingSoftware.AddDomainEvent(new SoftwareDeleted.Event(deletingSoftware.Id));
             await context.SaveChangesAsync(cancellationToken);
             // return result
             return Result.NoContent();
