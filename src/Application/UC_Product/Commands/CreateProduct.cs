@@ -49,16 +49,33 @@ public class CreateProduct
             };
             context.Products.Add(newProduct);
             //check product types are existed
-            IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
+            IEnumerable<Type> checkingTypes =
+                context.Types
+                .Where(t => t.DeletedAt == null)
+                .Where(t => request.TypeIds.Contains(t.Id));
             if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound("Some types are not found");
             // types - add product types
-            newProduct.ProductTypes = checkingTypes.Select(t => new ProductType { ProductId = newProduct.Id, TypeId = t.Id }).ToList();
+            newProduct.ProductTypes =
+                checkingTypes.Select(t => new ProductType
+                {
+                    ProductId = newProduct.Id,
+                    TypeId = t.Id
+                }
+                                    )
+                            .ToList();
 
             //check product softwares are existed
-            IEnumerable<Software> checkingSoftwares = context.Softwares.Where(s => request.SoftwareIds.Contains(s.Id) && s.DeletedAt == null);
+            IEnumerable<Software> checkingSoftwares = context.Softwares
+                .Where(s => s.DeletedAt == null)
+                .Where(s => request.SoftwareIds.Contains(s.Id));
             if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound("Some softwares are not found");
             // software - add product softwares
-            newProduct.ProductSoftwares = checkingSoftwares.Select(s => new ProductSoftware { ProductId = newProduct.Id, SoftwareId = s.Id }).ToList();
+            newProduct.ProductSoftwares = checkingSoftwares.Select(s => new ProductSoftware
+            {
+                ProductId = newProduct.Id,
+                SoftwareId = s.Id
+            })
+                                                            .ToList();
             // images - add product images
             List<Task<string>> tasks = [];
             // upload images
@@ -76,7 +93,9 @@ public class CreateProduct
             List<Task<string>> modelMaterialTasks = [];
             foreach (var modelMaterial in request.ModelMaterials)
             {
-                modelMaterialTasks.Add(firebaseService.UploadFile(modelMaterial.FileName, modelMaterial, "model-materials"));
+                modelMaterialTasks.Add(firebaseService.UploadFile(modelMaterial.FileName,
+                                                                    modelMaterial,
+                                                                    "model-materials"));
             }
             string[] modelMaterialUrls = await Task.WhenAll(modelMaterialTasks);
             foreach (var materialUrl in modelMaterialUrls)

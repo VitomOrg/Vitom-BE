@@ -17,7 +17,10 @@ public class DeleteBlog
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
             // get blog
-            Blog? deletingBlog = await context.Blogs.SingleOrDefaultAsync(b => b.Id.Equals(request.Id), cancellationToken);
+            Blog? deletingBlog =
+                await context.Blogs
+                    .Where(b => b.DeletedAt == null)
+                    .SingleOrDefaultAsync(b => b.Id.Equals(request.Id), cancellationToken);
             if (deletingBlog is null) return Result.NotFound();
             // check if user is owner
             if (!deletingBlog.UserId.Equals(currentUser.User!.Id)) return Result.Forbidden();

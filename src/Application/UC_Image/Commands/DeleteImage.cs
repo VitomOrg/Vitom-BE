@@ -23,7 +23,9 @@ public class DeleteImage
             //check if image id exists
             var deleteImages = context.ProductImages
                 .AsNoTracking()
-                .Where(image => request.ImageIds.Contains(image.Id) && image.ProductId.Equals(request.ProductId));
+                .Where(image => image.DeletedAt == null)
+                .Where(image => image.ProductId.Equals(request.ProductId))
+                .Where(image => request.ImageIds.Contains(image.Id));
             if (deleteImages.Count() != request.ImageIds.Length)
                 return Result.NotFound($"Some images are not found");
             //delete images

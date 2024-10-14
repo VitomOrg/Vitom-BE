@@ -41,7 +41,7 @@ public class FetchProductsForEachSoftware
                     .Where(s => request.Type == null || s.ProductSoftwares.Any(ps => ps.Product.ProductTypes.Any(p => p.Type.Name.ToLower().Contains(request.Type.ToLower()))))
                     .Where(s => s.ProductSoftwares.Any(ps => ps.Product.DeletedAt == null));
 
-            int count = await query.CountAsync();
+            int count = await query.CountAsync(cancellationToken);
 
             IEnumerable<FetchProductsForEachSoftwareResponse> result =
                     await query

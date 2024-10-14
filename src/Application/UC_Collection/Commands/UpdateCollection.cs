@@ -27,7 +27,8 @@ public class UpdateCollection
             if (currentUser.User is null || currentUser.User.DeletedAt != null) return Result.Forbidden();
             // Get existing collection
             Collection? collection = await context.Collections
-                .SingleOrDefaultAsync(c => c.Id == request.Id && c.DeletedAt == null, cancellationToken);
+                .Where(c => c.DeletedAt == null)
+                .SingleOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
             //check if collection is not found
             if (collection is null) return Result.NotFound();
             //check if user is not the owner of the collection

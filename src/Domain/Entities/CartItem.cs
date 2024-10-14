@@ -1,6 +1,6 @@
+using Domain.Primitives;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Domain.Primitives;
 
 namespace Domain.Entities;
 

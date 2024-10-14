@@ -18,7 +18,9 @@ public class DeleteSoftware
             // check if current user is admin
             if (!currentUser.User!.IsAdmin()) return Result.Forbidden();
             // get deleting software
-            Software? deletingSoftware = await context.Softwares.SingleOrDefaultAsync(s => s.Id.Equals(request.Id), cancellationToken);
+            Software? deletingSoftware = await context.Softwares
+                .Where(s => s.DeletedAt == null)
+                .SingleOrDefaultAsync(s => s.Id.Equals(request.Id), cancellationToken);
             if (deletingSoftware is null) return Result.NotFound();
             // if deleted at is not null means already deleted
             if (deletingSoftware.DeletedAt is not null) return Result.Error($"Software with id {request.Id} has already been deleted");

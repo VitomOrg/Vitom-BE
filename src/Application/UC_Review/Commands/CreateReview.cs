@@ -27,7 +27,9 @@ public class CreateReview
             // check if user is not logged in
             if (currentUser.User == null) return Result.Forbidden();
             // check if product is existed
-            Product? product = await context.Products.SingleOrDefaultAsync(p => p.Id == request.ProductId && p.DeletedAt == null, cancellationToken);
+            Product? product = await context.Products
+                .Where(p => p.DeletedAt == null)
+                .SingleOrDefaultAsync(p => p.Id == request.ProductId, cancellationToken);
             if (product == null) return Result.NotFound($"Product with id {request.ProductId} is not existed");
             // init new review object
             Review newReview = new()

@@ -36,7 +36,7 @@ public class ViewListOfType
                 .Types.AsNoTracking().IgnoreQueryFilters()
                 .Where(t => t.DeletedAt == null)
                 .Where(t =>
-                    t.Name.ToLower().Contains(request.Keyword.ToLower()) && t.DeletedAt == null
+                    t.Name.ToLower().Contains(request.Keyword.ToLower())
                 );
 
             int totalPages = (int)Math.Ceiling((decimal)query.Count() / request.PageSize);

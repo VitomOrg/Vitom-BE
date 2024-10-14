@@ -19,6 +19,7 @@ public class DeleteProductFromCart
         {
             Product? product = await context
                 .Products.AsNoTracking()
+                .Where(p => p.DeletedAt == null)
                 .FirstOrDefaultAsync(p => p.Id == request.ProductId, cancellationToken);
 
             if (product is null)

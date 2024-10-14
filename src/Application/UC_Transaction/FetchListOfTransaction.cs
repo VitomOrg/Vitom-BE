@@ -36,8 +36,8 @@ public class FetchListOfTransaction
                 .Include(t => t.User)
                 .Include(t => t.TransactionDetails)
                 .ThenInclude(td => td.Product)
-                .Where(t => t.UserId == currentUser.User!.Id)
-                .Where(t => t.DeletedAt == null);
+                .Where(t => t.DeletedAt == null)
+                .Where(t => t.UserId == currentUser.User!.Id);
 
             //sort
             if (request.AscByCreatedAt)

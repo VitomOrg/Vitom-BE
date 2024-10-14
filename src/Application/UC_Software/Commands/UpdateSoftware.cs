@@ -23,7 +23,9 @@ public class UpdateSoftware
             // check if current user is admin
             if (!currentUser.User!.IsAdmin()) return Result.Forbidden();
             // get updating software
-            Software? updatingSoftware = await context.Softwares.SingleOrDefaultAsync(s => s.Id.Equals(request.Id) && s.DeletedAt == null, cancellationToken);
+            Software? updatingSoftware = await context.Softwares
+                .Where(s => s.DeletedAt == null)
+                .SingleOrDefaultAsync(s => s.Id.Equals(request.Id), cancellationToken);
             if (updatingSoftware is null) return Result.NotFound();
             // update the software
             updatingSoftware.Update(

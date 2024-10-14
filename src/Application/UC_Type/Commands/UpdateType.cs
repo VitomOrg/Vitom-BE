@@ -20,7 +20,9 @@ public class UpdateType
             if (!currentUser.User!.IsAdmin())
                 return Result.Forbidden();
 
-            Type? updatingType = await context.Types.SingleOrDefaultAsync(
+            Type? updatingType = await context.Types
+                .Where(t => t.DeletedAt == null)
+                .SingleOrDefaultAsync(
                 t => t.Id.Equals(request.Id) && t.DeletedAt == null,
                 cancellationToken
             );

@@ -1,11 +1,15 @@
 using Application.Contracts;
+using Domain.Primitives;
 using MediatR;
 
 namespace Application.UC_User.Events;
 
 public class UserCreatedEvent
 {
-    public record Event(string Email) : INotification;
+    public class Event(string Email) : BaseEvent
+    {
+        public string Email { get; set; } = Email;
+    }
 
     public class Handler(IMailServices mailServices) : INotificationHandler<Event>
     {

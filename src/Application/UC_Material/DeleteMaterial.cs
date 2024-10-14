@@ -23,7 +23,9 @@ public class DeleteMaterial
             //check if material exists in database
             var deleteMaterial = context.ModelMaterials
                 .AsNoTracking()
-                .Where(m => request.MaterialIds.Contains(m.Id) && m.ProductId.Equals(request.ProductId));
+                .Where(m => m.DeletedAt == null)
+                .Where(m => m.ProductId.Equals(request.ProductId))
+                .Where(m => request.MaterialIds.Contains(m.Id));
             if (deleteMaterial.Count() != request.MaterialIds.Length)
                 return Result.NotFound($"Some materials are not found");
             //delete material

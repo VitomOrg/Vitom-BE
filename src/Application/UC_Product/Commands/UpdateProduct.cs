@@ -43,7 +43,8 @@ public class UpdateProduct
             .Include(product => product.ProductImages)
             .Include(product => product.ModelMaterials)
             .Include(product => product.Model)
-            .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
+            .Where(p => p.DeletedAt == null)
+            .SingleOrDefaultAsync(p => p.Id.Equals(request.Id), cancellationToken);
             if (updatingProduct is null) return Result.NotFound();
             // check if user is owner
             if (!updatingProduct.UserId.Equals(currentUser.User.Id) && !currentUser.User.IsAdmin()) return Result.Forbidden();
@@ -60,7 +61,9 @@ public class UpdateProduct
             if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete model files failed");
 
             //check product types are existed
-            IEnumerable<Type> checkingTypes = context.Types.Where(t => request.TypeIds.Contains(t.Id) && t.DeletedAt == null);
+            IEnumerable<Type> checkingTypes = context.Types
+                                                    .Where(t => t.DeletedAt == null)
+                                                    .Where(t => request.TypeIds.Contains(t.Id));
             if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound("Some types are not found");
             // types - add product types
             foreach (Type type in checkingTypes)
@@ -68,7 +71,9 @@ public class UpdateProduct
                 context.ProductTypes.Add(new ProductType { ProductId = updatingProduct.Id, TypeId = type.Id });
             }
             //check product softwares are existed
-            IEnumerable<Software> checkingSoftwares = context.Softwares.Where(s => request.SoftwareIds.Contains(s.Id) && s.DeletedAt == null);
+            IEnumerable<Software> checkingSoftwares = context.Softwares
+                                                            .Where(s => s.DeletedAt == null)
+                                                            .Where(s => request.SoftwareIds.Contains(s.Id));
             if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound("Some softwares are not found");
             // softwares - add product softwares
             foreach (Software software in checkingSoftwares)

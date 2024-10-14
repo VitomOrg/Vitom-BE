@@ -47,8 +47,6 @@ namespace Application.UC_Product.Queries
                 .Where(p => request.Search == null || p.Name.ToLower().Contains(request.Search.ToLower()))
                 .Where(p => request.SoftwareIds.Length == 0 || p.ProductSoftwares.Any(ps => request.SoftwareIds.Contains(ps.SoftwareId)))
                 .Where(p => request.TypeIds.Length == 0 || p.ProductTypes.Any(ps => request.TypeIds.Contains(ps.TypeId)))
-                // .Where(p => EF.Functions.Like((string)(object)p.License, $"%{request.License}%"))
-                // .Where(p => ((string)(object)p.License).Contains(request.License))
                 .Where(p => p.License == request.License || request.License == null)
                 .Where(p => p.Price >= request.PriceFrom && p.Price < request.PriceTo);
                 //sort
@@ -64,10 +62,10 @@ namespace Application.UC_Product.Queries
                 int totalPages = (int)Math.Ceiling((double)query.Count() / request.PageSize);
                 //get result
                 IEnumerable<ProductDetailsResponse> result = await query
-                .Skip((request.PageIndex - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .Select(p => p.MapToProductDetailsResponse())
-                .ToListAsync();
+                    .Skip((request.PageIndex - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .Select(p => p.MapToProductDetailsResponse())
+                    .ToListAsync(cancellationToken);
                 //map to paginated response
                 cacheResponse = new(
                     Data: result,

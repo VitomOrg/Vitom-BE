@@ -20,7 +20,9 @@ public class DeleteType
             if (!currentUser.User!.IsAdmin())
                 return Result.Forbidden();
 
-            Type? deletingType = await context.Types.SingleOrDefaultAsync(
+            Type? deletingType = await context.Types
+                .Where(t => t.DeletedAt == null)
+                .SingleOrDefaultAsync(
                 t => t.Id.Equals(request.Id),
                 cancellationToken
             );
