@@ -1,5 +1,6 @@
 using Application.Caches.Events;
 using Application.Contracts;
+using Application.UC_Type.Events;
 using Ardalis.Result;
 using Domain.Primitives;
 using MediatR;
@@ -35,6 +36,7 @@ public class DeleteType
 
             deletingType.Delete();
             deletingType.AddDomainEvent(new EntityRemove.Event("type"));
+            deletingType.AddDomainEvent(new TypeDeleted.Event(deletingType.Id));
             await context.SaveChangesAsync(cancellationToken);
 
             return Result.NoContent();
