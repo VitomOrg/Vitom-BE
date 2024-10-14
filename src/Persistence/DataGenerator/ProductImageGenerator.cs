@@ -16,7 +16,7 @@ public class ProductImageGenerator
             .RuleFor(e => e.DeletedAt, (f, e) => f.Random.Bool() ? f.Date.Past() : null!)
             .RuleFor(e => e.ProductId, f => f.PickRandom(products).Id)
             .RuleFor(e => e.Url, f => f.Image.PicsumUrl())
-            .Generate(100)
+            .Generate(2000)
             .ToArray()
             .DistinctBy(e => new { e.ProductId, e.Url })
         ];

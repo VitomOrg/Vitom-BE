@@ -14,6 +14,7 @@ public static class BlogImageGenerator
         .RuleFor(b => b.CreatedAt, f => f.Date.Past())
         .RuleFor(b => b.UpdatedAt, f => f.Random.Bool() ? f.Date.Past() : null!)
         .RuleFor(b => b.DeletedAt, f => f.Random.Bool() ? f.Date.Past() : null!)
-        .Generate(10)
+        .Generate(2000)
+        .DistinctBy(b => new { b.BlogId, b.Url })
             ];
 }
