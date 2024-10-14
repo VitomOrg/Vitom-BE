@@ -10,13 +10,8 @@ public class User : Entity
     public required RolesEnum Role { get; set; }
     public bool IsLicense { get; set; } = false;
 
-    [MaxLength(25)]
     public required string Username { get; set; }
-
-    [MaxLength(50)]
     public required string Email { get; set; }
-
-    [MaxLength(25)]
     public required string PhoneNumber { get; set; }
     public required string ImageUrl { get; set; } = string.Empty;
 
