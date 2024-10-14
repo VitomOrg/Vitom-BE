@@ -10,7 +10,6 @@ public class Product : Entity
     public required string UserId { get; set; }
     public LicenseEnum License { get; set; } = LicenseEnum.Free;
 
-    [MaxLength(100)]
     public required string Name { get; set; }
     public string Description { get; set; } = string.Empty;
 
