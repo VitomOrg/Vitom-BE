@@ -1,14 +1,14 @@
 // USINGasd
 using API.Extensions;
 using API.Middlewares;
-using Infrastructure;
 using Application;
-using Persistence;
-using Serilog;
 using Application.Contracts;
+using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Persistence;
+using Serilog;
 // builder config
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;

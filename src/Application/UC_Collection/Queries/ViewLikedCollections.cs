@@ -52,6 +52,7 @@ public class ViewLikedCollections
             IEnumerable<AllCollectionDetailsResponse> result = await query
                 .Skip((request.PageIndex - 1) * request.PageSize)
                 .Take(request.PageSize)
+                .Where(c => c.DeletedAt == null)
                 .Select(c => c.MapToAllCollectionDetailsResponse())
                 .ToListAsync(cancellationToken);
 

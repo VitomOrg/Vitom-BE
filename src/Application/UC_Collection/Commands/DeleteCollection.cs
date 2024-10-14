@@ -19,6 +19,7 @@ public class DeleteCollection
             // check if user is admin
             Collection? gettingColletion = await context
                                                 .Collections
+                                                .Where(c => c.DeletedAt == null)
                                                 .SingleOrDefaultAsync(c => c.Id.Equals(request.Id), cancellationToken);
 
             if (gettingColletion is null) return Result.NotFound();

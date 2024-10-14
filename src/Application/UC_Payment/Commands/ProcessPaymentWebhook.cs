@@ -30,6 +30,7 @@ public class ProcessPaymentWebhook
             var cart = await context
                 .Carts.Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
+                .Where(c => c.DeletedAt == null)
                 .FirstOrDefaultAsync(
                     c => c.OrderCode == webhookData.orderCode,
                     cancellationToken

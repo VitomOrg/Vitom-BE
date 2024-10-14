@@ -24,6 +24,7 @@ public class AddProductToCart
         {
             Product? product = await context
                 .Products.AsNoTracking()
+                .Where(p => p.DeletedAt == null)
                 .FirstOrDefaultAsync(
                     p => p.Id == request.ProductId && p.DeletedAt == null,
                     cancellationToken
@@ -35,6 +36,7 @@ public class AddProductToCart
             // Check if the product is already in the cart
             CartItem? cartItem = context
                 .CartItems.Include(ci => ci.Cart)
+                .Where(ci => ci.DeletedAt == null)
                 .FirstOrDefault(ci =>
                     ci.ProductId == product.Id && ci.Cart.UserId == currentUser.User!.Id
                 );
@@ -46,6 +48,7 @@ public class AddProductToCart
                 .Carts
                 .AsNoTracking()
                 .Include(c => c.CartItems)
+                .Where(c => c.DeletedAt == null)
                 .FirstOrDefaultAsync(c => c.UserId == currentUser.User!.Id, cancellationToken);
 
             if (currentUserCart is null)

@@ -22,6 +22,7 @@ public class ProcessPaymentReturn
             var cart = await context
                 .Carts.Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
+                .Where(c => c.DeletedAt == null)
                 .FirstOrDefaultAsync(c => c.OrderCode == request.OrderCode, cancellationToken);
 
             if (cart is null)

@@ -6,7 +6,7 @@ namespace Persistence.DataGenerator;
 public class ModelGenerator
 {
     public static Model[] Generate(Product[] products)
-        => [..new Faker<Model>()
+        => [.. new Faker<Model>()
             .UseSeed(1)
             .UseDateTimeReference(DateTime.UtcNow)
             //base  enity

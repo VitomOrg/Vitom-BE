@@ -1,3 +1,4 @@
+using Application.Caches.Events;
 using Application.Contracts;
 using Application.UC_User.Events;
 using Ardalis.Result;
@@ -12,7 +13,7 @@ public class CreateUser
 {
     public record Command(Event AddingEvent) : IRequest<Result>;
 
-    public class Handler(IVitomDbContext context, IMediator mediator) : IRequestHandler<Command, Result>
+    public class Handler(IVitomDbContext context) : IRequestHandler<Command, Result>
     {
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -35,8 +36,9 @@ public class CreateUser
             if (user.Id.Equals(string.Empty))
                 return Result.NotFound("User is not found !");
             await context.Users.AddAsync(user, cancellationToken);
+            user.AddDomainEvent(new EntityCreated.Event("user"));
+            user.AddDomainEvent(new UserCreatedEvent.Event(user.Email));
             await context.SaveChangesAsync(cancellationToken);
-            await mediator.Publish(new UserCreatedEvent.Event(user.Email), cancellationToken);
             return Result.Success();
             // return Result.Success();
         }

@@ -25,6 +25,7 @@ public class ViewTypeById
             Type? checkingType = await context
                 .Types
                 .AsNoTracking()
+                .Where(t => t.DeletedAt == null)
                 .Where(t => t.Id.Equals(request.Id))
                 .FirstOrDefaultAsync(cancellationToken);
             // check if type not found

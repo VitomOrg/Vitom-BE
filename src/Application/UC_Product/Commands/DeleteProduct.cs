@@ -27,7 +27,8 @@ public class DeleteProduct
             .Include(product => product.ProductImages)
             .Include(product => product.ModelMaterials)
             .Include(product => product.Model)
-            .SingleOrDefaultAsync(p => p.Id.Equals(request.Id) && p.DeletedAt == null, cancellationToken);
+            .Where(product => product.DeletedAt == null)
+            .SingleOrDefaultAsync(p => p.Id.Equals(request.Id), cancellationToken);
 
             if (deletingProduct is null) return Result.NotFound();
             //if deleted at is not null means already deleted

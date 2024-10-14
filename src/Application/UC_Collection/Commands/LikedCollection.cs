@@ -23,7 +23,8 @@ public class LikedCollection
             // Check if collection exists
             Collection? collection = await context
                 .Collections.AsNoTracking()
-                .Where(c => c.Id == request.CollectionId && c.DeletedAt == null)
+                .Where(c => c.DeletedAt == null)
+                .Where(c => c.Id == request.CollectionId)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (collection is null)
@@ -32,6 +33,7 @@ public class LikedCollection
             // Get existing like collection
             LikeCollection? likeCollection = await context
                 .LikeCollections.AsNoTracking()
+                .Where(c => c.DeletedAt == null)
                 .Where(c => c.CollectionId == request.CollectionId)
                 .Where(c => c.UserId == currentUser.User!.Id)
                 .FirstOrDefaultAsync(cancellationToken);

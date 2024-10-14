@@ -29,6 +29,7 @@ public class UpdateBlog
             Blog? updatingBlog = await context.Blogs
                 .Include(b => b.Images)
                 .Include(b => b.User)
+                .Where(b => b.DeletedAt == null)
                 .SingleOrDefaultAsync(b => b.Id.Equals(request.Id) && b.DeletedAt == null, cancellationToken);
             if (updatingBlog is null) return Result.NotFound();
             // check if user is owner
