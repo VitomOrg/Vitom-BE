@@ -21,7 +21,7 @@ public class UserGenerator
                 .RuleFor(e => e.Email, f => f.Person.Email)
                 .RuleFor(e => e.PhoneNumber, f => f.Person.Phone)
                 .RuleFor(e => e.ImageUrl, f => f.Image.PicsumUrl())
-                .Generate(100)
+                .Generate(10)
                 .DistinctBy(e => e.Email)
                 .ToArray()
         ];
