@@ -1,3 +1,4 @@
+using API.EndpointHandlers.LikeProductEndpointHandler;
 using API.EndpointHandlers.ProductEndpointHandlers;
 using API.EndpointHandlers.UserEndpointHandlers;
 using Swashbuckle.AspNetCore.Annotations;
@@ -35,6 +36,12 @@ public static class ProductEndpoints
         group
             .MapDelete("/{id}", DeleteProductEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Organization delete existing product"))
+            .RequireAuthorization()
+            .DisableAntiforgery();
+
+        group
+            .MapPut("like", CreateLikeProductEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("like product"))
             .RequireAuthorization()
             .DisableAntiforgery();
 

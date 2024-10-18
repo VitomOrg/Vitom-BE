@@ -33,7 +33,6 @@ public class LikedCollection
             // Get existing like collection
             LikeCollection? likeCollection = await context
                 .LikeCollections.AsNoTracking()
-                .Where(c => c.DeletedAt == null)
                 .Where(c => c.CollectionId == request.CollectionId)
                 .Where(c => c.UserId == currentUser.User!.Id)
                 .FirstOrDefaultAsync(cancellationToken);
