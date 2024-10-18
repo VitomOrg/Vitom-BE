@@ -1,0 +1,46 @@
+# .dockerignore for .NET
+
+# Ignore .git folder and other VCS (version control system) folders
+.git
+.gitignore
+
+# Ignore build outputs
+bin/
+obj/
+
+# Ignore Visual Studio Code specific files
+.vscode/
+.vs/
+
+# Ignore Visual Studio specific files
+.vs/
+*.csproj.user
+
+# Ignore user-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore NuGet packages
+*.nupkg
+*.snupkg
+
+# Ignore other environment settings
+.env
+
+# Ignore log, lock and temp files
+*.log
+*.lock
+*.tmp
+
+# Ignore Docker-specific files (if not needed)
+docker-compose.yml
+docker-compose.override.yml
+Dockerfile*
+
+# Ignore node_modules (for projects using JavaScript/TypeScript)
+node_modules/
+
+# Ignore IDE settings (like JetBrains Rider)
+.idea/
