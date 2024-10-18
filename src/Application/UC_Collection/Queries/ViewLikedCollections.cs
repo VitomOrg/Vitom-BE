@@ -44,7 +44,7 @@ public class ViewLikedCollections
             IQueryable<Collection> query = context
                 .Collections.AsNoTracking()
                 .Include(c => c.User)
-                .Where(c => c.LikeCollections.Any(l => l.UserId == currentUser.User!.Id)) // Filter by current user's likes
+                .Where(c => c.LikeCollections.Any(l => l.UserId == currentUser.User!.Id && l.DeletedAt == null)) // Filter by current user's likes
                 .Where(c => c.DeletedAt == null);
 
             int totalPage = (int)Math.Ceiling((decimal)query.Count() / request.PageSize);
