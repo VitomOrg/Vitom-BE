@@ -21,7 +21,7 @@ public static class CollectionEndpoints
             .RequireAuthorization();
         // PUT
         group
-            .MapPut("like", LikeCollectionEndpointHandler.Handle)
+            .MapPatch("like", LikeCollectionEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Like a collection"))
             .RequireAuthorization();
         group.MapPut("", UpdateCollectionEndpointHandler.Handle)
