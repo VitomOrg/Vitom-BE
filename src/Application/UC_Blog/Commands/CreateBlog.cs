@@ -6,7 +6,6 @@ using Ardalis.Result;
 using Domain.Entities;
 using Domain.Primitives;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 
 namespace Application.UC_Blog.Commands;
 
@@ -16,7 +15,7 @@ public class CreateBlog
     public record Command(
         string Title,
         string Content,
-        IFormFileCollection Images
+        List<Stream> Images
     ) : IRequest<Result<CreateBlogResponses>>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser, IFirebaseService firebaseService) : IRequestHandler<Command, Result<CreateBlogResponses>>
@@ -35,7 +34,7 @@ public class CreateBlog
             List<Task<string>> tasks = [];
             foreach (var image in request.Images)
             {
-                tasks.Add(firebaseService.UploadFile(image.FileName, image, "blogs"));
+                tasks.Add(firebaseService.UploadFile(image, "blogs"));
             }
             string[] imageUrls = await Task.WhenAll(tasks);
             newBlog.Images = imageUrls.Select(i => new BlogImage()

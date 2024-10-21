@@ -16,7 +16,7 @@ public class UpdateBlog
         Guid Id,
         string Title,
         string Content,
-        IFormFileCollection Images
+        List<Stream> Images
     ) : IRequest<Result<UpdateBlogResponse>>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser, IFirebaseService firebaseService) : IRequestHandler<Command, Result<UpdateBlogResponse>>
@@ -38,7 +38,7 @@ public class UpdateBlog
             List<Task<string>> tasks = [];
             foreach (var image in request.Images)
             {
-                tasks.Add(firebaseService.UploadFile(image.FileName, image, "blogs"));
+                tasks.Add(firebaseService.UploadFile(image, "blogs"));
             }
             // update the blog
             updatingBlog.Update(

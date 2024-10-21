@@ -8,7 +8,6 @@ using Domain.Enums;
 using Domain.Primitives;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 // using System.Text.RegularExpressions;
 using Type = Domain.Entities.Type;
 
