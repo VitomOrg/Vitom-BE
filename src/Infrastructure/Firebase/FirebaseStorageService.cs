@@ -1,7 +1,9 @@
 using Application.Contracts;
 using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
 using System.IO.Compression;
+using System.Net.Mime;
 
 namespace Infrastructure.Firebase;
 
@@ -49,13 +51,14 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         return publicUrl;
     }
 
-    public async Task<string> UploadFile(string fileName, IFormFile file, string folderSave)
+    public async Task<string> UploadFile(Stream file, string folderSave)
     {
         // Create Guid to make the name of image unique
         var randomGuid = Guid.NewGuid();
 
+        FileStream? fs = file as FileStream;
         // Split the name into two parts: before and after the dot
-        var nameParts = fileName.Split('.');
+        var nameParts = fs!.Name.Split('.');
         var newName = $"{nameParts[0]}-{randomGuid}.{nameParts[1]}";
 
         using var stream = new MemoryStream();
@@ -63,7 +66,13 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
 
         // Uploading image to FireBase
         var objectName = $"images/{folderSave}/{newName}";
-        var image = await _storageClient.UploadObjectAsync(BucketName, objectName, file.ContentType, stream);
+        var provider = new FileExtensionContentTypeProvider();
+        string contentType = GetContentType(fs!);
+        // Get the file extension
+        string fileExtension = Path.GetExtension(fs!.Name);
+        {
+            var image = await _storageClient.UploadObjectAsync(BucketName, objectName, contentType, stream);
+        }
 
         // Make the object publicly accessible
         await _storageClient.UpdateObjectAsync(new Google.Apis.Storage.v1.Data.Object
@@ -98,7 +107,7 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
                 return false;
 
             // Extract the object name from the URL
-            var objectName = imageUrl.Substring(storageBaseUrl.Length);
+            var objectName = imageUrl[storageBaseUrl.Length..];
 
             // Delete the object from Firebase Storage
             await _storageClient.DeleteObjectAsync(BucketName, objectName);
@@ -110,10 +119,10 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         }
     }
 
-    public async Task<string> UploadFiles(List<IFormFile> files, string folderSave)
+    public async Task<string> UploadFiles(Stream[] files, string folderSave)
     {
         var randomGuid = Guid.NewGuid();
-        Stream[] fileStreams = files.Select(f => f.OpenReadStream()).ToArray();
+        Stream[] fileStreams = files;
         // Create a memory stream to hold the zip file
         MemoryStream zipMemoryStream = new();
 
@@ -123,20 +132,19 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
             for (int i = 0; i < fileStreams.Length; i++)
             {
                 // Add each file to the zip archive
-                ZipArchiveEntry zipEntry = archive.CreateEntry(files[i].FileName);
+                FileStream? fs = files[i] as FileStream;
+                ZipArchiveEntry zipEntry = archive.CreateEntry(fs!.Name);
 
-                using (Stream entryStream = zipEntry.Open())
-                {
-                    // Copy the file stream to the zip entry
-                    fileStreams[i].CopyTo(entryStream);
-                }
+                using Stream entryStream = zipEntry.Open();
+                // Copy the file stream to the zip entry
+                fileStreams[i].CopyTo(entryStream);
             }
         }
         // Reset the position of the memory stream to the beginning before returning it
         zipMemoryStream.Seek(0, SeekOrigin.Begin);
         // Uploading image to FireBase
         var objectName = $"images/{folderSave}/DownloadProduct-{randomGuid}.zip";
-        var image = await _storageClient.UploadObjectAsync(BucketName, objectName, "application/zip", zipMemoryStream);
+        _ = await _storageClient.UploadObjectAsync(BucketName, objectName, "application/zip", zipMemoryStream);
 
         // Make the object publicly accessible
         await _storageClient.UpdateObjectAsync(new Google.Apis.Storage.v1.Data.Object
@@ -157,6 +165,20 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
 
         return publicUrl;
+    }
+    public static string GetContentType(FileStream fileStream)
+    {
+        var provider = new FileExtensionContentTypeProvider();
+        // Get the file extension
+        string fileExtension = Path.GetExtension(fileStream.Name);
 
+        // Try to get the content type based on the file extension
+        if (!provider.TryGetContentType(fileExtension, out string contentType))
+        {
+            // If no content type is found, set a default content type
+            contentType = "application/octet-stream";
+        }
+
+        return contentType;
     }
 }
