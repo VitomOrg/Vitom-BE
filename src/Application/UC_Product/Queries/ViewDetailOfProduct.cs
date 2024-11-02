@@ -34,6 +34,7 @@ public class ViewDetailOfProduct
                 .Include(p => p.UserLibraries)
                 .Include(p => p.LikeProducts)
                 .Include(p => p.CollectionProducts)
+                .Include(p => p.Model)
                 .Include(p => p.ProductTypes).ThenInclude(p => p.Type)
                 .Include(p => p.ProductSoftwares).ThenInclude(p => p.Software)
                 .Include(p => p.ProductImages)
