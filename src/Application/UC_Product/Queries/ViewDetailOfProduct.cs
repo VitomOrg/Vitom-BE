@@ -3,6 +3,7 @@ using Application.Mappers.ProductMappers;
 using Application.Responses.ProductResponses;
 using Ardalis.Result;
 using Domain.Entities;
+using Domain.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ public class ViewDetailOfProduct
 {
     public record Query(Guid Id) : IRequest<Result<ProductDetailsResponse>>;
 
-    public class Handler(IVitomDbContext context, ICacheServices cacheServices)
+    public class Handler(IVitomDbContext context, ICacheServices cacheServices, CurrentUser currentUser)
         : IRequestHandler<Query, Result<ProductDetailsResponse>>
     {
         public async Task<Result<ProductDetailsResponse>> Handle(
@@ -45,7 +46,7 @@ public class ViewDetailOfProduct
                 .Where(p => p.Id == request.Id);
 
             ProductDetailsResponse? result = await query
-                .Select(p => p.MapForProductDetail())
+                .Select(p => p.MapForProductDetail(currentUser))
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (result is null)

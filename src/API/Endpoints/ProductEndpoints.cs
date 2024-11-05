@@ -21,6 +21,10 @@ public static class ProductEndpoints
             .WithMetadata(new SwaggerOperationAttribute("Get product user liked"))
             .RequireAuthorization();
 
+        group.MapGet("/download-product", FetchLikedProductByUserIdEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get product user downloaded"))
+            .RequireAuthorization();
+
         group
             .MapPost("", CreateProductEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Organization create new product"))

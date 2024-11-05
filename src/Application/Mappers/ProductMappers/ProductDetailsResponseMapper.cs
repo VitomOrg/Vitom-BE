@@ -3,6 +3,7 @@ using Application.Mappers.MaterialMappers;
 using Application.Responses.ProductResponses;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Primitives;
 
 namespace Application.Mappers.ProductMappers;
 
@@ -29,7 +30,7 @@ public static class ProductDetailsResponseMapper
             TotalLiked: product.TotalLiked
         );
 
-    public static ProductDetailsResponse MapForProductDetail(this Product product)
+    public static ProductDetailsResponse MapForProductDetail(this Product product, CurrentUser currentUser)
         => new(
             Id: product.Id,
             CreatedAt: product.CreatedAt,
@@ -45,7 +46,7 @@ public static class ProductDetailsResponseMapper
             ObjUrl: product.Model?.Obj,
             GlbUrl: product.Model?.Glb,
             Price: product.Price,
-            DownloadUrl: product.UserLibraries.Any(x => x.DeletedAt == null) == true ? product.DownloadUrl : String.Empty,
+            DownloadUrl: product.UserLibraries.Any(x => x.DeletedAt == null && x.UserId == currentUser.User?.Id) == true ? product.DownloadUrl : String.Empty,
             TotalPurchases: product.TotalPurchases,
             TotalLiked: product.TotalLiked
         );
