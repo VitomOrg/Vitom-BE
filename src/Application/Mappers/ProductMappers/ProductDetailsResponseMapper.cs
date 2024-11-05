@@ -46,7 +46,8 @@ public static class ProductDetailsResponseMapper
             ObjUrl: product.Model?.Obj,
             GlbUrl: product.Model?.Glb,
             Price: product.Price,
-            DownloadUrl: product.UserLibraries.Any(x => x.DeletedAt == null && x.UserId == currentUser.User?.Id) == true ? product.DownloadUrl : String.Empty,
+            DownloadUrl: (product.UserLibraries.Any(x => x.DeletedAt == null && x.UserId == currentUser.User?.Id)
+                            || product.License.Equals(LicenseEnum.Free)) ? product.DownloadUrl : String.Empty,
             TotalPurchases: product.TotalPurchases,
             TotalLiked: product.TotalLiked
         );
