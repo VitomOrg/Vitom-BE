@@ -5,6 +5,7 @@ using Application.Responses.BlogResponses;
 using Ardalis.Result;
 using Domain.Entities;
 using Domain.Primitives;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
@@ -47,6 +48,14 @@ public class CreateBlog
             newBlog.AddDomainEvent(new EntityCreated.Event("blog"));
             await context.SaveChangesAsync(cancellationToken);
             return Result.Success(newBlog.MapToCreateBlogResponse(), "Create new blog successfully");
+        }
+    }
+    public class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Title).NotEmpty().WithMessage("Title is required");
+            RuleFor(x => x.Content).NotEmpty().WithMessage("Content is required");
         }
     }
 }
