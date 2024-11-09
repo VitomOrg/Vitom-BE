@@ -22,5 +22,6 @@ public record ProductDetailsResponse
     decimal Price,
     string DownloadUrl,
     int TotalPurchases,
-    int TotalLiked
+    int TotalLiked,
+    bool IsLiked = false
 );

@@ -14,7 +14,7 @@ public static class ProductDetailsResponseMapper
             Id: product.Id,
             CreatedAt: product.CreatedAt,
             UserId: product.UserId,
-            License: Enum.TryParse(product.License.ToString(), out LicenseEnum license) ? ((LicenseEnum)product.License).ToString() : "unknown license",
+            License: Enum.TryParse(product.License.ToString(), out LicenseEnum license) ? product.License.ToString() : "unknown license",
             Name: product.Name,
             Description: product.Description,
             Types: product.ProductTypes.Where(pt => pt.DeletedAt == null).Select(p => p.Type.Name),
@@ -35,7 +35,7 @@ public static class ProductDetailsResponseMapper
             Id: product.Id,
             CreatedAt: product.CreatedAt,
             UserId: product.UserId,
-            License: Enum.TryParse(product.License.ToString(), out LicenseEnum license) ? ((LicenseEnum)product.License).ToString() : "unknown license",
+            License: Enum.TryParse(product.License.ToString(), out LicenseEnum license) ? product.License.ToString() : "unknown license",
             Name: product.Name,
             Description: product.Description,
             Types: product.ProductTypes.Where(pt => pt.DeletedAt == null).Select(p => p.Type.Name),
@@ -47,8 +47,9 @@ public static class ProductDetailsResponseMapper
             GlbUrl: product.Model?.Glb,
             Price: product.Price,
             DownloadUrl: (product.UserLibraries.Any(x => x.DeletedAt == null && x.UserId == currentUser.User?.Id)
-                            || product.License.Equals(LicenseEnum.Free)) ? product.DownloadUrl : String.Empty,
+                            || product.License.Equals(LicenseEnum.Free)) ? product.DownloadUrl : string.Empty,
             TotalPurchases: product.TotalPurchases,
-            TotalLiked: product.TotalLiked
+            TotalLiked: product.TotalLiked,
+            IsLiked: product.LikeProducts.Any(x => x.UserId == currentUser.User?.Id)
         );
 }
