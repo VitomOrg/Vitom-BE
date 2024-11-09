@@ -1,5 +1,5 @@
+using Ardalis.Result;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace API.Middlewares;
@@ -12,13 +12,8 @@ public class ExceptionHandlerMiddleware : IExceptionHandler
         {
             httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             httpContext.Response.ContentType = "application/problem+json";
-            ProblemDetails problemDetails = new()
-            {
-                Title = exception.Message,
-                Detail = exception.StackTrace,
-                Status = (int)HttpStatusCode.BadRequest,
-            };
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            Result result = Result.CriticalError(ex.Message);
+            await httpContext.Response.WriteAsJsonAsync(result, cancellationToken);
             return true;
         }
         return false;
