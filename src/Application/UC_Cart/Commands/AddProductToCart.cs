@@ -1,7 +1,6 @@
 using Application.Caches.Events;
 using Application.Contracts;
 using Application.Responses.CartResponses;
-using Application.UC_Cart.Events;
 using Ardalis.Result;
 using Domain.Entities;
 using Domain.Primitives;
