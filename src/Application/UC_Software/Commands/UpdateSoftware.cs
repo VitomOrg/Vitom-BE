@@ -22,6 +22,8 @@ public class UpdateSoftware
         {
             // check if current user is admin
             if (!currentUser.User!.IsAdmin()) return Result.Forbidden();
+            if (context.Softwares.Any(s => EF.Functions.Like(s.Name, $"%{request.Name}%")))
+                return Result.Error("Software name already exists");
             // get updating software
             Software? updatingSoftware = await context.Softwares
                 .Where(s => s.DeletedAt == null)

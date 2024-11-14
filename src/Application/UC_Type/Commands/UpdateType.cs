@@ -20,6 +20,9 @@ public class UpdateType
             if (!currentUser.User!.IsAdmin())
                 return Result.Forbidden();
 
+            if (context.Types.Any(t => EF.Functions.Like(t.Name, $"{request.Name}")))
+                return Result.Error("Type name already exists");
+
             Type? updatingType = await context.Types
                 .Where(t => t.DeletedAt == null)
                 .SingleOrDefaultAsync(

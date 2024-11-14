@@ -25,12 +25,7 @@ public class CreateSoftware
             // check if user is admin
             if (!currentUser.User!.IsAdmin()) return Result.Forbidden();
             if (context.Softwares.Any(s => EF.Functions.Like(s.Name, $"%{request.Name}%")))
-                throw new ValidationAppException(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Name", ["Software name already existed"] }
-                    }
-                );
+                return Result.Error("Software name already exists");
 
             // init new software object
             Software newSoftware = new()
