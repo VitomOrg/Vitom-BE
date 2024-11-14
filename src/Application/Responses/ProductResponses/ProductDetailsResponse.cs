@@ -12,8 +12,8 @@ public record ProductDetailsResponse
     string License,
     string Name,
     string Description,
-    IEnumerable<string> Types,
-    IEnumerable<string> Softwares,
+    TypesResponse[] Types,
+    SoftwaresResponse[] Softwares,
     IEnumerable<ImageDetailResponse> Images,
     IEnumerable<MaterialDetailResponse> ModelMaterials,
     string? FbxUrl,
@@ -25,3 +25,13 @@ public record ProductDetailsResponse
     int TotalLiked,
     bool IsLiked = false
 );
+
+public record SoftwaresResponse (
+    Guid Id,
+    string Name
+);
+public record TypesResponse (
+    Guid Id,
+    string Name
+);
+

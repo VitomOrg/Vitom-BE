@@ -25,6 +25,8 @@ namespace Application.UC_Product.Queries
             LicenseEnum? License
         ) : IRequest<Result<PaginatedResponse<ProductDetailsResponse>>>;
 
+
+
         public class Handler(IVitomDbContext context, ICacheServices cacheServices) : IRequestHandler<Query, Result<PaginatedResponse<ProductDetailsResponse>>>
         {
             public async Task<Result<PaginatedResponse<ProductDetailsResponse>>> Handle(Query request, CancellationToken cancellationToken)
@@ -80,4 +82,6 @@ namespace Application.UC_Product.Queries
             }
         }
     }
+
+    
 }
