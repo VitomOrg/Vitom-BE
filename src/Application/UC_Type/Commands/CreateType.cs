@@ -6,6 +6,7 @@ using Ardalis.Result;
 using Domain.Primitives;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Type = Domain.Entities.Type;
 
 namespace Application.UC_Type.Commands;
@@ -25,6 +26,9 @@ public class CreateType
             // check if user is admin
             if (!currentUser.User!.IsAdmin())
                 return Result.Forbidden();
+
+            if (context.Types.Any(t => EF.Functions.Like(t.Name, $"{request.Name}")))
+                return Result.Error("Type name already exists");
 
             Type newType = new() { Name = request.Name, Description = request.Description };
 
