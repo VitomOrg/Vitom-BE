@@ -21,9 +21,7 @@ services:
     ports:
       - 8090:80
     depends_on:
-      postgres_db:
-        condition: service_started
-        restart: true
+      - postgres_db
     restart: unless-stopped
     volumes:
       - ./servers.json:/pgadmin4/servers.json

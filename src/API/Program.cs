@@ -79,7 +79,7 @@ builder.Services.AddAuthorization();
 //register validators
 // builder.Services.AddScoped<IValidator<CreateProductEndpointHandler.CreateProductRequest>, CreateProductRequestValidator>();
 // using SERILOG
-builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
+// builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 // app config
 var app = builder.Build();
 // Configure the HTTP request pipeline.
@@ -98,7 +98,7 @@ else
 }
 // await app.AddPayOS();
 app.UseCors();
-app.UseSerilogRequestLogging();
+// app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
