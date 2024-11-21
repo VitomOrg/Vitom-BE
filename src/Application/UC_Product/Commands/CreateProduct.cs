@@ -114,7 +114,6 @@ public class CreateProduct
             List<IFormFile> zipFiles = request.Images;
             zipFiles.AddRange(request.ModelMaterials);
             zipFiles.AddRange([request.Fbx, request.Obj, request.Glb]);
-            Task<string> zipTask = firebaseService.UploadFiles(zipFiles, "download-zip-product");
             // await all tasks are finished
             string[] modelUrls = await Task.WhenAll(modelTasks);
             newProduct.Model = new Model
@@ -138,7 +137,7 @@ public class CreateProduct
                 newProduct.ProductImages.Add(new ProductImage { ProductId = newProduct.Id, Url = imageUrl });
             }
             // await for zip uploads
-            string zipUrl = await zipTask;
+            string zipUrl = await firebaseService.UploadFiles(zipFiles, "download-zip-product");
             newProduct.DownloadUrl = zipUrl;
             newProduct.AddDomainEvent(new EntityCreated.Event("product"));
             // save changes
