@@ -2,13 +2,11 @@
 using API.Extensions;
 using API.Middlewares;
 using Application;
-using Application.Contracts;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Persistence;
-using Serilog;
 // builder config
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -94,7 +92,7 @@ else
 {
     app.UseSwagger();
     app.UseSwaggerUI(option => option.DisplayRequestDuration());
-    app.MigrateDatabase<VitomDBContext>(async (dbContext, _) => await dbContext.Seed());
+    app.MigrateDatabase<VitomDBContext>(async (dbContext, _) => await Task.Delay(0));
 }
 // await app.AddPayOS();
 app.UseCors();
