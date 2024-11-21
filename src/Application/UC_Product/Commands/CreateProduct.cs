@@ -76,19 +76,36 @@ public class CreateProduct
             // images - add product images
             List<Task<string>> tasks = [];
             // upload images
+            // foreach (var image in request.Images)
+            // {
+            //     tasks.Add(firebaseService.UploadFile(image.FileName, image, "products"));
+            // }
             foreach (var image in request.Images)
             {
+                if (image.OpenReadStream().CanSeek)
+                {
+                    image.OpenReadStream().Position = 0;
+                }
                 tasks.Add(firebaseService.UploadFile(image.FileName, image, "products"));
             }
             // Add model files
             List<Task<string>> modelTasks = [];
-            modelTasks.Add(firebaseService.UploadFile(request.Fbx.FileName, request.Fbx, "models"));
-            modelTasks.Add(firebaseService.UploadFile(request.Obj.FileName, request.Obj, "models"));
-            modelTasks.Add(firebaseService.UploadFile(request.Glb.FileName, request.Glb, "models"));
+            foreach (var modelFile in new[] { request.Fbx, request.Obj, request.Glb })
+            {
+                if (modelFile.OpenReadStream().CanSeek)
+                {
+                    modelFile.OpenReadStream().Position = 0;
+                }
+                modelTasks.Add(firebaseService.UploadFile(modelFile.FileName, modelFile, "models"));
+            }
             List<Task<string>> modelMaterialTasks = [];
             // material - add product model materials
             foreach (var modelMaterial in request.ModelMaterials)
             {
+                if (modelMaterial.OpenReadStream().CanSeek)
+                {
+                    modelMaterial.OpenReadStream().Position = 0;
+                }
                 modelMaterialTasks.Add(firebaseService.UploadFile(modelMaterial.FileName,
                                                                     modelMaterial,
                                                                     "model-materials"));
