@@ -9,7 +9,7 @@ using Domain.Primitives;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using Type = Domain.Entities.Type;
 
 namespace Application.UC_Product.Commands;
@@ -37,6 +37,7 @@ public class CreateProduct
         {
             // check if user is Organization
             if (!currentUser.User!.IsOrganization() || currentUser.User.DeletedAt != null) return Result.Forbidden();
+            if (context.Products.Any(p => EF.Functions.Like(p.Name, $"%{request.Name}%"))) return Result.Error("Product name already exists");
             // init new product object
             Product newProduct = new()
             {
@@ -60,10 +61,7 @@ public class CreateProduct
                 {
                     ProductId = newProduct.Id,
                     TypeId = t.Id
-                }
-                                    )
-                            .ToList();
-
+                }).ToList();
             //check product softwares are existed
             IEnumerable<Software> checkingSoftwares = context.Softwares
                 .Where(s => s.DeletedAt == null)
@@ -74,8 +72,7 @@ public class CreateProduct
             {
                 ProductId = newProduct.Id,
                 SoftwareId = s.Id
-            })
-                                                            .ToList();
+            }).ToList();
             // images - add product images
             List<Task<string>> tasks = [];
             // upload images
@@ -83,30 +80,25 @@ public class CreateProduct
             {
                 tasks.Add(firebaseService.UploadFile(image.FileName, image, "products"));
             }
-            // await all tasks are finished
-            string[] imageUrls = await Task.WhenAll(tasks);
-            foreach (var imageUrl in imageUrls)
-            {
-                newProduct.ProductImages.Add(new ProductImage { ProductId = newProduct.Id, Url = imageUrl });
-            }
-            // material - add product model materials
+            // Add model files
+            List<Task<string>> modelTasks = [];
+            modelTasks.Add(firebaseService.UploadFile(request.Fbx.FileName, request.Fbx, "models"));
+            modelTasks.Add(firebaseService.UploadFile(request.Obj.FileName, request.Obj, "models"));
+            modelTasks.Add(firebaseService.UploadFile(request.Glb.FileName, request.Glb, "models"));
             List<Task<string>> modelMaterialTasks = [];
+            // material - add product model materials
             foreach (var modelMaterial in request.ModelMaterials)
             {
                 modelMaterialTasks.Add(firebaseService.UploadFile(modelMaterial.FileName,
                                                                     modelMaterial,
                                                                     "model-materials"));
             }
-            string[] modelMaterialUrls = await Task.WhenAll(modelMaterialTasks);
-            foreach (var materialUrl in modelMaterialUrls)
-            {
-                newProduct.ModelMaterials.Add(new ModelMaterial { ProductId = newProduct.Id, Url = materialUrl });
-            }
-            // Add model files
-            List<Task<string>> modelTasks = [];
-            modelTasks.Add(firebaseService.UploadFile(request.Fbx.FileName, request.Fbx, "models"));
-            modelTasks.Add(firebaseService.UploadFile(request.Obj.FileName, request.Obj, "models"));
-            modelTasks.Add(firebaseService.UploadFile(request.Glb.FileName, request.Glb, "models"));
+            // zip all images, materials and upload zip file to firebase service
+            List<IFormFile> zipFiles = request.Images;
+            zipFiles.AddRange(request.ModelMaterials);
+            zipFiles.AddRange([request.Fbx, request.Obj, request.Glb]);
+            Task<string> zipTask = firebaseService.UploadFiles(zipFiles, "download-zip-product");
+            // await all tasks are finished
             string[] modelUrls = await Task.WhenAll(modelTasks);
             newProduct.Model = new Model
             {
@@ -116,12 +108,20 @@ public class CreateProduct
                 Glb = modelUrls[2]
             };
             // zip all images, materials and upload zip file to firebase service
-            List<IFormFile> zipFiles = request.Images;
-            zipFiles.AddRange(request.ModelMaterials);
-            zipFiles.AddRange([request.Fbx, request.Obj, request.Glb]);
 
-            string zipUrl = await firebaseService.UploadFiles(zipFiles, "download-zip-product");
             //update download url for product
+            string[] modelMaterialUrls = await Task.WhenAll(modelMaterialTasks);
+            foreach (var materialUrl in modelMaterialUrls)
+            {
+                newProduct.ModelMaterials.Add(new ModelMaterial { ProductId = newProduct.Id, Url = materialUrl });
+            }
+            string[] imageUrls = await Task.WhenAll(tasks);
+            foreach (var imageUrl in imageUrls)
+            {
+                newProduct.ProductImages.Add(new ProductImage { ProductId = newProduct.Id, Url = imageUrl });
+            }
+            // await for zip uploads
+            string zipUrl = await zipTask;
             newProduct.DownloadUrl = zipUrl;
             newProduct.AddDomainEvent(new EntityCreated.Event("product"));
             // save changes
