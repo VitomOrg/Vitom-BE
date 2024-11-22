@@ -13,34 +13,40 @@ namespace API.EndpointHandlers.ProductEndpointHandlers;
 public class CreateProductEndpointHandler
 {
     public static async Task<IResult> Handle(ISender sender,
-        [FromForm] LicenseEnum license,
-        [FromForm] string name,
-        [FromForm] string description,
-        [FromForm] decimal price,
-        [FromForm] Guid[] typeIds,
-        [FromForm] Guid[] softwareIds,
-        [FromForm] IFormFileCollection files, //param for upload file in swagger
-        [FromForm] IFormFileCollection modelMaterialFiles, // param for upload model material in swagger
-        IFormFile fbx,
-        IFormFile obj,
-        IFormFile glb,
-        HttpContext httpContext,
+        CreateProductCommand command,
+        // HttpContext httpContext,
         CancellationToken cancellationToken = default)
     {
-        var form = await httpContext.Request.ReadFormAsync(cancellationToken);
+        // var form = await httpContext.Request.ReadFormAsync(cancellationToken);
         Result<CreateProductResponse> result = await sender.Send(new CreateProduct.Command(
-            License: license,
-            Name: name,
-            Description: description,
-            Price: price,
-            TypeIds: typeIds,
-            SoftwareIds: softwareIds,
-            Images: (List<IFormFile>)form.Files.GetFiles("Files"),
-            ModelMaterials: (List<IFormFile>)form.Files.GetFiles("ModelMaterialFiles"),
-            Fbx: fbx,
-            Obj: obj,
-            Glb: glb
+            License: command.license,
+            Name: command.name,
+            Description: command.description,
+            Price: command.price,
+            TypeIds: command.typeIds,
+            SoftwareIds: command.softwareIds,
+            // Images: (List<IFormFile>)form.Files.GetFiles("Files"),
+            // ModelMaterials: (List<IFormFile>)form.Files.GetFiles("ModelMaterialFiles"),
+            Images: command.files,
+            ModelMaterials: command.modelMaterialFiles,
+            Fbx: command.fbx,
+            Obj: command.obj,
+            Glb: command.glb
         ), cancellationToken);
         return result.Check();
     }
+
+    public record CreateProductCommand(
+        LicenseEnum license,
+        string name,
+        string description,
+        decimal price,
+        Guid[] typeIds,
+        Guid[] softwareIds,
+        string[] files,
+        string[] modelMaterialFiles,
+        string fbx,
+        string obj,
+        string glb
+    );
 }

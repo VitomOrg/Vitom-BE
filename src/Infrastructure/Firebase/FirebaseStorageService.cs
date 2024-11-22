@@ -26,22 +26,27 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
 
         // Uploading image to FireBase
         var objectName = $"images/{newName}";
-        var image = await _storageClient.UploadObjectAsync(BucketName, objectName, file.ContentType, stream);
+        var image = await _storageClient.UploadObjectAsync(
+            BucketName,
+            objectName,
+            file.ContentType,
+            stream,
+            new UploadObjectOptions { PredefinedAcl = PredefinedObjectAcl.PublicRead });
 
-        // Make the object publicly accessible
-        await _storageClient.UpdateObjectAsync(new Google.Apis.Storage.v1.Data.Object
-        {
-            Bucket = BucketName,
-            Name = objectName,
-            Acl =
-            [
-                new Google.Apis.Storage.v1.Data.ObjectAccessControl
-                {
-                    Entity = "allUsers",
-                    Role = "READER"
-                }
-            ]
-        });
+        // // Make the object publicly accessible
+        // await _storageClient.UpdateObjectAsync(new Google.Apis.Storage.v1.Data.Object
+        // {
+        //     Bucket = BucketName,
+        //     Name = objectName,
+        //     Acl =
+        //     [
+        //         new Google.Apis.Storage.v1.Data.ObjectAccessControl
+        //         {
+        //             Entity = "allUsers",
+        //             Role = "READER"
+        //         }
+        //     ]
+        // });
 
         // Construct and return the public URL for the uploaded image
         var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
@@ -63,22 +68,12 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
 
         // Uploading image to FireBase
         var objectName = $"images/{folderSave}/{newName}";
-        var image = await _storageClient.UploadObjectAsync(BucketName, objectName, file.ContentType, stream);
-
-        // Make the object publicly accessible
-        await _storageClient.UpdateObjectAsync(new Google.Apis.Storage.v1.Data.Object
-        {
-            Bucket = BucketName,
-            Name = objectName,
-            Acl =
-            [
-                new Google.Apis.Storage.v1.Data.ObjectAccessControl
-                {
-                    Entity = "allUsers",
-                    Role = "READER"
-                }
-            ]
-        });
+        var image = await _storageClient.UploadObjectAsync(
+            BucketName,
+            objectName,
+            file.ContentType,
+            stream,
+            new UploadObjectOptions { PredefinedAcl = PredefinedObjectAcl.PublicRead });
 
         // Construct and return the public URL for the uploaded image
         var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";
@@ -110,48 +105,64 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
         }
     }
 
-    public async Task<string> UploadFiles(List<IFormFile> files, string folderSave)
+    public async Task<string> UploadFiles(List<string> files, string folderSave)
     {
         var randomGuid = Guid.NewGuid();
-        Stream[] fileStreams = files.Select(f => f.OpenReadStream()).ToArray();
+        var httpClient = new HttpClient();
+
         // Create a memory stream to hold the zip file
         MemoryStream zipMemoryStream = new();
 
         // Create the zip archive in the memory stream
         using (ZipArchive archive = new(zipMemoryStream, ZipArchiveMode.Create, true))
         {
-            for (int i = 0; i < fileStreams.Length; i++)
+            for (int i = 0; i < files.Count; i++)
             {
                 // Add each file to the zip archive
-                ZipArchiveEntry zipEntry = archive.CreateEntry(files[i].FileName);
+                ZipArchiveEntry zipEntry = archive.CreateEntry(Path.GetFileName(files[i]));
 
                 using (Stream entryStream = zipEntry.Open())
                 {
                     // Copy the file stream to the zip entry
-                    fileStreams[i].CopyTo(entryStream);
+                    var response = await httpClient.GetAsync(files[i]);
+                    response.EnsureSuccessStatusCode();
+
+                    await response.Content.CopyToAsync(entryStream);
                 }
             }
         }
+
+        // var randomGuid = Guid.NewGuid();
+        // Stream[] fileStreams = files.Select(f => f.OpenReadStream()).ToArray();
+        // // Create a memory stream to hold the zip file
+        // MemoryStream zipMemoryStream = new();
+
+        // // Create the zip archive in the memory stream
+        // using (ZipArchive archive = new(zipMemoryStream, ZipArchiveMode.Create, true))
+        // {
+        //     for (int i = 0; i < fileStreams.Length; i++)
+        //     {
+        //         // Add each file to the zip archive
+        //         ZipArchiveEntry zipEntry = archive.CreateEntry(files[i].FileName);
+
+        //         using (Stream entryStream = zipEntry.Open())
+        //         {
+        //             // Copy the file stream to the zip entry
+        //             fileStreams[i].CopyTo(entryStream);
+        //         }
+        //     }
+        // }
+
         // Reset the position of the memory stream to the beginning before returning it
         zipMemoryStream.Seek(0, SeekOrigin.Begin);
         // Uploading image to FireBase
         var objectName = $"images/{folderSave}/DownloadProduct-{randomGuid}.zip";
-        var image = await _storageClient.UploadObjectAsync(BucketName, objectName, "application/zip", zipMemoryStream);
-
-        // Make the object publicly accessible
-        await _storageClient.UpdateObjectAsync(new Google.Apis.Storage.v1.Data.Object
-        {
-            Bucket = BucketName,
-            Name = objectName,
-            Acl =
-            [
-                new Google.Apis.Storage.v1.Data.ObjectAccessControl
-                {
-                    Entity = "allUsers",
-                    Role = "READER"
-                }
-            ]
-        });
+        var image = await _storageClient.UploadObjectAsync(
+            BucketName,
+            objectName,
+            "application/zip",
+            zipMemoryStream,
+            new UploadObjectOptions { PredefinedAcl = PredefinedObjectAcl.PublicRead });
 
         // Construct and return the public URL for the uploaded image
         var publicUrl = $"https://storage.googleapis.com/{BucketName}/{objectName}";

@@ -10,5 +10,5 @@ public interface IFirebaseService
 
     Task<bool> DeleteFile(string imageUrl);
 
-    Task<string> UploadFiles(List<IFormFile> files, string folderSave);
+    Task<string> UploadFiles(List<string> files, string folderSave);
 }
