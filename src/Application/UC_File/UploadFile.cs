@@ -12,7 +12,7 @@ public class UploadFile
 {
     public record Command(FileEnum FileEnum, IFormFile File) : IRequest<Result<string>>;
 
-    public class Handler(IFirebaseService firebaseService, CurrentUser currentUser) : IRequestHandler<Command, Result<string>>
+    public class Handler(IFirebaseService firebaseService) : IRequestHandler<Command, Result<string>>
     {
         public async Task<Result<string>> Handle(Command request, CancellationToken cancellationToken)
         {
