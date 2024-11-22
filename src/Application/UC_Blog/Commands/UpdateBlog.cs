@@ -16,7 +16,7 @@ public class UpdateBlog
         Guid Id,
         string Title,
         string Content,
-        IFormFileCollection Images
+        string[] Images
     ) : IRequest<Result<UpdateBlogResponse>>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser, IFirebaseService firebaseService) : IRequestHandler<Command, Result<UpdateBlogResponse>>
@@ -34,12 +34,6 @@ public class UpdateBlog
             if (updatingBlog is null) return Result.NotFound();
             // check if user is owner
             if (!updatingBlog.UserId.Equals(currentUser.User.Id)) return Result.Forbidden();
-            // upload images 
-            List<Task<string>> tasks = [];
-            foreach (var image in request.Images)
-            {
-                tasks.Add(firebaseService.UploadFile(image.FileName, image, "blogs"));
-            }
             // update the blog
             updatingBlog.Update(
                 title: request.Title,
@@ -56,10 +50,8 @@ public class UpdateBlog
             }
             await Task.WhenAll(deleteTasks);
             if (deleteTasks.Any(t => !t.Result)) return Result.Error("Delete images failed");
-            // AWAIT get image urls
-            string[] urls = await Task.WhenAll(tasks);
             // add new images
-            await context.BlogImages.AddRangeAsync(urls
+            await context.BlogImages.AddRangeAsync(request.Images
                 .Select(url => new BlogImage
                 {
                     Url = url,
@@ -70,7 +62,7 @@ public class UpdateBlog
             // save to db
             await context.SaveChangesAsync(cancellationToken);
             // return result
-            return Result.Success(new UpdateBlogResponse(urls), "Update blog successfully");
+            return Result.Success(new UpdateBlogResponse(request.Images), "Update blog successfully");
         }
     }
 }

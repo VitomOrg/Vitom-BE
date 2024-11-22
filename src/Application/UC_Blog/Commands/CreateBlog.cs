@@ -17,7 +17,7 @@ public class CreateBlog
     public record Command(
         string Title,
         string Content,
-        IFormFileCollection Images
+        string[] Images
     ) : IRequest<Result<CreateBlogResponses>>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser, IFirebaseService firebaseService) : IRequestHandler<Command, Result<CreateBlogResponses>>
@@ -33,13 +33,7 @@ public class CreateBlog
                 Content = request.Content,
                 UserId = currentUser.User.Id,
             };
-            List<Task<string>> tasks = [];
-            foreach (var image in request.Images)
-            {
-                tasks.Add(firebaseService.UploadFile(image.FileName, image, "blogs"));
-            }
-            string[] imageUrls = await Task.WhenAll(tasks);
-            newBlog.Images = imageUrls.Select(i => new BlogImage()
+            newBlog.Images = request.Images.Select(i => new BlogImage()
             {
                 Url = i,
                 BlogId = newBlog.Id
