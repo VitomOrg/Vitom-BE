@@ -22,11 +22,11 @@ public class UpdateProduct
         decimal Price,
         Guid[] TypeIds,
         Guid[] SoftwareIds,
-        List<IFormFile> Images,
-        List<IFormFile> ModelMaterials,
-        IFormFile Fbx,
-        IFormFile Obj,
-        IFormFile Glb
+        string[] Images,
+        string[] ModelMaterials,
+        string Fbx,
+        string Obj,
+        string Glb
     ) : IRequest<Result>;
 
     public class Handler(IVitomDbContext context, CurrentUser currentUser, IFirebaseService firebaseService) : IRequestHandler<Command, Result>
@@ -57,6 +57,7 @@ public class UpdateProduct
             tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Fbx));
             tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Obj));
             tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Glb));
+            tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.DownloadUrl));
             await Task.WhenAll(tasksDelete);
             if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete model files failed");
 
@@ -81,41 +82,26 @@ public class UpdateProduct
                 context.ProductSoftwares.Add(new ProductSoftware { ProductId = updatingProduct.Id, SoftwareId = software.Id });
             }
             // images - add product images
-            List<Task<string>> tasks = [];
-            // upload images
-            foreach (var image in request.Images)
-            {
-                tasks.Add(firebaseService.UploadFile(image.FileName, image, "products"));
-            }
-            // await all tasks are finished
-            string[] imageUrls = await Task.WhenAll(tasks);
-            foreach (var imageUrl in imageUrls)
-            {
-                context.ProductImages.Add(new ProductImage { ProductId = updatingProduct.Id, Url = imageUrl });
-            }
+            context.ProductImages.AddRange(
+                request.Images.Select(
+                    imageUrl => new ProductImage
+                    {
+                        ProductId = updatingProduct.Id,
+                        Url = imageUrl
+                    }));
             // model materials - add product model materials
-            List<Task<string>> tasksModelMaterials = [];
-            // upload model materials
-            foreach (var modelMaterial in request.ModelMaterials)
-            {
-                tasksModelMaterials.Add(firebaseService.UploadFile(modelMaterial.FileName, modelMaterial, "model-materials"));
-            }
-            // await all tasks are finished
-            string[] modelMaterialUrls = await Task.WhenAll(tasksModelMaterials);
-            foreach (var modelMaterialUrl in modelMaterialUrls)
-            {
-                context.ModelMaterials.Add(new ModelMaterial { ProductId = updatingProduct.Id, Url = modelMaterialUrl });
-            }
+            context.ModelMaterials.AddRange(
+                request.ModelMaterials.Select(
+                    modelMaterialUrl => new ModelMaterial
+                    {
+                        ProductId = updatingProduct.Id,
+                        Url = modelMaterialUrl
+                    }));
             // Add model files
-            List<Task<string>> modelTasks = [];
-            modelTasks.Add(firebaseService.UploadFile(request.Fbx.FileName, request.Fbx, "models"));
-            modelTasks.Add(firebaseService.UploadFile(request.Obj.FileName, request.Obj, "models"));
-            modelTasks.Add(firebaseService.UploadFile(request.Glb.FileName, request.Glb, "models"));
-            string[] modelUrls = await Task.WhenAll(modelTasks);
             updatingProduct.Model.Update(
-                modelUrls[0],
-                modelUrls[1],
-                modelUrls[2]
+                request.Fbx,
+                request.Obj,
+                request.Glb
             );
             //update product
             updatingProduct.Update(
@@ -124,6 +110,15 @@ public class UpdateProduct
                 description: request.Description,
                 price: request.Price
             );
+            // await for zip uploads
+            List<string> zipFiles =
+            [
+                .. request.Images,
+                .. request.ModelMaterials,
+                .. new[] { request.Fbx, request.Obj, request.Glb },
+            ];
+            string zipUrl = await firebaseService.UploadFiles(zipFiles, "download-zip-product");
+            updatingProduct.DownloadUrl = zipUrl;
             updatingProduct.AddDomainEvent(new EntityUpdated.Event("product"));
             //save to db
             await context.SaveChangesAsync(cancellationToken);
@@ -140,17 +135,11 @@ public class UpdateProduct
             RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
             RuleFor(x => x.Price).GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative number")
                 .Must(HaveValidDecimalPlaces).WithMessage("Price must have up to two decimal places");
-            RuleFor(x => x.Images)
-                .Must(HaveValidFiles)
-                .WithMessage("Each ImageUrl must be a valid URL");
             RuleFor(x => x.Fbx)
-                .Must(HaveValidFile).WithMessage("Fbx file must be a valid file")
                 .Must(BeFbxFile).WithMessage("Fbx file must be a Fbx file");
             RuleFor(x => x.Obj)
-                .Must(HaveValidFile).WithMessage("Obj file must be a valid file")
                 .Must(BeObjFile).WithMessage("Obj file must be a obj file");
             RuleFor(x => x.Glb)
-                .Must(HaveValidFile).WithMessage("Glb file must be a valid file")
                 .Must(BeGlbFile).WithMessage("Glb file must be a glb file");
         }
 
@@ -160,19 +149,13 @@ public class UpdateProduct
             return decimal.Round(price, 2) == price;
         }
 
-        private bool HaveValidFiles(List<IFormFile> images)
-            => images.All(image => image.Length < 10240000);
+        private bool BeGlbFile(string fileName)
+            => fileName.ToLower().EndsWith(".glb");
 
-        private bool HaveValidFile(IFormFile file)
-            => file.Length < 10240000;
+        private bool BeObjFile(string fileName)
+            => fileName.ToLower().EndsWith(".obj");
 
-        private bool BeGlbFile(IFormFile formFile)
-            => formFile.FileName.ToLower().EndsWith(".glb");
-
-        private bool BeObjFile(IFormFile formFile)
-            => formFile.FileName.ToLower().EndsWith(".obj");
-
-        private bool BeFbxFile(IFormFile formFile)
-            => formFile.FileName.ToLower().EndsWith(".fbx");
+        private bool BeFbxFile(string fileName)
+            => fileName.ToLower().EndsWith(".fbx");
     }
 }
