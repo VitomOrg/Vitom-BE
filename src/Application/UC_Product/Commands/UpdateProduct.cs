@@ -52,19 +52,41 @@ public class UpdateProduct
             //remove all current relationships
             context.ProductTypes.RemoveRange(updatingProduct.ProductTypes);
             context.ProductSoftwares.RemoveRange(updatingProduct.ProductSoftwares);
-            //remove model files in firebase directory
+            context.ProductImages.RemoveRange(updatingProduct.ProductImages);
+            context.ModelMaterials.RemoveRange(updatingProduct.ModelMaterials);
+            //remove files in firebase directory
+            IEnumerable<ProductImage> unusedImages = [.. context.ProductImages
+                .AsNoTracking()
+                .Where(pi => pi.ProductId.Equals(updatingProduct.Id))
+                .Where(pi => !request.Images.Contains(pi.Url))];
             List<Task<bool>> tasksDelete = [];
-            tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Fbx));
-            tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Obj));
-            tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Glb));
+            foreach (var productImage in unusedImages)
+            {
+                tasksDelete.Add(firebaseService.DeleteFile(productImage.Url));
+            }
+            IEnumerable<ModelMaterial> unusedModelMaterials = [.. context.ModelMaterials
+                .AsNoTracking()
+                .Where(mm => mm.ProductId.Equals(updatingProduct.Id))
+                .Where(mm => !request.ModelMaterials.Contains(mm.Url))];
+            foreach (var modelMaterial in unusedModelMaterials)
+            {
+                tasksDelete.Add(firebaseService.DeleteFile(modelMaterial.Url));
+            }
+            if (request.Fbx != updatingProduct.Model.Fbx)
+                tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Fbx));
+            if (request.Obj != updatingProduct.Model.Obj)
+                tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Obj));
+            if (request.Glb != updatingProduct.Model.Glb)
+                tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.Model.Glb));
             tasksDelete.Add(firebaseService.DeleteFile(updatingProduct.DownloadUrl));
             await Task.WhenAll(tasksDelete);
             if (tasksDelete.Any(t => !t.Result)) return Result.Error("Delete model files failed");
 
             //check product types are existed
             IEnumerable<Type> checkingTypes = context.Types
-                                                    .Where(t => t.DeletedAt == null)
-                                                    .Where(t => request.TypeIds.Contains(t.Id));
+                .AsNoTracking()
+                .Where(t => t.DeletedAt == null)
+                .Where(t => request.TypeIds.Contains(t.Id));
             if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound("Some types are not found");
             // types - add product types
             foreach (Type type in checkingTypes)
@@ -73,8 +95,9 @@ public class UpdateProduct
             }
             //check product softwares are existed
             IEnumerable<Software> checkingSoftwares = context.Softwares
-                                                            .Where(s => s.DeletedAt == null)
-                                                            .Where(s => request.SoftwareIds.Contains(s.Id));
+                .AsNoTracking()
+                .Where(s => s.DeletedAt == null)
+                .Where(s => request.SoftwareIds.Contains(s.Id));
             if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound("Some softwares are not found");
             // softwares - add product softwares
             foreach (Software software in checkingSoftwares)

@@ -125,7 +125,11 @@ public class FirebaseStorageService(StorageClient storageClient) : IFirebaseServ
                 {
                     // Copy the file stream to the zip entry
                     var response = await httpClient.GetAsync(files[i]);
-                    response.EnsureSuccessStatusCode();
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Error uploading file: {response.StatusCode}, {errorContent}");
+                    }
 
                     await response.Content.CopyToAsync(entryStream);
                 }
