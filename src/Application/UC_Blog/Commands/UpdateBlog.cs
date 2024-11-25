@@ -43,8 +43,12 @@ public class UpdateBlog
             if (updatingBlog.Images.Count > 0)
                 context.BlogImages.RemoveRange(updatingBlog.Images);
             //remove images from firebase
+            IEnumerable<BlogImage> unusedBlogImages = context.BlogImages
+                .AsNoTracking()
+                .Where(bi => bi.BlogId.Equals(updatingBlog.Id))
+                .Where(bi => !request.Images.Contains(bi.Url));
             List<Task<bool>> deleteTasks = [];
-            foreach (var image in updatingBlog.Images)
+            foreach (var image in unusedBlogImages)
             {
                 deleteTasks.Add(firebaseService.DeleteFile(image.Url));
             }

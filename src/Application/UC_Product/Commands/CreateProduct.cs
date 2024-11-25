@@ -37,7 +37,7 @@ public class CreateProduct
         {
             // check if user is Organization
             if (!currentUser.User!.IsOrganization() || currentUser.User.DeletedAt != null) return Result.Forbidden();
-            if (context.Products.Any(p => EF.Functions.Like(p.Name, $"%{request.Name}%"))) return Result.Error("Product name already exists");
+            if (context.Products.Any(p => p.Name.Trim().ToLower() == request.Name.Trim().ToLower())) return Result.Error("Product name already exists");
             // init new product object
             Product newProduct = new()
             {
@@ -52,11 +52,13 @@ public class CreateProduct
             //check product types are existed
             IEnumerable<Type> checkingTypes =
                 context.Types
+                .AsNoTracking()
                 .Where(t => t.DeletedAt == null)
                 .Where(t => request.TypeIds.Contains(t.Id));
             if (checkingTypes.Count() != request.TypeIds.Length) return Result.NotFound("Some types are not found");
             //check product softwares are existed
             IEnumerable<Software> checkingSoftwares = context.Softwares
+                .AsNoTracking()
                 .Where(s => s.DeletedAt == null)
                 .Where(s => request.SoftwareIds.Contains(s.Id));
             if (checkingSoftwares.Count() != request.SoftwareIds.Length) return Result.NotFound("Some softwares are not found");

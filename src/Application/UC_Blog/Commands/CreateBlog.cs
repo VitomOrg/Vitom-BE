@@ -20,7 +20,7 @@ public class CreateBlog
         string[] Images
     ) : IRequest<Result<CreateBlogResponses>>;
 
-    public class Handler(IVitomDbContext context, CurrentUser currentUser, IFirebaseService firebaseService) : IRequestHandler<Command, Result<CreateBlogResponses>>
+    public class Handler(IVitomDbContext context, CurrentUser currentUser) : IRequestHandler<Command, Result<CreateBlogResponses>>
     {
         public async Task<Result<CreateBlogResponses>> Handle(Command request, CancellationToken cancellationToken)
         {
