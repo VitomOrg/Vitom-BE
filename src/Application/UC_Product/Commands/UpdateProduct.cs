@@ -146,7 +146,7 @@ public class UpdateProduct
             //save to db
             await context.SaveChangesAsync(cancellationToken);
             //return final result
-            return Result.NoContent();
+            return Result.SuccessWithMessage("Update product successfully");
         }
     }
 
