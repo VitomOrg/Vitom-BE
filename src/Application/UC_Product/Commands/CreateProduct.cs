@@ -37,7 +37,9 @@ public class CreateProduct
         {
             // check if user is Organization
             if (!currentUser.User!.IsOrganization() || currentUser.User.DeletedAt != null) return Result.Forbidden();
-            if (context.Products.Any(p => p.Name.Trim().ToLower() == request.Name.Trim().ToLower())) return Result.Error("Product name already exists");
+            if (context.Products.Any(p => p.DeletedAt == null
+            && p.Name.Trim().ToLower() == request.Name.Trim().ToLower()))
+                return Result.Error("Product name already exists");
             // init new product object
             Product newProduct = new()
             {
