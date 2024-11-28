@@ -2,11 +2,9 @@ using Application.Caches.Events;
 using Application.Contracts;
 using Ardalis.Result;
 using Domain.Entities;
-using Domain.Enums;
 using Domain.Primitives;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Type = Domain.Entities.Type;
 
@@ -16,7 +14,6 @@ public class UpdateProduct
 {
     public record Command(
         Guid Id,
-        LicenseEnum License,
         string Name,
         string Description,
         decimal Price,
@@ -128,7 +125,7 @@ public class UpdateProduct
             );
             //update product
             updatingProduct.Update(
-                license: request.License,
+                license: request.Price != 0 ? Domain.Enums.LicenseEnum.Pro : Domain.Enums.LicenseEnum.Free,
                 name: request.Name,
                 description: request.Description,
                 price: request.Price
@@ -154,7 +151,6 @@ public class UpdateProduct
     {
         public Validator()
         {
-            RuleFor(x => x.License).IsInEnum().WithMessage("License must be 0, 1, Free, or Pro");
             RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
             RuleFor(x => x.Price).GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative number")
                 .Must(HaveValidDecimalPlaces).WithMessage("Price must have up to two decimal places");

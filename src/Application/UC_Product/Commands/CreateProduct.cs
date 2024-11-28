@@ -4,11 +4,9 @@ using Application.Mappers.ProductMappers;
 using Application.Responses.ProductResponses;
 using Ardalis.Result;
 using Domain.Entities;
-using Domain.Enums;
 using Domain.Primitives;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Type = Domain.Entities.Type;
 
@@ -18,7 +16,6 @@ public class CreateProduct
 {
     public record Command
     (
-        LicenseEnum License,
         string Name,
         string Description,
         decimal Price,
@@ -44,7 +41,7 @@ public class CreateProduct
             Product newProduct = new()
             {
                 UserId = currentUser.User!.Id,
-                License = request.License,
+                License = request.Price != 0 ? Domain.Enums.LicenseEnum.Pro : Domain.Enums.LicenseEnum.Free,
                 Name = request.Name,
                 Description = request.Description,
                 Price = request.Price,
@@ -230,7 +227,6 @@ public class CreateProduct
     {
         public Validator()
         {
-            RuleFor(x => x.License).IsInEnum().WithMessage("License must be 0, 1, Free, or Pro");
             RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
             RuleFor(x => x.Price).GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative number")
                 .Must(HaveValidDecimalPlaces).WithMessage("Price must have at most two decimal places");
