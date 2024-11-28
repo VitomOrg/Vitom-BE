@@ -17,7 +17,6 @@ public class UpdateProductEndpointHandler
     {
         Result result = await sender.Send(new UpdateProduct.Command(
             Id: id,
-            License: command.license,
             Name: command.name,
             Description: command.description,
             Price: command.price,
@@ -33,7 +32,6 @@ public class UpdateProductEndpointHandler
     }
 
     public record UpdateProductCommand(
-        LicenseEnum license,
         string name,
         string description,
         decimal price,

@@ -36,7 +36,6 @@ public class CreateProductEndpointHandler
     }
 
     public record CreateProductCommand(
-        LicenseEnum license,
         string name,
         string description,
         decimal price,
