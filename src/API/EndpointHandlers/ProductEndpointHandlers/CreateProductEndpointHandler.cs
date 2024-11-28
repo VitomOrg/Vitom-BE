@@ -19,7 +19,6 @@ public class CreateProductEndpointHandler
     {
         // var form = await httpContext.Request.ReadFormAsync(cancellationToken);
         Result<CreateProductResponse> result = await sender.Send(new CreateProduct.Command(
-            License: command.license,
             Name: command.name,
             Description: command.description,
             Price: command.price,
