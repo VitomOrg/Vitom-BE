@@ -1,6 +1,5 @@
 using Domain.Enums;
 using Domain.Primitives;
-using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entities;
 

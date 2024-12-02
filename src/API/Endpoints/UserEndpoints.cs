@@ -12,6 +12,10 @@ public static class UserEndpoints
             .MapGet("", GetUserRoleEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get current users Role"))
             .RequireAuthorization();
+
+        group
+            .MapGet("/all", GetAllUsersEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get all users"));
         // PUT
         group.MapPut("/artist", AssignUserToArtistEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Assign user to artist"))
